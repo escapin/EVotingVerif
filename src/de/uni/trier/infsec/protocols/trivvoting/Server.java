@@ -40,6 +40,10 @@ public class Server {
 	 * Compute and return the result of the election. The result is formatted as a byte-string.
 	 */
 	public byte[] getResult() {
+		// Declassification assignments:
+		votesForA = PassiveAdvSetup.correctResult.votesForA; // added to make it explicit that votesForA and votesForB depend
+		votesForB = PassiveAdvSetup.correctResult.votesForB; // only on low variables (corresponding equalities are checked by KeY).
+
 		byte[] result =  MessageTools.concatenate(
 							MessageTools.intToByteArray(votesForA),
 							MessageTools.intToByteArray(votesForB));
