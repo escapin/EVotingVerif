@@ -40,6 +40,10 @@ public class Server {
 	 * Compute and return the result of the election. The result is formatted as a byte-string.
 	 */
 	public byte[] getResult() {
+		// PROVE THAT:
+		// votesForA == PassiveAdvSetup.correctResult.votesForA;
+		// votesForB == PassiveAdvSetup.correctResult.votesForB;
+
 		byte[] result =  MessageTools.concatenate(
 							MessageTools.intToByteArray(votesForA),
 							MessageTools.intToByteArray(votesForB));
