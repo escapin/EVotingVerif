@@ -76,8 +76,20 @@ public class PassiveAdvSetup {
 	/*
 	 * Compute the correct result from a vector of voters' choices
 	 */
-	public static Result result(byte[] choices) {
+	/*@ normal_behavior
+      @     ensures     \result.votesForA == (\sum int i; 0 <= i && i < choices.length; (choices[i] == 0) ? 1 : 0);
+      @     ensures     \result.votesForB == (\sum int i; 0 <= i && i < choices.length; (choices[i] == 1) ? 1 : 0);
+      @     ensures     \fresh(\result);
+      @     assignable  \nothing;
+      @*/
+    public /*@ helper */ static Result result(byte[] choices) {
 		Result result = new Result();
+        /*@ loop_invariant  0 <= i && i <= choices.length;
+          @ loop_invariant  result.votesForA == (\sum int j; 0 <= j && j < i; (choices[j] == 0) ? 1 : 0);
+          @ loop_invariant  result.votesForB == (\sum int j; 0 <= j && j < i; (choices[j] == 1) ? 1 : 0);
+          @ assignable      result.votesForA, result.votesForB;
+          @ decreases       choices.length - i;
+          @*/
 		for( int i=0; i<choices.length; ++i ) {
 			int candidate = choices[i];
 			if (candidate==0) result.votesForA++;
