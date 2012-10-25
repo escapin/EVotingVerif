@@ -1,8 +1,8 @@
 ### This Makefile does _not_ build the project,
 ### but produces stub files for KeY.
 
-STUBMAKER_PATH=~/Programs/key-tools/stubmaker
-JAVART_PATH=/usr/lib64/jvm/jre-1.6.0-openjdk/lib
+STUBMAKER_PATH=~/workspace/key-tools/stubmaker
+JAVART_PATH=/usr/lib/jvm/java-6-sun/jre/lib
 
 all:	stubs
 
@@ -11,9 +11,8 @@ all:	stubs
 stubs:	FILES
 	@echo "Producing stubs for verification with KeY..."
 	@java -jar $(STUBMAKER_PATH)/stubmaker.jar \
-	-hideType float -hideType double \
 	-expand -list FILES -d stubs \
-	lib/bcprov-jdk16-146.jar \
+	-hideType float -hideType double \
 	$(JAVART_PATH)/rt.jar \
 	$(JAVART_PATH)/jce.jar \
 	> stubmaker.log
