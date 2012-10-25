@@ -14,7 +14,10 @@ public class Server {
 	private boolean[] ballotCast = new boolean[NumberOfVoters];  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private int votesForA = 0;
 	private int votesForB = 0;
-	private Decryptor serverDecr = null;
+	private /*@ nullable @*/ Decryptor serverDecr = null;
+	
+	
+	//@ invariant ballotCast.length == NumberOfVoters;
 
 	public Server(Decryptor serverDecr ) {
 		this.serverDecr = serverDecr;
@@ -25,12 +28,20 @@ public class Server {
 	/*
 	 * Collect a ballot from the voter identified by voterID. 
 	 */
+	/*@ normal_behavior
+	  @   requires ballot.length == NumberOfVoters;
+	  @   requires 0 <= voterID && voterID < NumberOfVoters;
+	  @   requires !ballotCast[voterID];
+	  @   ensures ballotCast[voterID];
+	  @   ensures ballot[voterID] == 0 ==> votesForA == \old(votesForA)+1;
+      @   ensures ballot[voterID] == 1 ==> votesForB == \old(votesForB)+1;
+      @   assignable ballotCast[voterID], votesForA, votesForB;
+	  @*/
 	public void collectBallot(int voterID, byte[] ballot) {
 		if( voterID<0 || voterID>=NumberOfVoters ) return;  // invalid  voter ID
 		if( ballotCast[voterID] ) return;  // the voter has already voted
 		ballotCast[voterID] = true; 
-		if( ballot==null || ballot.length!=1 ) return;  // malformed ballot
-		int candidate = ballot[0];
+		int candidate = ballot[voterID];
 		if (candidate==0) ++votesForA;
 		if (candidate==1) ++votesForB;
 		// all the remaining values are consider invalid
