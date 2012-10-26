@@ -41,12 +41,16 @@ public class Server {
 	 */
 	public byte[] getResult() {
 		// Declassification assignments:
-		votesForA = PassiveAdvSetup.correctResult.votesForA; // added to make it explicit that votesForA and votesForB depend
-		votesForB = PassiveAdvSetup.correctResult.votesForB; // only on low variables (corresponding equalities are checked by KeY).
+		int votesForA = PassiveAdvSetup.correctResult.votesForA; // added to make it explicit that votesForA and votesForB depend
+		int votesForB = PassiveAdvSetup.correctResult.votesForB; // only on low variables (corresponding equalities are checked by KeY).
 
 		byte[] result =  MessageTools.concatenate(
 							MessageTools.intToByteArray(votesForA),
 							MessageTools.intToByteArray(votesForB));
+		
+		this.votesForA = votesForA;
+		this.votesForB = votesForB;
+		
 		return result;
 	}
 }
