@@ -1,0 +1,14 @@
+Joana Verification Progress - Juergen Graf <graf@kit.edu>
+---------------------------------------------------------
+
+1. commit 67be6a0247c7b379a93b569c5512ff1630ce25bf
+
+Convert to Java 1.4, because runtime libraries are far smaller and thus our whole-program analysis runs faster and is more precise, because less overappproximations are needed.
+
+2. First verification attempt shows multiple security leaks. We traced them back to the array reference of voiterChoices beein tainted.
+
+3. commit 9f23c5b404d75c79809ed39a2d9e6a93be91c7d8
+
+Explicitely copy values of the voterChoices(1|2) arrays, because simply switching array references due to secret information also taints the array base pointer in our approach. But the secret information is not where the array is stored in memory, only  which values it holds.
+
+4. A single security leak is found, as the result contains direct information about the voterChoice value. As we cannot reason about values itself, we are not aware, that in both possible cases the actual value would be the same. We only observe that the value is used and thus assume an illegal flow.
