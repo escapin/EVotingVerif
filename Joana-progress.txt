@@ -1,14 +1,35 @@
 Joana Verification Progress - Juergen Graf <graf@kit.edu>
 ---------------------------------------------------------
 
-1. commit 67be6a0247c7b379a93b569c5512ff1630ce25bf
+1. commit ca6b1d829692188c0c6717e8898f4119250414e7
 
-Convert to Java 1.4, because runtime libraries are far smaller and thus our whole-program analysis runs faster and is more precise, because less overappproximations are needed.
+Convert to Java 1.4, because runtime libraries are far smaller and thus our
+whole-program analysis runs faster and is more precise, because less over-
+appproximations are needed.
 
-2. First verification attempt shows multiple security leaks. We traced them back to the array reference of voiterChoices beein tainted.
+2. First verification attempt shows multiple security leaks. We traced them
+back to the array reference of voiterChoices being tainted. Because of
+possible NullPointerExceptions and IndexOutOfBoundsExceptions illegal flow is
+detected.
 
-3. commit 9f23c5b404d75c79809ed39a2d9e6a93be91c7d8
+3. commit a7e0721f61a941cbfc80d404ecec7b306f7a5c67
 
-Explicitely copy values of the voterChoices(1|2) arrays, because simply switching array references due to secret information also taints the array base pointer in our approach. But the secret information is not where the array is stored in memory, only  which values it holds.
+Explicitly copy values of the voterChoices(1|2) arrays, because simply
+switching array references due to secret information also taints the array
+base pointer in our approach. But the secret information is not where the
+array is stored in memory, only  which values it holds.
 
-4. A single security leak is found, as the result contains direct information about the voterChoice value. As we cannot reason about values itself, we are not aware, that in both possible cases the actual value would be the same. We only observe that the value is used and thus assume an illegal flow.
+4. A single security leak is found, as the result contains about
+Server.votesForA and Server.votesForB. The killing definitions in line 44f
+could not be detected, thus we assume that both members are still tainted.
+
+We propose 2 solutions: 
+  4.1. Improve detection of killing definitions.
+       (We started working in this issue by now)
+  4.2. Change code of getResult, to make use of correctResult.votesFor(A|B)
+       more explicit. (See next step)
+
+5. commit 768a6738a3befa71916f082b018b7b21b257b3a7
+
+After changing the code as proposed in 4.2 we can verify noninterference for this program.
+
