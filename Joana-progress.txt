@@ -33,3 +33,26 @@ We propose 2 solutions:
 
 After changing the code as proposed in 4.2 we can verify noninterference for this program.
 
+6. commit 5cbc222583d9ab6f03b7790620c5c44278c4d29c
+
+An improved analysis for local killing definitions enables Joana now to
+verify the non-interference of the original getResult() code from the master branch.
+
+ 1	public byte[] getResult() {
+ 2		// Declassification assignments:
+ 3		votesForA = PassiveAdvSetup.correctResult.votesForA;
+ 4		votesForB = PassiveAdvSetup.correctResult.votesForB;
+ 5
+ 6		byte[] result =  MessageTools.concatenate(
+ 7							MessageTools.intToByteArray(votesForA),
+ 8							MessageTools.intToByteArray(votesForB));
+ 9		
+10//		this.votesForA = votesForA;
+11//		this.votesForB = votesForB;
+12		
+13		return result;
+14	}
+
+We can now detect, that the read operations (votesFor(A|B)) in line 7 and 8 only
+depend on the values set in lines 3 and 4 and never on the values previously stored
+in both attributes.
