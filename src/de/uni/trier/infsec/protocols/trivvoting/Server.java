@@ -41,7 +41,8 @@ public class Server {
 		if( voterID<0 || voterID>=NumberOfVoters ) return;  // invalid  voter ID
 		if( ballotCast[voterID] ) return;  // the voter has already voted
 		ballotCast[voterID] = true; 
-		int candidate = ballot[voterID];
+		if( ballot==null || ballot.length!=1 ) return;  // malformed ballot
+		int candidate = ballot[0];
 		if (candidate==0) ++votesForA;
 		if (candidate==1) ++votesForB;
 		// all the remaining values are consider invalid
