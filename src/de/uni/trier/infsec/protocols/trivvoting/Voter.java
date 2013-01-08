@@ -1,23 +1,23 @@
 package de.uni.trier.infsec.protocols.trivvoting;
 
-import de.uni.trier.infsec.functionalities.pkenc.ideal.Encryptor;
+import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
 
 /*
- * Voter client for TivVoting.
+ * Voter client for TrivVoting.
  */
 public class Voter {
-	private Encryptor serverEnc = null;
+	private SAMT.Channel channel_to_server;
 
-	public Voter(Encryptor serverEnc) {
-		this.serverEnc = serverEnc;
+	public Voter(SAMT.Channel channel_to_server) {
+		this.channel_to_server = channel_to_server;
 	}
 
 	/*
-	 * Prepare and return (a bit-string representing) the ballot containing the
-	 * vote given as the argument.
+	 * Prepare the ballot containing the vote given as the argument and send it
+	 * through the secure channel to the server.
 	 */
-	public byte[] makeBallot(byte vote) {
+	public void onSendBallot(byte vote) {
 		byte [] ballot = new byte[] {vote};  // for now, the ballot is not even encrypted!
-		return ballot;
+		channel_to_server.send(ballot);
 	}
 }
