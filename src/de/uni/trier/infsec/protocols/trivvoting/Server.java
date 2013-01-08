@@ -61,6 +61,13 @@ public class Server {
 	public byte[] getResult() {
 		if (!resultReady()) return null; // the result is only returned when all the voters have voted
 
+		// PROVE THAT
+		// 		votesForA == HonestVotersSetup.CorrectResult.votesForA
+		// 		votesForB == HonestVotersSetup.CorrectResult.votesForB
+		// (this shows that the extension is conservative)
+		votesForA = HonestVotersSetup.CorrectResult.votesForA; // (hybrid approach extension)
+		votesForB = HonestVotersSetup.CorrectResult.votesForB; // (hybrid approach extension)
+
 		byte[] result =  MessageTools.concatenate(
 							MessageTools.intToByteArray(votesForA),
 							MessageTools.intToByteArray(votesForB));

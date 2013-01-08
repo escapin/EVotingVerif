@@ -21,13 +21,21 @@ public class HonestVotersSetup {
 	 * Objects representing a result of the e-voting process. For now, two candidates only.
 	 */
 	static class Result {
-		public int votesForA;
-		public int votesForB;
-		public Result() { votesForA=0; votesForB=0; }
+		public int votesForA = 0;
+		public int votesForB = 0;
+	}
+
+	/*
+	 * Class with static fields to store the correct result computed from the votes actually
+	 * used by the voters. This class plays the role of the class M from the hybrid approach,
+	 * as described in the paper.
+	 */
+	static class CorrectResult {
+		static public int votesForA = 0;
+		static public int votesForB = 0;
 	}
 
 	static private boolean secret;  // SECRET INPUT
-	static Result correctResult; 	// it will store the correct result computed from the votes actually used by the voters
 
 	public static void main(String[] args) throws NetworkError {
 
@@ -44,7 +52,8 @@ public class HonestVotersSetup {
 		Result result1 = result(voterChoices1);
 		Result result2 = result(voterChoices2);
 		if( !sameResults(result1,result2) ) return; // abort, if the result in not the same in both cases
-		correctResult = result1;
+		CorrectResult.votesForA = result1.votesForA; // (hybrid approach extension)
+		CorrectResult.votesForB = result1.votesForB; // (hybrid approach extension)
 
 		// now, one of the vectors of voters' choices given by the adversary is chosen
 		// to be used by the voters, depending on the value of the secret bit:
