@@ -80,8 +80,8 @@ public class HonestVotersSetup {
 		Voter[] voters = new Voter[Server.NumberOfVoters];
 		for( int i=0; i<Server.NumberOfVoters; ++i ) {
 			SAMT.AgentProxy voter_proxy = SAMT.register(i);
-			SAMT.Channel channel_from_client_to_server =  voter_proxy.channelTo(SERVER_ID);
-			voters[i] = new Voter(channel_from_client_to_server);
+			SAMT.Channel channel_from_voter_to_server =  voter_proxy.channelTo(SERVER_ID);
+			voters[i] = new Voter(channel_from_voter_to_server);
 		}
 
 		// Main loop -- the adversary decides how many times it runs and what to do in each step:
@@ -100,8 +100,7 @@ public class HonestVotersSetup {
 					break;
 
 			case 2: // send the result of the election (if ready) over the network
-					Network.networkOut(server.getResult());
-					break;
+					server.onSendResult();
 
 			case 3: // the adversary sends a message using its channel to the server
 					byte[] message = Environment.untrustedInputMessage();

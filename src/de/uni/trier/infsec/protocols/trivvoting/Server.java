@@ -1,5 +1,7 @@
 package de.uni.trier.infsec.protocols.trivvoting;
 
+import de.uni.trier.infsec.environment.network.Network;
+import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
 import de.uni.trier.infsec.utils.MessageTools;
 
@@ -28,6 +30,7 @@ public class Server {
 	 */
 	public void onCollectBallot() {
 		SAMT.AuthenticatedMessage am = samt_proxy.getMessage();
+		if (am==null) return;
 		int voterID = am.sender_id;
 		byte[] ballot = am.message;
 
@@ -45,21 +48,18 @@ public class Server {
 	 * Returns true if the result is ready, that is if all the eligible voters have already voted.
 	 */
 	public boolean resultReady() {
-		boolean ready = true;
 		for( int i=0; i<NumberOfVoters; ++i ) {
-			if( ! ballotCast[i] ) {
-				ready = false;
-				break;
-			}
+			if( !ballotCast[i] )
+				return false;
 		}
-		return ready;
+		return true;
 	}
 
 	/*
 	 * Compute and return the result of the election. The result is formatted as a byte-string.
 	 */
-	public byte[] getResult() {
-		if (!resultReady()) return null; // the result is only returned when all the voters have voted
+	public void onSendResult() throws NetworkError {
+		if (!resultReady()) return; // the result is only returned when all the voters have voted
 
 		// PROVE THAT
 		// 		votesForA == HonestVotersSetup.CorrectResult.votesForA
@@ -71,6 +71,6 @@ public class Server {
 		byte[] result =  MessageTools.concatenate(
 							MessageTools.intToByteArray(votesForA),
 							MessageTools.intToByteArray(votesForB));
-		return result;
+		Network.networkOut(result);
 	}
 }
