@@ -8,8 +8,8 @@ import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
 public class Voter {
 	private SAMT.Channel channel_to_server;
 
-	public Voter(SAMT.Channel channel_to_server) {
-		this.channel_to_server = channel_to_server;
+	public Voter(SAMT.AgentProxy voter_proxy) {
+		this.channel_to_server = voter_proxy.channelTo(HonestVotersSetup.SERVER_ID);
 	}
 
 	/*
@@ -20,4 +20,5 @@ public class Voter {
 		byte [] ballot = new byte[] {vote};  // for now, the ballot is not even encrypted!
 		channel_to_server.send(ballot);
 	}
+
 }

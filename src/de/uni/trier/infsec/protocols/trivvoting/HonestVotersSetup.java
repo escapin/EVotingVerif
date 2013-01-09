@@ -36,6 +36,10 @@ public class HonestVotersSetup {
 
 	static private boolean secret;  // SECRET INPUT
 
+	static final int SERVER_ID = -1;
+	static final int BULLETIN_BOARD_ID = -2;
+	static final int ADVERSARY_ID = -3;
+
 	public static void main(String[] args) throws NetworkError {
 
 		// DETERMINE THE VOTERS' CHOICES
@@ -65,26 +69,30 @@ public class HonestVotersSetup {
 
 		// SET UP THE SYSTEM AND RUN IT
 
+		// Register and create the bulletin board:
+		SAMT.AgentProxy BB_proxy = SAMT.register(BULLETIN_BOARD_ID);
+		BulletinBoard BB = new BulletinBoard(BB_proxy);
+
 		// Register and create the server:
-		final int SERVER_ID = -1;
 		SAMT.AgentProxy server_proxy = SAMT.register(SERVER_ID);
 		Server server = new Server(server_proxy);
 
 		// Register the adversary, i.e. register an SMTP agent and a channel from this agent to the server
 		// that can be used by the adversary.
-		SAMT.AgentProxy adversary_proxy = SAMT.register(-2);
+		SAMT.AgentProxy adversary_proxy = SAMT.register(ADVERSARY_ID);
 		SAMT.Channel channel_from_adversary_to_server = adversary_proxy.channelTo(SERVER_ID);
+		SAMT.Channel channel_from_adversary_to_BB = adversary_proxy.channelTo(BULLETIN_BOARD_ID);
 
 		// Register and create the voters
 		Voter[] voters = new Voter[Server.NumberOfVoters];
 		for( int i=0; i<Server.NumberOfVoters; ++i ) {
 			SAMT.AgentProxy voter_proxy = SAMT.register(i);
-			SAMT.Channel channel_from_voter_to_server =  voter_proxy.channelTo(SERVER_ID);
-			voters[i] = new Voter(channel_from_voter_to_server);
+			voters[i] = new Voter(voter_proxy);
 		}
 
 		// Main loop -- the adversary decides how many times it runs and what to do in each step:
 		while( Environment.untrustedInput() != 0 )  {
+			byte[] message;
 			int decision = Environment.untrustedInput();
 			switch (decision) {
 			case 0:	// a voter (determined by the adversary) votes according to voterChoices
@@ -100,10 +108,28 @@ public class HonestVotersSetup {
 
 			case 2: // send the result of the election (if ready) over the network
 					server.onSendResult();
+					break;
 
-			case 3: // the adversary sends a message using its channel to the server
-					byte[] message = Environment.untrustedInputMessage();
+			case 3: // post the result of the election (if ready) on the bulletin board
+					server.onPostResult();
+					break;
+
+			case 4: // the bulletin board reads a message:
+					BB.onPost();
+					break;
+
+			case 5: // the bulletin board sends its content (over the network):
+					BB.onRequestContent();
+					break;
+
+			case 6: // the adversary sends a message using its channel to the server
+					message = Environment.untrustedInputMessage();
 					channel_from_adversary_to_server.send(message);
+					break;
+
+			case 7: // the adversary sends a message using its channel to the bulletin board
+					message = Environment.untrustedInputMessage();
+					channel_from_adversary_to_BB.send(message);
 					break;
 			}
 		}

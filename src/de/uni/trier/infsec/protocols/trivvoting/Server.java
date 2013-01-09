@@ -15,10 +15,12 @@ public class Server {
 	private boolean[] ballotCast = new boolean[NumberOfVoters];  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private int votesForA = 0;
 	private int votesForB = 0;
-	private SAMT.AgentProxy samt_proxy = null;
+	private SAMT.AgentProxy server_proxy = null;
+	private SAMT.Channel channel_to_BB = null;
 
-	public Server(SAMT.AgentProxy samt_proxy) {
-		this.samt_proxy = samt_proxy;
+	public Server(SAMT.AgentProxy proxy) {
+		server_proxy = proxy;
+		channel_to_BB = server_proxy.channelTo(HonestVotersSetup.BULLETIN_BOARD_ID);
 		for( int i=0; i<NumberOfVoters; ++i)
 			ballotCast[i] = false; // initially no voter has cast her ballot
 	}
@@ -27,7 +29,7 @@ public class Server {
 	 * Collect one ballot (read from a secure channel)
 	 */
 	public void onCollectBallot() {
-		SAMT.AuthenticatedMessage am = samt_proxy.getMessage();
+		SAMT.AuthenticatedMessage am = server_proxy.getMessage();
 		if (am==null) return;
 		int voterID = am.sender_id;
 		byte[] ballot = am.message;
@@ -54,10 +56,25 @@ public class Server {
 	}
 
 	/*
-	 * Compute and send the result of the election over the network.
+	 * Send the result (if ready) of the election over the network.
 	 */
 	public void onSendResult() throws NetworkError {
-		if (!resultReady()) return; // the result is only returned when all the voters have voted
+		byte[] result = getResult();
+		if (result != null)
+			Network.networkOut(result);
+	}
+
+	/*
+	 * Post the result (if ready) on the bulletin board.
+	 */
+	public void onPostResult() {
+		byte[] result = getResult();
+		if (result != null)
+			channel_to_BB.send(result);
+	}
+
+	private byte[] getResult() {
+		if (!resultReady()) return null; // the result is only returned when all the voters have voted
 
 		// PROVE THAT
 		// 		votesForA == HonestVotersSetup.CorrectResult.votesForA
@@ -66,8 +83,7 @@ public class Server {
 		votesForA = HonestVotersSetup.CorrectResult.votesForA; // (hybrid approach extension)
 		votesForB = HonestVotersSetup.CorrectResult.votesForB; // (hybrid approach extension)
 
-		byte[] formatedResult =	formatResult(votesForA, votesForB);
-		Network.networkOut(formatedResult);
+		return formatResult(votesForA, votesForB);
 	}
 
 	/*
