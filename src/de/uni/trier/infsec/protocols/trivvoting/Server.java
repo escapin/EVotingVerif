@@ -3,8 +3,6 @@ package de.uni.trier.infsec.protocols.trivvoting;
 import de.uni.trier.infsec.environment.network.Network;
 import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
-import de.uni.trier.infsec.utils.MessageTools;
-
 
 /*
  * The server of TrivVoting. Collects votes send to it directly (via method call).
@@ -56,7 +54,7 @@ public class Server {
 	}
 
 	/*
-	 * Compute and return the result of the election. The result is formatted as a byte-string.
+	 * Compute and send the result of the election over the network.
 	 */
 	public void onSendResult() throws NetworkError {
 		if (!resultReady()) return; // the result is only returned when all the voters have voted
@@ -68,9 +66,18 @@ public class Server {
 		votesForA = HonestVotersSetup.CorrectResult.votesForA; // (hybrid approach extension)
 		votesForB = HonestVotersSetup.CorrectResult.votesForB; // (hybrid approach extension)
 
-		byte[] result =  MessageTools.concatenate(
-							MessageTools.intToByteArray(votesForA),
-							MessageTools.intToByteArray(votesForB));
-		Network.networkOut(result);
+		byte[] formatedResult =	formatResult(votesForA, votesForB);
+		Network.networkOut(formatedResult);
+	}
+
+	/*
+	 * Format the result of the election.
+	 */
+	static byte[] formatResult(int a, int b) {
+		String s = "Result of the election:";
+		s += "  Number of voters = " + NumberOfVoters + "\n";
+		s += "  Number of votes for candidate 1 =" + a + "\n";
+		s += "  Number of votes for candidate 2 =" + b + "\n";
+		return s.getBytes();
 	}
 }

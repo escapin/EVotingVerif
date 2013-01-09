@@ -1,6 +1,5 @@
 package de.uni.trier.infsec.protocols.trivvoting;
 
-import de.uni.trier.infsec.environment.network.Network;
 import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
