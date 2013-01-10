@@ -36,13 +36,9 @@ public class HonestVotersSetup {
 
 	static private boolean secret;  // SECRET INPUT
 
-	static final int SERVER_ID = -1;
-	static final int BULLETIN_BOARD_ID = -2;
-	static final int ADVERSARY_ID = -3;
-
 	public static void main(String[] args) throws NetworkError {
 
-		// DETERMINE THE VOTERS' CHOICES
+		// DETERMINE THE VOTERS' CHOICES AND THE CORRECT RESULT
 
 		// the adversary determines two possible ways the voters vote:
 		byte[] voterChoices1 = new byte[Server.NumberOfVoters];
@@ -70,18 +66,18 @@ public class HonestVotersSetup {
 		// SET UP THE SYSTEM AND RUN IT
 
 		// Register and create the bulletin board:
-		SAMT.AgentProxy BB_proxy = SAMT.register(BULLETIN_BOARD_ID);
+		SAMT.AgentProxy BB_proxy = SAMT.register(Identifiers.BULLETIN_BOARD_ID);
 		BulletinBoard BB = new BulletinBoard(BB_proxy);
 
 		// Register and create the server:
-		SAMT.AgentProxy server_proxy = SAMT.register(SERVER_ID);
+		SAMT.AgentProxy server_proxy = SAMT.register(Identifiers.SERVER_ID);
 		Server server = new Server(server_proxy);
 
 		// Register the adversary, i.e. register an SMTP agent and a channel from this agent to the server
 		// that can be used by the adversary.
-		SAMT.AgentProxy adversary_proxy = SAMT.register(ADVERSARY_ID);
-		SAMT.Channel channel_from_adversary_to_server = adversary_proxy.channelTo(SERVER_ID);
-		SAMT.Channel channel_from_adversary_to_BB = adversary_proxy.channelTo(BULLETIN_BOARD_ID);
+		SAMT.AgentProxy adversary_proxy = SAMT.register(Identifiers.ADVERSARY_ID);
+		SAMT.Channel channel_from_adversary_to_server = adversary_proxy.channelTo(Identifiers.SERVER_ID);
+		SAMT.Channel channel_from_adversary_to_BB = adversary_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
 
 		// Register and create the voters
 		Voter[] voters = new Voter[Server.NumberOfVoters];
@@ -106,11 +102,11 @@ public class HonestVotersSetup {
 					server.onCollectBallot();
 					break;
 
-			case 2: // send the result of the election (if ready) over the network
+			case 2: // the server sends the result of the election (if ready) over the network
 					server.onSendResult();
 					break;
 
-			case 3: // post the result of the election (if ready) on the bulletin board
+			case 3: // the server posts the result of the election (if ready) on the bulletin board
 					server.onPostResult();
 					break;
 

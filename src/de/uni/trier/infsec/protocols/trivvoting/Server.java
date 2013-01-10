@@ -20,7 +20,7 @@ public class Server {
 
 	public Server(SAMT.AgentProxy proxy) {
 		server_proxy = proxy;
-		channel_to_BB = server_proxy.channelTo(HonestVotersSetup.BULLETIN_BOARD_ID);
+		channel_to_BB = server_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
 		for( int i=0; i<NumberOfVoters; ++i)
 			ballotCast[i] = false; // initially no voter has cast her ballot
 	}

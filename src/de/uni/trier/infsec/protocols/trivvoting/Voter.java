@@ -9,7 +9,8 @@ public class Voter {
 	private SAMT.Channel channel_to_server;
 
 	public Voter(SAMT.AgentProxy voter_proxy) {
-		this.channel_to_server = voter_proxy.channelTo(HonestVotersSetup.SERVER_ID);
+		// create secure channel to the server
+		this.channel_to_server = voter_proxy.channelTo(Identifiers.SERVER_ID);
 	}
 
 	/*
