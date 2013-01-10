@@ -11,21 +11,6 @@ public class MessageTools {
 		return copy;
 	}
 
-    public static boolean equal(byte[] a, byte[] b) {
-        if( a.length != b.length ) return false;
-        for( int i=0; i<a.length; ++i)
-            if( a[i] != b[i] ) return false;
-        return true;
-    }			
-
-	public static byte[] getZeroMessage(int messageSize) {
-		byte[] zeroVector = new byte[messageSize];
-		for (int i = 0; i < zeroVector.length; i++) {
-			zeroVector[i] = 0x00;
-		}
-		return zeroVector;
-	}
-	
 	public static byte[] concatenate(byte[] m1, byte[] m2) {
 		byte[] out = new byte[m1.length + m2.length + 4]; // we allocate 4 additional bytes for the length of m1
 		byte[] len = intToByteArray(m1.length);
