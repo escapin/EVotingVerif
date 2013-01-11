@@ -1,7 +1,7 @@
 package de.uni.trier.infsec.functionalities.samt.ideal;
 
-import static de.uni.trier.infsec.utils.MessageTools.copyOf;
 import de.uni.trier.infsec.environment.Environment;
+import de.uni.trier.infsec.utils.MessageTools;
 
 /**
  * Ideal functionality for SAMT (Secure Authenticated Message Transmission).
@@ -106,7 +106,7 @@ public class SAMT {
 			Environment.untrustedOutput(recipient.ID);
 			Environment.untrustedOutput(message.length);
 			// add the message along with the identity of the sender to the queue of the recipient
-			recipient.queue.add(copyOf(message), sender.ID);
+			recipient.queue.add(MessageTools.copyOf(message), sender.ID);
 		}
 	}
 	
@@ -154,7 +154,7 @@ public class SAMT {
 			Node node = first;
 			for( int i=0;  i<index && node!=null;  ++i )
 				node = node.next;
-			return  node!=null ? new AuthenticatedMessage(copyOf(node.message), node.sender_id) : null;
+			return  node!=null ? new AuthenticatedMessage(MessageTools.copyOf(node.message), node.sender_id) : null;
 		}
 	}
 
