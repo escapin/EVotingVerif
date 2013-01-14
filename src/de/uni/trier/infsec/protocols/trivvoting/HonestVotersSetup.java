@@ -1,8 +1,9 @@
 package de.uni.trier.infsec.protocols.trivvoting;
 
-import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.environment.Environment;
+import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
+import de.uni.trier.infsec.functionalities.samt.ideal.SAMTSecret;
 
 
 /*
@@ -70,8 +71,9 @@ public class HonestVotersSetup {
 		BulletinBoard BB = new BulletinBoard(BB_proxy);
 
 		// Register and create the server:
-		SAMT.AgentProxy server_proxy = SAMT.register(Identifiers.SERVER_ID);
-		Server server = new Server(server_proxy);
+		SAMTSecret.AgentProxy server_proxy = SAMTSecret.register(Identifiers.SERVER_ID);
+		SAMT.AgentProxy server_proxy_unsafe = SAMT.register(Identifiers.SERVER_ID);
+		Server server = new Server(server_proxy, server_proxy_unsafe);
 
 		// Register the adversary, i.e. register an SMTP agent and a channel from this agent to the server
 		// that can be used by the adversary.
@@ -82,7 +84,7 @@ public class HonestVotersSetup {
 		// Register and create the voters
 		Voter[] voters = new Voter[Server.NumberOfVoters];
 		for( int i=0; i<Server.NumberOfVoters; ++i ) {
-			SAMT.AgentProxy voter_proxy = SAMT.register(i);
+			SAMTSecret.AgentProxy voter_proxy = SAMTSecret.register(i);
 			voters[i] = new Voter(voter_proxy);
 		}
 
