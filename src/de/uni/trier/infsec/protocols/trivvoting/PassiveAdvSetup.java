@@ -59,7 +59,12 @@ public class PassiveAdvSetup {
 
 		// now, one of the vectors of voters' choices given by the adversary is chosen
 		// to be used by the voters, depending on the value of the secret bit:
-		byte[] voterChoices = (secret ? voterChoices1 : voterChoices2);
+		byte[] voterChoices = new byte[Server.NumberOfVoters];
+		for (int i=0; i<Server.NumberOfVoters; ++i) {
+			final byte data1 = voterChoices1[i];
+			final byte data2 = voterChoices2[i];
+			voterChoices[i] = (secret ? data1 : data2);
+		}
 
 		// voting (the voters create ballots and cast them directly to the server):
 		for( int i=0; i<Server.NumberOfVoters; ++i ) {
