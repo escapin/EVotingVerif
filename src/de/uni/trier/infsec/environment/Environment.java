@@ -22,6 +22,7 @@ public class Environment {
 		return new Node(1, new Node(7,null));  // just an example
 	}
 
+    //@ to be specified
     public static int untrustedInput() {
     	if (!listInitialized) {
     		list = initialValue();
@@ -32,7 +33,8 @@ public class Environment {
     	list = list.next;
     	return tmp;
 	}
-		
+
+    //@ to be specified
     public static void untrustedOutput(int x) {
 		if (untrustedInput()==0) {
 			result = (x==untrustedInput());
