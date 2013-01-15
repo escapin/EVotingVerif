@@ -1,10 +1,11 @@
-java.lang.Annotation
+java.lang.annotation.Annotation
 java.lang.ArithmeticException
 java.lang.ArrayStoreException
 java.lang.AssertionError
 java.lang.Character
 java.lang.ClassCastException
 java.lang.ExceptionInInitializerError
+java.lang.IndexOutOfBoundsException
 java.lang.NegativeArraySizeException
 java.lang.NoClassDefFoundError
 java.lang.NullPointerException
