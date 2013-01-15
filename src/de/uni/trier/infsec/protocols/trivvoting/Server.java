@@ -17,6 +17,8 @@ public class Server {
 	private int votesForB = 0;
 	private SAMT.AgentProxy server_proxy = null;
 	private SAMT.Channel channel_to_BB = null;
+	
+	//@ invariant ballotCast.length == NumberOfVoters;
 
 	public Server(SAMT.AgentProxy proxy) {
 		server_proxy = proxy;
