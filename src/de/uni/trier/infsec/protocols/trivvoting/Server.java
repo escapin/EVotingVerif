@@ -35,8 +35,8 @@ public class Server {
           @     requires    proxy.ID == Identifiers.SERVER_ID;
           @     ensures     true;   // and implicitly \invariant_for(this);
           @*/
-        public Server(SAMT.AgentProxy proxy) {
-		server_proxy = proxy;
+        public Server() {
+                server_proxy = SAMT.register(Identifiers.SERVER_ID);
 		channel_to_BB = server_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
 		for( int i=0; i<NumberOfVoters; ++i)
 			ballotCast[i] = false; // initially no voter has cast her ballot
