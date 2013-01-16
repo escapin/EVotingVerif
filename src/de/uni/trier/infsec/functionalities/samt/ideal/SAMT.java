@@ -54,16 +54,16 @@ public class SAMT {
 	 */
 	static public class AgentProxy
 	{
-		private final int ID;
-		private final MessageQueue queue;  // messages sent to this agent
+		private /*@ spec_public @*/ final int ID;
+		private /*@ spec_public @*/ final MessageQueue queue;  // messages sent to this agent
 		
-                //@ to be specified
+                // to be specified
 		private AgentProxy(int id) {
 			this.ID = id;
 			this.queue = new MessageQueue();
 		}
 
-                //@ to be specified
+                // to be specified
 		public AuthenticatedMessage getMessage() {
 			// The environment decides which message is to be delivered.
 			// Note that the same message may be delivered several times or not delivered at all.
@@ -97,8 +97,8 @@ public class SAMT {
 	 */
 	static public class Channel 
 	{
-		private final AgentProxy sender;
-		private final AgentProxy recipient;
+		private /*@ spec_public @*/ final AgentProxy sender;
+		private /*@ spec_public @*/ final AgentProxy recipient;
 		
                 /*@ public normal_behavior
                   @     ensures sender.ID == from.ID;
@@ -108,11 +108,11 @@ public class SAMT {
 			this.recipient = to;
 		}		
 
-                //@ to be specified
+                // to be specified
                 /*@ public normal_behavior
                   @     requires    sender.ID < 0
                   @              || sender.ID >= Server.NumberOfVoters
-                  @              || message[0] == HonestVotersSetup.votersChoices[sender.ID];
+                  @              || message[0] == HonestVotersSetup.voterChoices[sender.ID];
                   @*/
 		public void send(byte[] message) {
 			// leak the length of the sent message and the identities of the involved parties
@@ -155,11 +155,11 @@ public class SAMT {
                         /*@ invariant
                           @         sender_id < 0
                           @      || sender_id >= Server.NumberOfVoters
-                          @      || votersChoices[sender_id] == message[0];
+                          @      || HonestVotersSetup.voterChoices[sender_id] == message[0];
                           @ invariant next != null ==> \invariant_for(next);
                           @*/
 
-                        //@ to be specified
+                        // to be specified
 			Node(byte[] message, int sender_id, Node next) {
 				this.message = message;
 				this.sender_id = sender_id;
@@ -168,12 +168,12 @@ public class SAMT {
 		}		
 		private Node first = null;
 		
-                //@ to be specified
+                // to be specified
 		void add(byte[] message, int sender_id) {
 			first = new Node(message, sender_id, first);
 		}
 	
-                //@ to be specified
+                // to be specified
 		AuthenticatedMessage get(int index) {
 			if (index<0) return null;
 			Node node = first;

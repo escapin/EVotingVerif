@@ -35,6 +35,7 @@ public class HonestVotersSetup {
 	}
 
 	static private boolean secret;  // SECRET INPUT
+    private /*@ spec_public @*/ static byte[] voterChoices;
 
 	public static void main(String[] args) throws NetworkError {
 
@@ -54,9 +55,7 @@ public class HonestVotersSetup {
 		CorrectResult.votesForA = result1.votesForA; // (hybrid approach extension)
 		CorrectResult.votesForB = result1.votesForB; // (hybrid approach extension)
 
-		// now, one of the vectors of voters' choices given by the adversary is chosen
-		// to be used by the voters, depending on the value of the secret bit:
-		byte[] voterChoices = new byte[Server.NumberOfVoters];
+		voterChoices = new byte[Server.NumberOfVoters];
 		for (int i=0; i<Server.NumberOfVoters; ++i) {
 			final byte data1 = voterChoices1[i];
 			final byte data2 = voterChoices2[i];

@@ -20,12 +20,12 @@ public class Server {
 
 
         /*@ invariant
-          @     votesForA =
-          @         (\sum int i; 0 <= i && i < voterChoices.length;
+          @     votesForA ==
+          @         (\sum int i; 0 <= i && i < HonestVotersSetup.voterChoices.length;
           @             (ballotCast[i] && HonestVotersSetup.voterChoices[i] == 0) ? 1 : 0);
           @ invariant
-          @     votesForB =
-          @         (\sum int i; 0 <= i && i < voterChoices.length;
+          @     votesForB ==
+          @         (\sum int i; 0 <= i && i < HonestVotersSetup.voterChoices.length;
           @             (ballotCast[i] && HonestVotersSetup.voterChoices[i] == 1) ? 1 : 0);
           @ invariant channel_to_BB.sender.ID == Identifiers.SERVER_ID;
           @*/
@@ -45,7 +45,7 @@ public class Server {
 	/*
 	 * Collect one ballot (read from a secure channel)
 	 */
-        //@ to be specified
+        // to be specified
 	public void onCollectBallot() {
 		SAMT.AuthenticatedMessage am = server_proxy.getMessage();
 		if (am==null) return;
@@ -65,7 +65,7 @@ public class Server {
 	/*
 	 * Returns true if the result is ready, that is if all the eligible voters have already voted.
 	 */
-        //@ to be specified
+        // to be specified
 	public boolean resultReady() {
 		for( int i=0; i<NumberOfVoters; ++i ) {
 			if( !ballotCast[i] )
@@ -77,7 +77,7 @@ public class Server {
 	/*
 	 * Send the result (if ready) of the election over the network.
 	 */
-        //@ to be specified
+        // to be specified
 	public void onSendResult() throws NetworkError {
 		byte[] result = getResult();
 		if (result != null)
@@ -96,14 +96,16 @@ public class Server {
 			channel_to_BB.send(result);
 	}
 
-        //@ to be specified
+    //@ requires resultReady();
 	private byte[] getResult() {
 		if (!resultReady()) return null; // the result is only returned when all the voters have voted
 
-		// PROVE THAT
-		// 		votesForA == HonestVotersSetup.CorrectResult.votesForA
-		// 		votesForB == HonestVotersSetup.CorrectResult.votesForB
+		/*@ ensures
+		  @		votesForA == HonestVotersSetup.CorrectResult.votesForA
+		  @  &&	votesForB == HonestVotersSetup.CorrectResult.votesForB;
+		  @*/{}
 		// (this shows that the extension is conservative)
+		
 		votesForA = HonestVotersSetup.CorrectResult.votesForA; // (hybrid approach extension)
 		votesForB = HonestVotersSetup.CorrectResult.votesForB; // (hybrid approach extension)
 
@@ -113,6 +115,7 @@ public class Server {
 	/*
 	 * Format the result of the election.
 	 */
+	//@ pure helper
 	static byte[] formatResult(int a, int b) {
 		String s = "Result of the election:";
 		s += "  Number of voters = " + NumberOfVoters + "\n";
