@@ -7,7 +7,9 @@ import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
  */
 public class Voter {
         private static int idCounter = 0;
-    
+
+        private final byte vote = HonestVotersSetup.setup.getVoteForVoter(this);
+
         public final int ID;
 	private final SAMT.Channel channel_to_server;
 
@@ -24,7 +26,6 @@ public class Voter {
 	 * through the secure channel to the server.
 	 */
 	public void onSendBallot() {
-                byte vote = HonestVotersSetup.setup.getVoteForVoter(this);
 		byte [] ballot = new byte[] {vote};  // for now, the ballot is not even encrypted!
 		channel_to_server.send(ballot);
 	}
