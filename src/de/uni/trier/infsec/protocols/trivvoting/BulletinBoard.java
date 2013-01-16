@@ -13,7 +13,7 @@ public class BulletinBoard {
 
 	public BulletinBoard() {
 		content = new MessageList();
-		samt_proxy = AMT.register(Identifiers.BULLETIN_BOARD_ID);
+		amt_proxy = AMT.register(Identifiers.BULLETIN_BOARD_ID);
 	}
 
 	/*

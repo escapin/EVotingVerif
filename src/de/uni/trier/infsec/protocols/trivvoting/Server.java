@@ -48,7 +48,8 @@ public class Server {
           @*/
         public Server() {
                 samt_proxy = SAMT.register(Identifiers.SERVER_ID);
-		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
+		AMT.AgentProxy amt_proxy = AMT.register(Identifiers.SERVER_ID);
+                channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
 		for( int i=0; i<NumberOfVoters; ++i)
 			ballotCast[i] = false; // initially no voter has cast her ballot
 	}
