@@ -42,6 +42,16 @@ public class HonestVotersSetup {
         private /*@ spec_public @*/ final byte[] voterChoices2;
         private /*@ spec_public @*/ final byte[] voterChoices;
 
+        /*@ invariant
+          @     CorrectResult.votesForA ==
+          @         (\sum int i; 0 <= i && i < NumberOfVoters;
+          @             (voterChoices[i] == 0) ? 1 : 0);
+          @ invariant
+          @     CorrectResult.votesForB ==
+          @         (\sum int i; 0 <= i && i < NumberOfVoters;
+          @             (voterChoices[i] == 1) ? 1 : 0);
+          @*/
+
         private HonestVotersSetup() {
 		// the adversary determines two possible ways the voters vote:
             	voterChoices1 = new byte[Server.NumberOfVoters];

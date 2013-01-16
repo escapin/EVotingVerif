@@ -20,9 +20,15 @@ public class Server {
 	private final AMT.Channel channel_to_BB;
 	
 	/*@ model \locset footprint;
-	  @ represents footprint = \set_union(this.*,\set_union(ballotCast[*],
-	  @                                \set_union(HonestVotersSetup.voterChoices[*],\locset(HonestVotersSetup.voterChoices, 
-	  @                                channel_to_BB.sender, channel_to_BB.sender.ID, Identifiers.SERVER_ID))));
+	  @ represents footprint =
+          @     \set_union(this.*,
+          @                ballotCast[*],
+          @                HonestVotersSetup.setup.voterChoices[*],
+          @                \locset(HonestVotersSetup.setup,
+          @                        HonestVotersSetup.setup.voterChoices,
+	  @                        channel_to_BB.sender,
+          @                        channel_to_BB.sender.ID,
+          @                        Identifiers.SERVER_ID));
 	  @ accessible footprint : \empty;
 	  @*/
 
@@ -30,14 +36,14 @@ public class Server {
         /*@ invariant
           @     votesForA ==
           @         (\sum int i; 0 <= i && i < NumberOfVoters;
-          @             (ballotCast[i] && HonestVotersSetup.voterChoices[i] == 0) ? 1 : 0);
+          @             (ballotCast[i] && HonestVotersSetup.setup.voterChoices[i] == 0) ? 1 : 0);
           @ invariant
           @     votesForB ==
           @         (\sum int i; 0 <= i && i < NumberOfVoters;
-          @             (ballotCast[i] && HonestVotersSetup.voterChoices[i] == 1) ? 1 : 0);
+          @             (ballotCast[i] && HonestVotersSetup.setup.voterChoices[i] == 1) ? 1 : 0);
           @ invariant channel_to_BB.sender.ID == Identifiers.SERVER_ID;
           @ invariant ballotCast.length == NumberOfVoters
-          @           && HonestVotersSetup.voterChoices.length == NumberOfVoters;
+          @           && HonestVotersSetup.setup.voterChoices.length == NumberOfVoters;
           @ accessible \inv : footprint;
           @*/
 
@@ -76,7 +82,7 @@ public class Server {
 	/*
 	 * Returns true if the result is ready, that is if all the eligible voters have already voted.
 	 */
-    //@ ensures \result == (\forall int i; 0 <= i && i < NumberOfVoters; ballotCast[i]);
+        //@ ensures \result == (\forall int i; 0 <= i && i < NumberOfVoters; ballotCast[i]);
 	//@ strictly_pure
 	public boolean resultReady() {
 		for( int i=0; i<NumberOfVoters; ++i ) {
@@ -108,12 +114,17 @@ public class Server {
 			channel_to_BB.send(result);
 	}
 
-    //@ requires resultReady();
-	//@ pure // (this shows that the extension is conservative)
+        //@ requires    \invariant_for(this);
+        //@ requires    \invariant_for(HonestVotersSetup.setup);
+	//@ pure helper // (this shows that the extension is conservative)
 	private byte[] getResult() {
 		if (!resultReady()) return null; // the result is only returned when all the voters have voted
 
-		
+		/*@ ensures votesForA = HonestVotersSetup.CorrectResult.votesForA;
+                  @ ensures votesForB = HonestVotersSetup.CorrectResult.votesForB;
+                  @*/
+                { int lemma; }
+
 		votesForA = HonestVotersSetup.CorrectResult.votesForA; // (hybrid approach extension)
 		votesForB = HonestVotersSetup.CorrectResult.votesForB; // (hybrid approach extension)
 
