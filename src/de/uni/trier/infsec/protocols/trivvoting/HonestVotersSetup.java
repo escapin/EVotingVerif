@@ -2,6 +2,7 @@ package de.uni.trier.infsec.protocols.trivvoting;
 
 import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.environment.network.NetworkError;
+import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
 
 
 /*
@@ -96,10 +97,15 @@ public class HonestVotersSetup {
 		BulletinBoard BB = new BulletinBoard();
 
 		// Register and create the server:
-		Server server = new Server();
+		SAMT.AgentProxy server_samt_proxy = SAMT.register(Identifiers.SERVER_ID);
+		AMT.AgentProxy server_amt_proxy = AMT.register(Identifiers.SERVER_ID);
+		Server server = new Server(server_samt_proxy, server_amt_proxy);
 
-		// Register the adversary, i.e. register an SMTP agent and a channel from this agent to the server
-		// that can be used by the adversary.
+		// Register the adversary, i.e. create proxies and channels he can use.
+		SAMT.AgentProxy adversary_samt_proxy = SAMT.register(Identifiers.ADVERSARY_ID);
+		SAMT.Channel channel_from_adversary_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID);
+		AMT.AgentProxy adversary_amt_proxy = AMT.register(Identifiers.ADVERSARY_ID);
+		AMT.Channel channel_from_adversary_to_BB = adversary_amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
                 Adversary adversary = new Adversary();
 
 		// Register and create the voters
