@@ -3,6 +3,7 @@ package de.uni.trier.infsec.protocols.trivvoting;
 import de.uni.trier.infsec.environment.network.Network;
 import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
+import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
 
 /*
  * The server of TrivVoting. Collects votes send to it directly (via method call).
@@ -15,12 +16,12 @@ public class Server {
 	private boolean[] ballotCast = new boolean[NumberOfVoters];  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private int votesForA = 0;
 	private int votesForB = 0;
-	private SAMT.AgentProxy server_proxy = null;
-	private SAMT.Channel channel_to_BB = null;
+	private SAMT.AgentProxy samt_proxy = null;
+	private AMT.Channel channel_to_BB = null;
 
-	public Server(SAMT.AgentProxy proxy) {
-		server_proxy = proxy;
-		channel_to_BB = server_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
+	public Server(SAMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) {
+		this.samt_proxy = samt_proxy;
+		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
 		for( int i=0; i<NumberOfVoters; ++i)
 			ballotCast[i] = false; // initially no voter has cast her ballot
 	}
@@ -29,7 +30,7 @@ public class Server {
 	 * Collect one ballot (read from a secure channel)
 	 */
 	public void onCollectBallot() {
-		SAMT.AuthenticatedMessage am = server_proxy.getMessage();
+		SAMT.AuthenticatedMessage am = samt_proxy.getMessage();
 		if (am==null) return;
 		int voterID = am.sender_id;
 		byte[] ballot = am.message;
