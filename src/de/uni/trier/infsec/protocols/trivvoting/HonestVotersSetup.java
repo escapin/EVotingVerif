@@ -35,7 +35,7 @@ public class HonestVotersSetup {
 	}
 
 	static private boolean secret;  // SECRET INPUT
-    private /*@ spec_public @*/ static byte[] voterChoices;
+    private /*@ spec_public @*/ final static byte[] voterChoices = new byte[Server.NumberOfVoters];
 
 	public static void main(String[] args) throws NetworkError {
 
@@ -55,7 +55,6 @@ public class HonestVotersSetup {
 		CorrectResult.votesForA = result1.votesForA; // (hybrid approach extension)
 		CorrectResult.votesForB = result1.votesForB; // (hybrid approach extension)
 
-		voterChoices = new byte[Server.NumberOfVoters];
 		for (int i=0; i<Server.NumberOfVoters; ++i) {
 			final byte data1 = voterChoices1[i];
 			final byte data2 = voterChoices2[i];
