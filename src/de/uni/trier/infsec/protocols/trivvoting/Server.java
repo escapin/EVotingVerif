@@ -43,7 +43,6 @@ public class Server {
 
 
         /*@ public normal_behavior
-          @     requires    proxy.ID == Identifiers.SERVER_ID;
           @     ensures     true;   // and implicitly \invariant_for(this);
           @*/
         public Server() {
