@@ -11,9 +11,9 @@ import de.uni.trier.infsec.utils.MessageTools;
  */
 public class BulletinBoard {
 
-	public BulletinBoard(SAMT.AgentProxy proxy) {
+	public BulletinBoard() {
 		content = new MessageList();
-		samt_proxy = proxy;
+		samt_proxy = SAMT.register(Identifiers.BULLETIN_BOARD_ID);
 	}
 
 	/*
