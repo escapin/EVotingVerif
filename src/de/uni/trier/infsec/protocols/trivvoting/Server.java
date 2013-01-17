@@ -114,9 +114,8 @@ public class Server {
 			channel_to_BB.send(result);
 	}
 
-        //@ requires    \invariant_for(this);
         //@ requires    \invariant_for(HonestVotersSetup.setup);
-	//@ pure helper // (this shows that the extension is conservative)
+	//@ pure // (this shows that the extension is conservative)
 	private byte[] getResult() {
 		if (!resultReady()) return null; // the result is only returned when all the voters have voted
 
