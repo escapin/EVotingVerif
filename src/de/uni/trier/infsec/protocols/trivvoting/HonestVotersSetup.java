@@ -16,7 +16,20 @@ import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
  * to be taken.
  */
 public class HonestVotersSetup {
-
+	
+	static class Adversary {
+		public final SAMT.Channel channel_to_server;
+		public final AMT.Channel channel_to_BB;
+		
+		public Adversary() throws SAMT.Error, AMT.Error {
+			SAMT.AgentProxy adversary_samt_proxy = SAMT.register(Identifiers.ADVERSARY_ID);
+			channel_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID);
+			AMT.AgentProxy adversary_amt_proxy = AMT.register(Identifiers.ADVERSARY_ID);
+			channel_to_BB = adversary_amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
+			// should we here do some check whether the references are not null?
+		}
+	}
+	
 	/*
 	 * Objects representing a result of the e-voting process. For now, two candidates only.
 	 */
@@ -35,108 +48,18 @@ public class HonestVotersSetup {
 		static public int votesForB = 0;
 	}
 
+
 	static private boolean secret;  // SECRET INPUT
 
-	public static void main(String[] args) throws NetworkError, SAMT.Error, AMT.Error {
+	static private final Voter[] voters = new Voter[Server.NumberOfVoters];
+	static private Server server;
+	static private BulletinBoard BB;
 
-		// DETERMINE THE VOTERS' CHOICES AND THE CORRECT RESULT
-
-		// the adversary determines two possible ways the voters vote:
-		byte[] voterChoices1 = new byte[Server.NumberOfVoters];
-		byte[] voterChoices2 = new byte[Server.NumberOfVoters];
-		for( int i=0; i<Server.NumberOfVoters; ++i ) {
-			voterChoices1[i] = (byte)Environment.untrustedInput();
-			voterChoices2[i] = (byte)Environment.untrustedInput();
-		}
-		// we check whether they yield the same results:
-		Result result1 = result(voterChoices1);
-		Result result2 = result(voterChoices2);
-		if( !sameResults(result1,result2) ) return; // abort, if the result in not the same in both cases
-		CorrectResult.votesForA = result1.votesForA; // (hybrid approach extension)
-		CorrectResult.votesForB = result1.votesForB; // (hybrid approach extension)
-
-		// now, one of the vectors of voters' choices given by the adversary is chosen
-		// to be used by the voters, depending on the value of the secret bit:
-		byte[] voterChoices = new byte[Server.NumberOfVoters];
-		for (int i=0; i<Server.NumberOfVoters; ++i) {
-			final byte data1 = voterChoices1[i];
-			final byte data2 = voterChoices2[i];
-			voterChoices[i] = (secret ? data1 : data2);
-		}
-
-		// SET UP THE SYSTEM AND RUN IT
-
-		// Register and create the bulletin board:
-		AMT.AgentProxy BB_proxy = AMT.register(Identifiers.BULLETIN_BOARD_ID);
-		BulletinBoard BB = new BulletinBoard(BB_proxy);
-
-		// Register and create the server:
-		SAMT.AgentProxy server_samt_proxy = SAMT.register(Identifiers.SERVER_ID);
-		AMT.AgentProxy server_amt_proxy = AMT.register(Identifiers.SERVER_ID);
-		Server server = new Server(server_samt_proxy, server_amt_proxy);
-
-		// Register the adversary, i.e. create proxies and channels he can use.
-		SAMT.AgentProxy adversary_samt_proxy = SAMT.register(Identifiers.ADVERSARY_ID);
-		SAMT.Channel channel_from_adversary_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID);
-		AMT.AgentProxy adversary_amt_proxy = AMT.register(Identifiers.ADVERSARY_ID);
-		AMT.Channel channel_from_adversary_to_BB = adversary_amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
-
-		// Register and create the voters
-		Voter[] voters = new Voter[Server.NumberOfVoters];
-		for( int i=0; i<Server.NumberOfVoters; ++i ) {
-			SAMT.AgentProxy voter_proxy = SAMT.register(i);
-			voters[i] = new Voter(voter_proxy);
-		}
-
-		// Main loop -- the adversary decides how many times it runs and what to do in each step:
-		while( Environment.untrustedInput() != 0 )  {
-			byte[] message;
-			int decision = Environment.untrustedInput();
-			switch (decision) {
-			case 0:	// a voter (determined by the adversary) votes according to voterChoices
-					int voter_id = Environment.untrustedInput();
-					if (voter_id>=0 && voter_id<Server.NumberOfVoters) {
-						voters[voter_id].onSendBallot(voterChoices[voter_id]);
-					}
-					break;
-
-			case 1: // server reads a message (possibly a ballot) from a secure channel
-					server.onCollectBallot();
-					break;
-
-			case 2: // the server sends the result of the election (if ready) over the network
-					server.onSendResult();
-					break;
-
-			case 3: // the server posts the result of the election (if ready) on the bulletin board
-					server.onPostResult();
-					break;
-
-			case 4: // the bulletin board reads a message:
-					BB.onPost();
-					break;
-
-			case 5: // the bulletin board sends its content (over the network):
-					BB.onRequestContent();
-					break;
-
-			case 6: // the adversary sends a message using its channel to the server
-					message = Environment.untrustedInputMessage();
-					channel_from_adversary_to_server.send(message);
-					break;
-
-			case 7: // the adversary sends a message using its channel to the bulletin board
-					message = Environment.untrustedInputMessage();
-					channel_from_adversary_to_BB.send(message);
-					break;
-			}
-		}
-	}
 
 	/*
 	 * Compute the correct result from a vector of voters' choices
 	 */
-	public static Result result(byte[] choices) {
+	private static Result result(byte[] choices) {
 		Result result = new Result();
 		for( int i=0; i<choices.length; ++i ) {
 			int candidate = choices[i];
@@ -150,7 +73,115 @@ public class HonestVotersSetup {
 	/*
 	 * Check whether two results are the same.
 	 */
-	public static boolean sameResults(Result res1, Result res2 ) {
+	private static boolean sameResults(Result res1, Result res2 ) {
 		return res1.votesForA==res2.votesForA  &&  res1.votesForB==res2.votesForB;
+	}
+
+
+	private static boolean determine_voters_choices_and_create_voters() throws SAMT.Error {
+		// the adversary determines two possible ways the voters vote:
+		byte[] voterChoices1 = new byte[Server.NumberOfVoters];
+		byte[] voterChoices2 = new byte[Server.NumberOfVoters];
+		for( int i=0; i<Server.NumberOfVoters; ++i ) {
+			voterChoices1[i] = (byte)Environment.untrustedInput();
+			voterChoices2[i] = (byte)Environment.untrustedInput();
+		}
+		// we check whether they yield the same results:
+		Result result1 = result(voterChoices1);
+		Result result2 = result(voterChoices2);
+		if( !sameResults(result1,result2) ) return false;
+		CorrectResult.votesForA = result1.votesForA; // (hybrid approach extension)
+		CorrectResult.votesForB = result1.votesForB; // (hybrid approach extension)
+
+		// now, one of the vectors of voters' choices given by the adversary is chosen
+		// to be used by the voters, depending on the value of the secret bit:
+		byte[] voterChoices = new byte[Server.NumberOfVoters];
+		for (int i=0; i<Server.NumberOfVoters; ++i) {
+			final byte data1 = voterChoices1[i];
+			final byte data2 = voterChoices2[i];
+			voterChoices[i] = (secret ? data1 : data2);
+		}
+		
+		// Register and create the voters
+		for( int i=0; i<Server.NumberOfVoters; ++i ) {
+			SAMT.AgentProxy voter_proxy = SAMT.register(i);
+			voters[i] = new Voter(voterChoices[i], voter_proxy);
+		}
+		
+		return true;
+	}
+
+	// Register and create the server:
+	private static void create_server() throws SAMT.Error, AMT.Error {
+		SAMT.AgentProxy server_samt_proxy = SAMT.register(Identifiers.SERVER_ID);
+		AMT.AgentProxy server_amt_proxy = AMT.register(Identifiers.SERVER_ID);
+		server = new Server(server_samt_proxy, server_amt_proxy);
+	}
+
+	private static void create_bulletin_board() throws AMT.Error {
+		// Register and create the bulletin board:
+		AMT.AgentProxy BB_proxy = AMT.register(Identifiers.BULLETIN_BOARD_ID);
+		BB = new BulletinBoard(BB_proxy);		
+	}
+
+	private static void run() throws SAMT.Error, AMT.Error {
+		Adversary adversary = new Adversary();	
+		// Main loop -- the adversary decides how many times it runs and what to do in each step:
+		while( Environment.untrustedInput() != 0 )  {
+			byte[] message;
+			int decision = Environment.untrustedInput();
+			switch (decision) {
+			case 0:	// a voter (determined by the adversary) votes according to voterChoices
+					int voter_id = Environment.untrustedInput();
+					if (voter_id>=0 && voter_id<Server.NumberOfVoters) {
+						voters[voter_id].onSendBallot();
+					}
+					break;
+
+			case 1: // server reads a message (possibly a ballot) from a secure channel
+					server.onCollectBallot();
+					break;
+
+			case 2: // the server sends the result of the election (if ready) over the network
+					try {
+						server.onSendResult();
+					}
+					catch (NetworkError err) {}
+					break;
+
+			case 3: // the server posts the result of the election (if ready) on the bulletin board
+					server.onPostResult();
+					break;
+
+			case 4: // the bulletin board reads a message:
+					BB.onPost();
+					break;
+
+			case 5: // the bulletin board sends its content (over the network):
+					try {
+						BB.onRequestContent();
+					}
+					catch (NetworkError err) {}						
+					break;
+
+			case 6: // the adversary sends a message using its channel to the server
+					message = Environment.untrustedInputMessage();
+					adversary.channel_to_server.send(message);
+					break;
+
+			case 7: // the adversary sends a message using its channel to the bulletin board
+					message = Environment.untrustedInputMessage();
+					adversary.channel_to_BB.send(message);
+					break;
+			}
+		}		
+	}
+	
+	public static void main(String[] args) throws SAMT.Error, AMT.Error { 
+		boolean status = determine_voters_choices_and_create_voters();
+		if (!status) return;
+		create_server();
+		create_bulletin_board();
+		run();
 	}
 }
