@@ -12,12 +12,12 @@ import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
  */
 public class Server {
 
-	public static int NumberOfVoters = 50;
-	private boolean[] ballotCast = new boolean[NumberOfVoters];  // ballotCast[i]==true iff the i-th voter has already cast her ballot
+	public static final int NumberOfVoters = 50;
+	private final boolean[] ballotCast = new boolean[NumberOfVoters];  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private int votesForA = 0;
 	private int votesForB = 0;
-	private SAMT.AgentProxy samt_proxy = null;
-	private AMT.Channel channel_to_BB = null;
+	private final SAMT.AgentProxy samt_proxy;
+	private final AMT.Channel channel_to_BB;
 
 	public Server(SAMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) {
 		this.samt_proxy = samt_proxy;
