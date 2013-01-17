@@ -54,8 +54,8 @@ public class SAMT {
 	 */
 	static public class AgentProxy
 	{
-		private int ID;
-		private MessageQueue queue;  // messages sent to this agent
+		public final int ID;
+		private final MessageQueue queue;  // messages sent to this agent
 		
 		private AgentProxy(int id) {
 			this.ID = id;
@@ -65,7 +65,7 @@ public class SAMT {
 		public AuthenticatedMessage getMessage() {
 			// The environment decides which message is to be delivered.
 			// Note that the same message may be delivered several times or not delivered at all.
-			Environment.untrustedOutput(this.ID);
+			Environment.untrustedOutput(ID);
 			int index = Environment.untrustedInput();
 			return queue.get(index);
 		}
@@ -92,8 +92,8 @@ public class SAMT {
 	 */
 	static public class Channel 
 	{
-		private AgentProxy sender;
-		private AgentProxy recipient;
+		private final AgentProxy sender;
+		private final AgentProxy recipient;
 		
 		private Channel(AgentProxy from, AgentProxy to) {
 			this.sender = from;
@@ -115,11 +115,18 @@ public class SAMT {
 	 * registration fails (the method returns null).
 	 */
 	public static AgentProxy register(int id) {
+		Environment.untrustedOutput(id); // we try to register id --> adversary
+		// the environment can make registration impossible (by blocking the communication)
+		if(  Environment.untrustedInput() == 0 ) return null;
 		// check if the id is free
-		if( registeredAgents.fetch(id) != null ) return null;
+		if( registeredAgents.fetch(id) != null ) {
+			Environment.untrustedOutput(0); // registration unsuccessful --> adversary
+			return null;
+		}
 		// create a new agent, add it to the list of registered agents, and return it
 		AgentProxy agent = new AgentProxy(id);
 		registeredAgents.add(agent);
+		Environment.untrustedOutput(0); // registration successful --> adversary
 		return agent;
 	}
 		
@@ -134,9 +141,9 @@ public class SAMT {
 	private static class MessageQueue 
 	{
 		private static class Node {
-			byte[] message;
-			int sender_id;		
-			Node next;
+			final byte[] message;
+			final int sender_id;
+			final Node next;
 			Node(byte[] message, int sender_id, Node next) {
 				this.message = message;
 				this.sender_id = sender_id;
@@ -159,13 +166,13 @@ public class SAMT {
 	}
 
 	//
-	// Handlers -- a collection of registered agents.
+	// AgentsQueue -- a collection of registered agents.
 	//
 	private static class AgentsQueue
 	{	
 		private static class Node {
-			AgentProxy agent;
-			Node  next;
+			final AgentProxy agent;
+			final Node  next;
 			Node(AgentProxy agent, Node next) {
 				this.agent = agent;
 				this.next = next;
@@ -185,6 +192,6 @@ public class SAMT {
 		}
 	}
 
-	// one static list of handlers:
+	// static list of registered agents:
 	private static AgentsQueue registeredAgents = new AgentsQueue();
 }

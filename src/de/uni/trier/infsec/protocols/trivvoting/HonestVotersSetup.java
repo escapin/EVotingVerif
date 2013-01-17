@@ -1,9 +1,9 @@
 package de.uni.trier.infsec.protocols.trivvoting;
 
-import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.environment.network.NetworkError;
+import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
-import de.uni.trier.infsec.functionalities.samt.ideal.SAMTSecret;
+import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
 
 
 /*
@@ -67,24 +67,24 @@ public class HonestVotersSetup {
 		// SET UP THE SYSTEM AND RUN IT
 
 		// Register and create the bulletin board:
-		SAMT.AgentProxy BB_proxy = SAMT.register(Identifiers.BULLETIN_BOARD_ID);
+		AMT.AgentProxy BB_proxy = AMT.register(Identifiers.BULLETIN_BOARD_ID);
 		BulletinBoard BB = new BulletinBoard(BB_proxy);
 
 		// Register and create the server:
-		SAMTSecret.AgentProxy server_proxy = SAMTSecret.register(Identifiers.SERVER_ID);
-		SAMT.AgentProxy server_proxy_unsafe = SAMT.register(Identifiers.SERVER_ID);
-		Server server = new Server(server_proxy, server_proxy_unsafe);
+		SAMT.AgentProxy server_samt_proxy = SAMT.register(Identifiers.SERVER_ID);
+		AMT.AgentProxy server_amt_proxy = AMT.register(Identifiers.SERVER_ID);
+		Server server = new Server(server_samt_proxy, server_amt_proxy);
 
-		// Register the adversary, i.e. register an SMTP agent and a channel from this agent to the server
-		// that can be used by the adversary.
-		SAMT.AgentProxy adversary_proxy = SAMT.register(Identifiers.ADVERSARY_ID);
-		SAMT.Channel channel_from_adversary_to_server = adversary_proxy.channelTo(Identifiers.SERVER_ID);
-		SAMT.Channel channel_from_adversary_to_BB = adversary_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
+		// Register the adversary, i.e. create proxies and channels he can use.
+		SAMT.AgentProxy adversary_samt_proxy = SAMT.register(Identifiers.ADVERSARY_ID);
+		SAMT.Channel channel_from_adversary_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID);
+		AMT.AgentProxy adversary_amt_proxy = AMT.register(Identifiers.ADVERSARY_ID);
+		AMT.Channel channel_from_adversary_to_BB = adversary_amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
 
 		// Register and create the voters
 		Voter[] voters = new Voter[Server.NumberOfVoters];
 		for( int i=0; i<Server.NumberOfVoters; ++i ) {
-			SAMTSecret.AgentProxy voter_proxy = SAMTSecret.register(i);
+			SAMT.AgentProxy voter_proxy = SAMT.register(i);
 			voters[i] = new Voter(voter_proxy);
 		}
 
