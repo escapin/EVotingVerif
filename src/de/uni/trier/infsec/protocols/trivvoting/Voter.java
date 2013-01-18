@@ -8,7 +8,7 @@ import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
 public class Voter {
 	private final SAMT.Channel channel_to_server;
 
-	public Voter(SAMT.AgentProxy voter_proxy) {
+	public Voter(SAMT.AgentProxy voter_proxy) throws SAMT.Error {
 		// create secure channel to the server
 		this.channel_to_server = voter_proxy.channelTo(Identifiers.SERVER_ID);
 	}
@@ -17,7 +17,7 @@ public class Voter {
 	 * Prepare the ballot containing the vote given as the argument and send it
 	 * through the secure channel to the server.
 	 */
-	public void onSendBallot(byte vote) {
+	public void onSendBallot(byte vote) throws SAMT.Error {
 		byte [] ballot = new byte[] {vote};
 		channel_to_server.send(ballot);
 	}

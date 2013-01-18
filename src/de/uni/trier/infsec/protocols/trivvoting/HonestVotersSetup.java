@@ -37,7 +37,7 @@ public class HonestVotersSetup {
 
 	static private boolean secret;  // SECRET INPUT
 
-	public static void main(String[] args) throws NetworkError {
+	public static void main(String[] args) throws NetworkError, SAMT.Error, AMT.Error {
 
 		// DETERMINE THE VOTERS' CHOICES AND THE CORRECT RESULT
 
