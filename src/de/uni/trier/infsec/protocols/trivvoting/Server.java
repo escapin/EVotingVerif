@@ -19,7 +19,7 @@ public class Server {
 	private final SAMT.AgentProxy samt_proxy;
 	private final AMT.Channel channel_to_BB;
 
-	public Server(SAMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) {
+	public Server(SAMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) throws AMT.Error {
 		this.samt_proxy = samt_proxy;
 		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
 		for( int i=0; i<NumberOfVoters; ++i)
@@ -68,7 +68,7 @@ public class Server {
 	/*
 	 * Post the result (if ready) on the bulletin board.
 	 */
-	public void onPostResult() {
+	public void onPostResult() throws AMT.Error {
 		byte[] result = getResult();
 		if (result != null)
 			channel_to_BB.send(result);
