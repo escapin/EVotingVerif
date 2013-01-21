@@ -26,7 +26,6 @@ public class HonestVotersSetup {
 			channel_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID);
 			AMT.AgentProxy adversary_amt_proxy = AMT.register(Identifiers.ADVERSARY_ID);
 			channel_to_BB = adversary_amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
-			// should we here do some check whether the references are not null?
 		}
 	}
 
@@ -56,7 +55,7 @@ public class HonestVotersSetup {
 	static private BulletinBoard BB;
 
 
-	/*
+	/**
 	 * Compute the correct result from a vector of voters' choices
 	 */
 	private static Result result(byte[] choices) {
@@ -70,7 +69,7 @@ public class HonestVotersSetup {
 		return result;
 	}
 
-	/*
+	/**
 	 * Check whether two results are the same.
 	 */
 	private static boolean sameResults(Result res1, Result res2 ) {
@@ -78,6 +77,11 @@ public class HonestVotersSetup {
 	}
 
 
+	/**
+	 * Computes the correct result, as determined by the vectors voters' choices given as parameters,
+	 * checks if these two vectors yield the same result. If not, false is returned. Otherwise, voters
+	 * are registered and created.
+	 */
 	private static boolean select_voters_choices_and_create_voters(byte[] voterChoices1, byte[] voterChoices2) throws SAMT.Error {
 		// we check whether voterChoices1 and voterChoices2 yield the same
 		// results:
@@ -94,9 +98,8 @@ public class HonestVotersSetup {
 		return true;
 	}
 
-	/*
-	 * We check whether voterChoices1 and voterChoices2 yield the same
-	 * results:
+	/**
+	 * Checks whether voterChoices1 and voterChoices2 yield the same results
 	 */
 	private static boolean computeCorrectResult(byte[] voterChoices1, byte[] voterChoices2) {
 		Result result1 = result(voterChoices1);
@@ -107,7 +110,7 @@ public class HonestVotersSetup {
 		return true;
 	}
 
-	/*
+	/**
 	 * One of the vectors of voters' choices given by the adversary is chosen
 	 * to be used by the voters, depending on the value of the secret bit:
 	 */
@@ -121,8 +124,8 @@ public class HonestVotersSetup {
 		return voterChoices;
 	}
 
-	/*
-	 * Register and create the voters
+	/**
+	 * Register and create the voters.
 	 */
 	private static void registerAndCreateVoters(byte[] voterChoices) throws SAMT.Error {
 		for( int i=0; i<Server.NumberOfVoters; ++i ) {
@@ -131,19 +134,30 @@ public class HonestVotersSetup {
 		}
 	}
 
-	// Register and create the server:
+	/**
+	 * Register and create the server.
+	 */
 	private static void create_server() throws SAMT.Error, AMT.Error {
 		SAMT.AgentProxy server_samt_proxy = SAMT.register(Identifiers.SERVER_ID);
 		AMT.AgentProxy server_amt_proxy = AMT.register(Identifiers.SERVER_ID);
 		server = new Server(server_samt_proxy, server_amt_proxy);
 	}
 
+	/**
+	 * Register and create the bulletin board.
+	 */
 	private static void create_bulletin_board() throws AMT.Error {
 		// Register and create the bulletin board:
 		AMT.AgentProxy BB_proxy = AMT.register(Identifiers.BULLETIN_BOARD_ID);
 		BB = new BulletinBoard(BB_proxy);
 	}
 
+	/**
+	 * Run the main loop of the setup.
+	 *
+	 * First, the adversary registers his SAMT and AMT functionalities. Then, in a loop, the
+	 * adversary decides which actions are taken.
+	 */
 	private static void run() throws SAMT.Error, AMT.Error {
 		Adversary adversary = new Adversary();
 		// Main loop -- the adversary decides how many times it runs and what to do in each step:
