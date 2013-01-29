@@ -2,9 +2,11 @@ package de.uni.trier.infsec.protocols.trivvoting;
 
 import de.uni.trier.infsec.environment.network.Network;
 import de.uni.trier.infsec.environment.network.NetworkError;
+import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT.SAMTError;
 import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
+import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
 
 /*
  * The server of TrivVoting. Collects votes send to it directly (via method call).
@@ -20,9 +22,9 @@ public class Server {
 	private final SAMT.AgentProxy samt_proxy;
 	private final AMT.Channel channel_to_BB;
 
-	public Server(SAMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) throws AMT.Error {
+	public Server(SAMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) throws AMTError, PKIError, NetworkError {
 		this.samt_proxy = samt_proxy;
-		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
+		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID, "www.bulletinboard.com", 89);
 		for( int i=0; i<NumberOfVoters; ++i)
 			ballotCast[i] = false; // initially no voter has cast her ballot
 	}
@@ -69,7 +71,7 @@ public class Server {
 	/*
 	 * Post the result (if ready) on the bulletin board.
 	 */
-	public void onPostResult() throws AMT.Error {
+	public void onPostResult() throws AMTError {
 		byte[] result = getResult();
 		if (result != null)
 			channel_to_BB.send(result);

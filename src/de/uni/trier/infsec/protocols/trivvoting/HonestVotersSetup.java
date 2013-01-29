@@ -6,6 +6,7 @@ import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT.SAMTError;
 import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
+import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
 
 
 /*
@@ -23,11 +24,11 @@ public class HonestVotersSetup {
 		public final SAMT.Channel channel_to_server;
 		public final AMT.Channel channel_to_BB;
 
-		public Adversary() throws SAMTError, PKIError, NetworkError, AMT.Error {
+		public Adversary() throws SAMTError, PKIError, NetworkError, AMTError {
 			SAMT.AgentProxy adversary_samt_proxy = SAMT.register(Identifiers.ADVERSARY_ID);
 			channel_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID, "www.server.com", 89);
 			AMT.AgentProxy adversary_amt_proxy = AMT.register(Identifiers.ADVERSARY_ID);
-			channel_to_BB = adversary_amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
+			channel_to_BB = adversary_amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID, "www.bulletinboard.com", 89);
 		}
 	}
 
@@ -139,7 +140,7 @@ public class HonestVotersSetup {
 	/**
 	 * Register and create the server.
 	 */
-	private static void create_server() throws SAMTError, PKIError, AMT.Error {
+	private static void create_server() throws SAMTError, PKIError, AMTError, NetworkError {
 		SAMT.AgentProxy server_samt_proxy = SAMT.register(Identifiers.SERVER_ID);
 		AMT.AgentProxy server_amt_proxy = AMT.register(Identifiers.SERVER_ID);
 		server = new Server(server_samt_proxy, server_amt_proxy);
@@ -148,7 +149,7 @@ public class HonestVotersSetup {
 	/**
 	 * Register and create the bulletin board.
 	 */
-	private static void create_bulletin_board() throws AMT.Error {
+	private static void create_bulletin_board() throws AMTError, PKIError {
 		// Register and create the bulletin board:
 		AMT.AgentProxy BB_proxy = AMT.register(Identifiers.BULLETIN_BOARD_ID);
 		BB = new BulletinBoard(BB_proxy);
@@ -160,7 +161,7 @@ public class HonestVotersSetup {
 	 * First, the adversary registers his SAMT and AMT functionalities. Then, in a loop, the
 	 * adversary decides which actions are taken.
 	 */
-	private static void run() throws SAMTError, PKIError, NetworkError, AMT.Error {
+	private static void run() throws SAMTError, PKIError, NetworkError, AMTError {
 		Adversary adversary = new Adversary();
 		// Main loop -- the adversary decides how many times it runs and what to do in each step:
 		while( Environment.untrustedInput() != 0 )  {
@@ -213,7 +214,7 @@ public class HonestVotersSetup {
 		}
 	}
 
-	public static void main(String[] args) throws SAMTError, PKIError, NetworkError, AMT.Error {
+	public static void main(String[] args) throws SAMTError, PKIError, NetworkError, AMTError {
 		// the adversary determines two possible ways the voters vote:
 		byte[] voterChoices1 = new byte[Server.NumberOfVoters];
 		byte[] voterChoices2 = new byte[Server.NumberOfVoters];
