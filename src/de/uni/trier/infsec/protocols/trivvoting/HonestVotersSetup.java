@@ -2,7 +2,9 @@ package de.uni.trier.infsec.protocols.trivvoting;
 
 import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.environment.Environment;
+import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
+import de.uni.trier.infsec.functionalities.samt.ideal.SAMT.SAMTError;
 import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
 
 
@@ -21,9 +23,9 @@ public class HonestVotersSetup {
 		public final SAMT.Channel channel_to_server;
 		public final AMT.Channel channel_to_BB;
 
-		public Adversary() throws SAMT.Error, AMT.Error {
+		public Adversary() throws SAMTError, PKIError, NetworkError, AMT.Error {
 			SAMT.AgentProxy adversary_samt_proxy = SAMT.register(Identifiers.ADVERSARY_ID);
-			channel_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID);
+			channel_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID, "www.server.com", 89);
 			AMT.AgentProxy adversary_amt_proxy = AMT.register(Identifiers.ADVERSARY_ID);
 			channel_to_BB = adversary_amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
 		}
@@ -82,7 +84,7 @@ public class HonestVotersSetup {
 	 * checks if these two vectors yield the same result. If not, false is returned. Otherwise, voters
 	 * are registered and created.
 	 */
-	private static boolean select_voters_choices_and_create_voters(byte[] voterChoices1, byte[] voterChoices2) throws SAMT.Error {
+	private static boolean select_voters_choices_and_create_voters(byte[] voterChoices1, byte[] voterChoices2) throws SAMTError, PKIError, NetworkError {
 		// we check whether voterChoices1 and voterChoices2 yield the same
 		// results:
 		boolean status = computeCorrectResult(voterChoices1, voterChoices2);
@@ -127,7 +129,7 @@ public class HonestVotersSetup {
 	/**
 	 * Register and create the voters.
 	 */
-	private static void registerAndCreateVoters(byte[] voterChoices) throws SAMT.Error {
+	private static void registerAndCreateVoters(byte[] voterChoices) throws SAMTError, PKIError, NetworkError {
 		for( int i=0; i<Server.NumberOfVoters; ++i ) {
 			SAMT.AgentProxy voter_proxy = SAMT.register(i);
 			voters[i] = new Voter(voterChoices[i], voter_proxy);
@@ -137,7 +139,7 @@ public class HonestVotersSetup {
 	/**
 	 * Register and create the server.
 	 */
-	private static void create_server() throws SAMT.Error, AMT.Error {
+	private static void create_server() throws SAMTError, PKIError, AMT.Error {
 		SAMT.AgentProxy server_samt_proxy = SAMT.register(Identifiers.SERVER_ID);
 		AMT.AgentProxy server_amt_proxy = AMT.register(Identifiers.SERVER_ID);
 		server = new Server(server_samt_proxy, server_amt_proxy);
@@ -158,7 +160,7 @@ public class HonestVotersSetup {
 	 * First, the adversary registers his SAMT and AMT functionalities. Then, in a loop, the
 	 * adversary decides which actions are taken.
 	 */
-	private static void run() throws SAMT.Error, AMT.Error {
+	private static void run() throws SAMTError, PKIError, NetworkError, AMT.Error {
 		Adversary adversary = new Adversary();
 		// Main loop -- the adversary decides how many times it runs and what to do in each step:
 		while( Environment.untrustedInput() != 0 )  {
@@ -211,7 +213,7 @@ public class HonestVotersSetup {
 		}
 	}
 
-	public static void main(String[] args) throws SAMT.Error, AMT.Error {
+	public static void main(String[] args) throws SAMTError, PKIError, NetworkError, AMT.Error {
 		// the adversary determines two possible ways the voters vote:
 		byte[] voterChoices1 = new byte[Server.NumberOfVoters];
 		byte[] voterChoices2 = new byte[Server.NumberOfVoters];

@@ -3,6 +3,7 @@ package de.uni.trier.infsec.protocols.trivvoting;
 import de.uni.trier.infsec.environment.network.Network;
 import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
+import de.uni.trier.infsec.functionalities.samt.ideal.SAMT.SAMTError;
 import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
 
 /*
@@ -29,7 +30,7 @@ public class Server {
 	/*
 	 * Collect one ballot (read from a secure channel)
 	 */
-	public void onCollectBallot() {
+	public void onCollectBallot() throws SAMTError {
 		SAMT.AuthenticatedMessage am = samt_proxy.getMessage();
 		if (am==null) return;
 		int voterID = am.sender_id;
