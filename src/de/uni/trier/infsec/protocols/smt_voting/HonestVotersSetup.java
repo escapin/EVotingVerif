@@ -181,7 +181,7 @@ public class HonestVotersSetup {
 
 			case 2: // the server sends the result of the election (if ready) over the network
 					try {
-						server.onSendResult();
+						server.onSendResult("", 1);
 					}
 					catch (NetworkError err) {}
 					break;
@@ -195,10 +195,8 @@ public class HonestVotersSetup {
 					break;
 
 			case 5: // the bulletin board sends its content (over the network):
-					try {
-						BB.onRequestContent();
-					}
-					catch (NetworkError err) {}
+					byte[] content = BB.onRequestContent();
+					Environment.untrustedOutputMessage(content);
 					break;
 
 			case 6: // the adversary sends a message using its channel to the server

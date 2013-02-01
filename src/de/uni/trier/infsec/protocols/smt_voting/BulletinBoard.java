@@ -1,7 +1,5 @@
 package de.uni.trier.infsec.protocols.smt_voting;
 
-import de.uni.trier.infsec.environment.network.Network;
-import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
 import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
 import de.uni.trier.infsec.utils.MessageTools;
@@ -34,12 +32,12 @@ public class BulletinBoard {
 	 * Sends its content (that is the concatenation of all the message in the maintained
 	 * list of messages) over the network.
 	 */
-	public void onRequestContent() throws NetworkError {
+	public byte[] onRequestContent() {
 		byte[] contentMessage = {};
 		for( MessageList.Node node = content.first;  node!=null;  node = node.next ) {
 			contentMessage = MessageTools.concatenate(contentMessage, node.message);
 		}
-		Network.networkOut(contentMessage);
+		return contentMessage;
 	}
 
 	/// implementation ///
