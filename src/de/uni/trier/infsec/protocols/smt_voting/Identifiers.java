@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.protocols.trivvoting;
+package de.uni.trier.infsec.protocols.smt_voting;
 
 /*
  * Collection of agent identifiers.

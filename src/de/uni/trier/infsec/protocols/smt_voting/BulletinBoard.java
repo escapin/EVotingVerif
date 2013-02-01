@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.protocols.trivvoting;
+package de.uni.trier.infsec.protocols.smt_voting;
 
 import de.uni.trier.infsec.environment.network.Network;
 import de.uni.trier.infsec.environment.network.NetworkError;
