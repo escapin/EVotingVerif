@@ -1,7 +1,9 @@
-package de.uni.trier.infsec.functionalities.samt.ideal;
+package de.uni.trier.infsec.functionalities.smt.ideal;
 
 import de.uni.trier.infsec.utils.MessageTools;
-import de.uni.trier.infsec.environment.Environment;
+import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
+import de.uni.trier.infsec.environment.network.NetworkError;
+import de.uni.trier.infsec.environment.smt.SMTEnv;
 
 /**
  * Ideal functionality for SAMT (Secure Authenticated Message Transmission).
@@ -24,16 +26,11 @@ import de.uni.trier.infsec.environment.Environment;
  * 		// msg.message contains the received message
  * 		// msg.sender_id contains the id of the sender
  */
-public class SAMT {
+public class SMT {
 	
 	//// The public interface ////
 
-//	@SuppressWarnings("serial")
-	static public class Error extends Exception {}
-//	@SuppressWarnings("serial")
-	static public class NetworkError extends Error {}
-//	@SuppressWarnings("serial")
-	static public class PKIError extends Error {}
+	static public class SMTError extends Exception {}
 
 	/** 
 	 * Pair (message, sender_id).
@@ -75,23 +72,22 @@ public class SAMT {
 		 * In this ideal implementation the environment decides which message is to be delivered.
 		 * The same message may be delivered several times or not delivered at all.
 		 */
-		public AuthenticatedMessage getMessage() {
-			Environment.untrustedOutput(ID);
-			int index = Environment.untrustedInput();
+		public AuthenticatedMessage getMessage() throws SMTError {
+			if (registrationInProgress) throw new SMTError();
+			int index = SMTEnv.getMessage(this.ID);
+			if (index < 0) return null;
 			return queue.get(index);
 		}
 
-		public Channel channelTo(int recipient_id) throws Error {
-			// leak our ID and the ID of the recipient:
-			Environment.untrustedOutput(ID);
-			Environment.untrustedOutput(recipient_id);
-			// ask the environment, whether we get any answer from the PKI
-			if (Environment.untrustedInput() == 0) throw new NetworkError();
+		public Channel channelTo(int recipient_id, String server, int port) throws SMTError, PKIError, NetworkError {
+			if (registrationInProgress) throw new SMTError();
+			boolean network_ok = SMTEnv.channelTo(ID, recipient_id, server, port);
+			if (!network_ok) throw new NetworkError();
 			// get the answer from PKI
 			AgentProxy recipient = registeredAgents.fetch(recipient_id);
-			if (recipient==null) throw new PKIError(); // the agent not registered
+			if (recipient == null) throw new PKIError();
 			// create and return the channel
-			return new Channel(this,recipient);
+			return new Channel(this, recipient, server, port);
 		}
 	}
 
@@ -105,20 +101,18 @@ public class SAMT {
 	{
 		private final AgentProxy sender;
 		private final AgentProxy recipient;
-		
-		private Channel(AgentProxy from, AgentProxy to) {
+		private final String server;
+		private final int port;		
+
+		private Channel(AgentProxy from, AgentProxy to, String server, int port) {
 			this.sender = from;
 			this.recipient = to;
+			this.server = server;
+			this.port = port;
 		}		
 		
-		public void send(byte[] message) throws NetworkError {
-			// leak the length of the sent message and the identities of the involved parties
-			Environment.untrustedOutput(sender.ID);
-			Environment.untrustedOutput(recipient.ID);
-			Environment.untrustedOutput(message.length);
-			// possibly there are problems with the network (up to the environment)
-			if (Environment.untrustedInput() == 0) throw new NetworkError();
-			// add the message along with the identity of the sender to the queue of the recipient
+		public void send(byte[] message) {
+			SMTEnv.send(message.length, sender.ID, recipient.ID, server, port);
 			recipient.queue.add(MessageTools.copyOf(message), sender.ID);
 		}
 	}
@@ -127,21 +121,24 @@ public class SAMT {
 	 * Registering an agent with the given id. If this id has been already used (registered), 
 	 * registration fails (the method returns null).
 	 */
-	public static AgentProxy register(int id) throws Error {
-		Environment.untrustedOutput(id); // we try to register id --> adversary
-		// the environment can make registration impossible (by blocking the communication)
-		if(  Environment.untrustedInput() == 0 ) throw new NetworkError();
-		// check if the id is free
+	public static AgentProxy register(int id) throws SMTError, PKIError {
+		if (registrationInProgress) throw new SMTError();
+		registrationInProgress = true;
+		// call the environment/simulator
+		SMTEnv.register(id);
+		// check whether the id has not been claimed
 		if( registeredAgents.fetch(id) != null ) {
-			Environment.untrustedOutput(0); // registration unsuccessful --> adversary
+			registrationInProgress = false;
 			throw new PKIError();
 		}
 		// create a new agent, add it to the list of registered agents, and return it
 		AgentProxy agent = new AgentProxy(id);
 		registeredAgents.add(agent);
-		Environment.untrustedOutput(0); // registration successful --> adversary
+		registrationInProgress = false;
 		return agent;
 	}
+
+	private static boolean registrationInProgress = false;
 		
 	
 	//// Implementation ////

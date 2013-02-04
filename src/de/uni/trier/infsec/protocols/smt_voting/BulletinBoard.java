@@ -1,8 +1,7 @@
-package de.uni.trier.infsec.protocols.trivvoting;
+package de.uni.trier.infsec.protocols.smt_voting;
 
-import de.uni.trier.infsec.environment.network.Network;
-import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
+import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
 import de.uni.trier.infsec.utils.MessageTools;
 
 /*
@@ -20,7 +19,7 @@ public class BulletinBoard {
 	 * Reads a message, checks if it comes from the server, and, if this is the
 	 * case, adds it to the maintained list of messages.
 	 */
-	public void onPost() {
+	public void onPost() throws AMTError {
 		AMT.AuthenticatedMessage am = amt_proxy.getMessage();
 		if (am == null) return;
 		if (am.sender_id != Identifiers.SERVER_ID) return;
@@ -33,12 +32,12 @@ public class BulletinBoard {
 	 * Sends its content (that is the concatenation of all the message in the maintained
 	 * list of messages) over the network.
 	 */
-	public void onRequestContent() throws NetworkError {
+	public byte[] onRequestContent() {
 		byte[] contentMessage = {};
 		for( MessageList.Node node = content.first;  node!=null;  node = node.next ) {
 			contentMessage = MessageTools.concatenate(contentMessage, node.message);
 		}
-		Network.networkOut(contentMessage);
+		return contentMessage;
 	}
 
 	/// implementation ///

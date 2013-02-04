@@ -1,9 +1,12 @@
-package de.uni.trier.infsec.protocols.trivvoting;
+package de.uni.trier.infsec.protocols.smt_voting;
 
-import de.uni.trier.infsec.environment.network.Network;
+import de.uni.trier.infsec.environment.network.NetworkClient;
 import de.uni.trier.infsec.environment.network.NetworkError;
-import de.uni.trier.infsec.functionalities.samt.ideal.SAMT;
+import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
+import de.uni.trier.infsec.functionalities.smt.ideal.SMT;
+import de.uni.trier.infsec.functionalities.smt.ideal.SMT.SMTError;
 import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
+import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
 
 /*
  * The server of TrivVoting. Collects votes send to it directly (via method call).
@@ -16,12 +19,12 @@ public class Server {
 	private final boolean[] ballotCast = new boolean[NumberOfVoters];  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private int votesForA = 0;
 	private int votesForB = 0;
-	private final SAMT.AgentProxy samt_proxy;
+	private final SMT.AgentProxy samt_proxy;
 	private final AMT.Channel channel_to_BB;
 
-	public Server(SAMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) throws AMT.Error {
+	public Server(SMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) throws AMTError, PKIError, NetworkError {
 		this.samt_proxy = samt_proxy;
-		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID);
+		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID, "www.bulletinboard.com", 89);
 		for( int i=0; i<NumberOfVoters; ++i)
 			ballotCast[i] = false; // initially no voter has cast her ballot
 	}
@@ -29,8 +32,8 @@ public class Server {
 	/*
 	 * Collect one ballot (read from a secure channel)
 	 */
-	public void onCollectBallot() {
-		SAMT.AuthenticatedMessage am = samt_proxy.getMessage();
+	public void onCollectBallot() throws SMTError {
+		SMT.AuthenticatedMessage am = samt_proxy.getMessage();
 		if (am==null) return;
 		int voterID = am.sender_id;
 		byte[] ballot = am.message;
@@ -59,16 +62,16 @@ public class Server {
 	/*
 	 * Send the result (if ready) of the election over the network.
 	 */
-	public void onSendResult() throws NetworkError {
+	public void onSendResult(String addr, int port) throws NetworkError {
 		byte[] result = getResult();
 		if (result != null)
-			Network.networkOut(result);
+			NetworkClient.send(result, addr, port);
 	}
 
 	/*
 	 * Post the result (if ready) on the bulletin board.
 	 */
-	public void onPostResult() throws AMT.Error {
+	public void onPostResult() throws AMTError {
 		byte[] result = getResult();
 		if (result != null)
 			channel_to_BB.send(result);
