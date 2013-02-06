@@ -56,3 +56,13 @@ verify the non-interference of the original getResult() code from the master bra
 We can now detect, that the read operations (votesFor(A|B)) in line 7 and 8 only
 depend on the values set in lines 3 and 4 and never on the values previously stored
 in both attributes.
+
+7. commit e3699ed8f3c5882e4cf88eca89e7fc77d9e3d137
+
+Automatic optimization kicked in. Parameternodes were merged. This resulted in an unwanted false alarm.
+Solution: 
+	- Increase the merge threshold for the analysis: 
+		"-Dobjgraph.max-nodes-per-interface=40"
+or
+	- Deactivate automatic optimization:
+		"-Dobjgraph.max-nodes-per-interface=-1"
