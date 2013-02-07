@@ -1,7 +1,8 @@
 package de.uni.trier.infsec.protocols.smt_voting;
 
+
 /*
- * Collection of agent identifiers.
+ * Agent identifiers.
  */
 public class Identifiers {
 	static final int SERVER_ID = -1;

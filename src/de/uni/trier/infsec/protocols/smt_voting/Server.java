@@ -24,7 +24,7 @@ public class Server {
 
 	public Server(SMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) throws AMTError, PKIError, NetworkError {
 		this.samt_proxy = samt_proxy;
-		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID, "www.bulletinboard.com", 89);
+		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID, Parameters.DEFAULT_HOST_BBOARD, Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
 		for( int i=0; i<NumberOfVoters; ++i)
 			ballotCast[i] = false; // initially no voter has cast her ballot
 	}
@@ -33,7 +33,7 @@ public class Server {
 	 * Collect one ballot (read from a secure channel)
 	 */
 	public void onCollectBallot() throws SMTError {
-		SMT.AuthenticatedMessage am = samt_proxy.getMessage(789);
+		SMT.AuthenticatedMessage am = samt_proxy.getMessage(Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
 		if (am==null) return;
 		int voterID = am.sender_id;
 		byte[] ballot = am.message;
@@ -93,7 +93,7 @@ public class Server {
 	/*
 	 * Format the result of the election.
 	 */
-	static byte[] formatResult(int a, int b) {
+	private static byte[] formatResult(int a, int b) {
 		String s = "Result of the election:";
 		s += "  Number of voters = " + NumberOfVoters + "\n";
 		s += "  Number of votes for candidate 1 =" + a + "\n";
