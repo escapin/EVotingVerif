@@ -40,16 +40,6 @@ public class HonestVotersSetup {
 		public int votesForB = 0;
 	}
 
-	/*
-	 * Class with static fields to store the correct result computed from the votes actually
-	 * used by the voters. This class plays the role of the class M from the hybrid approach,
-	 * as described in the paper.
-	 */
-	static class CorrectResult {
-		static public int votesForA = 0;
-		static public int votesForB = 0;
-	}
-
 
 	static private boolean secret;  // SECRET INPUT
 
@@ -108,8 +98,6 @@ public class HonestVotersSetup {
 		Result result1 = result(voterChoices1);
 		Result result2 = result(voterChoices2);
 		if( !sameResults(result1,result2) ) return false;
-		CorrectResult.votesForA = result1.votesForA; // (hybrid approach extension)
-		CorrectResult.votesForB = result1.votesForB; // (hybrid approach extension)
 		return true;
 	}
 
