@@ -1,12 +1,6 @@
 package de.uni.trier.infsec.protocols.smt_voting;
 
-import de.uni.trier.infsec.environment.network.NetworkClient;
-import de.uni.trier.infsec.environment.network.NetworkError;
-import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
-import de.uni.trier.infsec.functionalities.smt.ideal.SMT;
-import de.uni.trier.infsec.functionalities.smt.ideal.SMT.SMTError;
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
+import de.uni.trier.infsec.environment.Environment;
 
 /*
  * The server of TrivVoting. Collects votes send to it directly (via method call).
@@ -19,26 +13,17 @@ public class Server {
 	private final boolean[] ballotCast;  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private int votesForA;
 	private int votesForB;
-	private final SMT.AgentProxy samt_proxy;
-	private final AMT.Channel channel_to_BB;
 
-	public Server(SMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) throws AMTError, PKIError, NetworkError {
+	public Server() {
 		votesForA = 0;
-                votesForB = 0;
-                this.samt_proxy = samt_proxy;
-		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID, Parameters.DEFAULT_HOST_BBOARD, Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
-                ballotCast = new boolean[NumberOfVoters]; // initially no voter has cast her ballot
+        votesForB = 0;
+        ballotCast = new boolean[NumberOfVoters]; // initially no voter has cast her ballot
 	}
 
 	/*
 	 * Collect one ballot (read from a secure channel)
 	 */
-	public void onCollectBallot() throws SMTError {
-		SMT.AuthenticatedMessage am = samt_proxy.getMessage(Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
-		if (am==null) return;
-		int voterID = am.sender_id;
-		byte[] ballot = am.message;
-
+	public void onCollectBallot(int voterID, byte[] ballot) {
 		if( voterID<0 || voterID>=NumberOfVoters ) return;  // invalid  voter ID
 		if( ballotCast[voterID] ) return;  // the voter has already voted
 		ballotCast[voterID] = true; 
@@ -46,7 +31,6 @@ public class Server {
 		int candidate = ballot[0];
 		if (candidate==0) ++votesForA;
 		if (candidate==1) ++votesForB;
-		// all the remaining values are consider invalid
 	}
 
 	/*
@@ -61,21 +45,12 @@ public class Server {
 	}
 
 	/*
-	 * Send the result (if ready) of the election over the network.
-	 */
-	public void onSendResult(String addr, int port) throws NetworkError {
-		byte[] result = getResult();
-		if (result != null)
-			NetworkClient.send(result, addr, port);
-	}
-
-	/*
 	 * Post the result (if ready) on the bulletin board.
 	 */
-	public void onPostResult() throws AMTError {
+	public void onPostResult()  {
 		byte[] result = getResult();
 		if (result != null)
-			channel_to_BB.send(result);
+			Environment.untrustedOutputMessage(result);
 	}
 
 	private byte[] getResult() {

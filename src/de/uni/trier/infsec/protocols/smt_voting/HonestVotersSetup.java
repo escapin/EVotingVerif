@@ -1,13 +1,6 @@
 package de.uni.trier.infsec.protocols.smt_voting;
 
-import de.uni.trier.infsec.environment.network.NetworkError;
 import de.uni.trier.infsec.environment.Environment;
-import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
-import de.uni.trier.infsec.functionalities.smt.ideal.SMT;
-import de.uni.trier.infsec.functionalities.smt.ideal.SMT.SMTError;
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
-
 
 /*
  * A setup for a server and (multiple) honest clients using secure authenticated channel
@@ -19,18 +12,6 @@ import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
  * to be taken.
  */
 public class HonestVotersSetup {
-
-	static class Adversary {
-		public final SMT.Channel channel_to_server;
-		public final AMT.Channel channel_to_BB;
-
-		public Adversary() throws SMTError, PKIError, NetworkError, AMTError {
-			SMT.AgentProxy adversary_samt_proxy = SMT.register(Identifiers.ADVERSARY_ID);
-			channel_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID, "www.server.com", 89);
-			AMT.AgentProxy adversary_amt_proxy = AMT.register(Identifiers.ADVERSARY_ID);
-			channel_to_BB = adversary_amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID, "www.bulletinboard.com", 89);
-		}
-	}
 
 	/*
 	 * Objects representing a result of the e-voting process. For now, two candidates only.
@@ -55,7 +36,6 @@ public class HonestVotersSetup {
 
 	static private Voter[] voters;
 	static private Server server;
-	static private BulletinBoard BB;
 
 
 	/**
@@ -85,9 +65,8 @@ public class HonestVotersSetup {
 	 * checks if these two vectors yield the same result. If not, false is returned. Otherwise, voters
 	 * are registered and created.
 	 */
-	private static boolean select_voters_choices_and_create_voters(byte[] voterChoices1, byte[] voterChoices2) throws SMTError, PKIError, NetworkError {
-		// we check whether voterChoices1 and voterChoices2 yield the same
-		// results:
+	private static boolean select_voters_choices_and_create_voters(byte[] voterChoices1, byte[] voterChoices2)  {
+		// we check whether voterChoices1 and voterChoices2 yield the same results:
 		boolean status = computeCorrectResult(voterChoices1, voterChoices2);
 		if (!status) return false;
 
@@ -130,94 +109,41 @@ public class HonestVotersSetup {
 	/**
 	 * Register and create the voters.
 	 */
-	private static void registerAndCreateVoters(byte[] voterChoices) throws SMTError, PKIError, NetworkError {
+	private static void registerAndCreateVoters(byte[] voterChoices)  {
 		voters = new Voter[Server.NumberOfVoters];
-                for( int i=0; i<Server.NumberOfVoters; ++i ) {
-			SMT.AgentProxy voter_proxy = SMT.register(i);
-			voters[i] = new Voter(voterChoices[i], voter_proxy);
+		for( int i=0; i<Server.NumberOfVoters; ++i ) {
+			voters[i] = new Voter(i, voterChoices[i]);
 		}
 	}
 
-	/**
-	 * Register and create the server.
-	 */
-	private static void create_server() throws SMTError, PKIError, AMTError, NetworkError {
-		SMT.AgentProxy server_samt_proxy = SMT.register(Identifiers.SERVER_ID);
-		AMT.AgentProxy server_amt_proxy = AMT.register(Identifiers.SERVER_ID);
-		server = new Server(server_samt_proxy, server_amt_proxy);
-	}
-
-	/**
-	 * Register and create the bulletin board.
-	 */
-	private static void create_bulletin_board() throws AMTError, PKIError {
-		// Register and create the bulletin board:
-		AMT.AgentProxy BB_proxy = AMT.register(Identifiers.BULLETIN_BOARD_ID);
-		BB = new BulletinBoard(BB_proxy);
-	}
-
-        private static void onVote() throws SMTError {
-                int voter_id = Environment.untrustedInput();
-                if (voter_id>=0 && voter_id<Server.NumberOfVoters) {
-                        voters[voter_id].onSendBallot();
-                }
+    private static void onVote()  {
+        int voter_id = Environment.untrustedInput();
+        if (voter_id>=0 && voter_id<Server.NumberOfVoters) {
+                voters[voter_id].onSendBallot(server);
         }
+    }
+
 
 	/**
 	 * Run the main loop of the setup.
-	 *
-	 * First, the adversary registers his SAMT and AMT functionalities. Then, in a loop, the
-	 * adversary decides which actions are taken.
 	 */
-	private static void run() throws SMTError, PKIError, NetworkError, AMTError {
-		Adversary adversary = new Adversary();
+	private static void run()  {
 		// Main loop -- the adversary decides how many times it runs and what to do in each step:
 		while( Environment.untrustedInput() != 0 )  {
-			byte[] message;
 			int decision = Environment.untrustedInput();
 			switch (decision) {
 			case 0:	// a voter (determined by the adversary) votes according to voterChoices
 					onVote();
 					break;
 
-			case 1: // server reads a message (possibly a ballot) from a secure channel
-					server.onCollectBallot();
-					break;
-
-			case 2: // the server sends the result of the election (if ready) over the network
-					try {
-						server.onSendResult("", 1);
-					}
-					catch (NetworkError err) {}
-					break;
-
-			case 3: // the server posts the result of the election (if ready) on the bulletin board
+			case 1: // the server posts the result of the election (if ready) on the bulletin board
 					server.onPostResult();
-					break;
-
-			case 4: // the bulletin board reads a message:
-					BB.onPost();
-					break;
-
-			case 5: // the bulletin board sends its content (over the network):
-					byte[] content = BB.onRequestContent();
-					Environment.untrustedOutputMessage(content);
-					break;
-
-			case 6: // the adversary sends a message using its channel to the server
-					message = Environment.untrustedInputMessage();
-					adversary.channel_to_server.send(message);
-					break;
-
-			case 7: // the adversary sends a message using its channel to the bulletin board
-					message = Environment.untrustedInputMessage();
-					adversary.channel_to_BB.send(message);
 					break;
 			}
 		}
 	}
 
-	public static void main(String[] args) throws SMTError, PKIError, NetworkError, AMTError {
+	public static void main(String[] args)  {
 		// the adversary determines two possible ways the voters vote:
 		byte[] voterChoices1 = new byte[Server.NumberOfVoters];
 		byte[] voterChoices2 = new byte[Server.NumberOfVoters];
@@ -228,8 +154,7 @@ public class HonestVotersSetup {
 
 		boolean status = select_voters_choices_and_create_voters(voterChoices1, voterChoices2);
 		if (!status) return;
-		create_server();
-		create_bulletin_board();
+		server = new Server();
 		run();
 	}
 }
