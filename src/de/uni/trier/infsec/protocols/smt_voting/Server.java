@@ -2,13 +2,8 @@ package de.uni.trier.infsec.protocols.smt_voting;
 
 import de.uni.trier.infsec.environment.Environment;
 
-/*
- * The server of TrivVoting. Collects votes send to it directly (via method call).
- * 
- * Two-candidates case only (for now).
- */
-public class Server {
-
+public class Server 
+{
 	public static final int NumberOfVoters = 50;
 	private final boolean[] ballotCast;  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private int votesForA;
@@ -26,15 +21,15 @@ public class Server {
 	public void onCollectBallot(int voterID, byte[] ballot) {
 		if( voterID<0 || voterID>=NumberOfVoters ) return;  // invalid  voter ID
 		if( ballotCast[voterID] ) return;  // the voter has already voted
-		ballotCast[voterID] = true; 
 		if( ballot==null || ballot.length!=1 ) return;  // malformed ballot
+		ballotCast[voterID] = true; 
 		int candidate = ballot[0];
 		if (candidate==0) ++votesForA;
 		if (candidate==1) ++votesForB;
 	}
 
 	/*
-	 * Returns true if the result is ready, that is if all the eligible voters have already voted.
+	 * Returns true if the result is ready, that is if all eligible voters have already voted.
 	 */
 	public boolean resultReady() {
 		for( int i=0; i<NumberOfVoters; ++i ) {

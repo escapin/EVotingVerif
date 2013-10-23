@@ -17,7 +17,7 @@ public class Voter {
 	 */
 	public void onSendBallot(Server server)  {
 		byte [] ballot = new byte[] {vote};
-		// send the vote directly to the server		
+		// send the vote directly to the server	(by a method call)	
 		server.onCollectBallot(id, ballot);
 	}
 }

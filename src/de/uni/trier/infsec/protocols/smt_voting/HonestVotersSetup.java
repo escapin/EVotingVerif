@@ -14,14 +14,6 @@ import de.uni.trier.infsec.environment.Environment;
 public class HonestVotersSetup {
 
 	/*
-	 * Objects representing a result of the e-voting process. For now, two candidates only.
-	 */
-	static class Result {
-		public int votesForA = 0;
-		public int votesForB = 0;
-	}
-
-	/*
 	 * Class with static fields to store the correct result computed from the votes actually
 	 * used by the voters. This class plays the role of the class M from the hybrid approach,
 	 * as described in the paper.
@@ -31,12 +23,13 @@ public class HonestVotersSetup {
 		static public int votesForB = 0;
 	}
 
-
-	static private boolean secret;  // SECRET INPUT
-
-	static private Voter[] voters;
-	static private Server server;
-
+	/**
+	 * Objects representing a result of the e-voting process. For now, two candidates only.
+	 */
+	static class Result {
+		public int votesForA = 0;
+		public int votesForB = 0;
+	}
 
 	/**
 	 * Compute the correct result from a vector of voters' choices
@@ -60,6 +53,12 @@ public class HonestVotersSetup {
 	}
 
 
+	static private boolean secret;  // SECRET INPUT
+
+	static private Voter[] voters;
+	static private Server server;
+
+	
 	/**
 	 * Computes the correct result, as determined by the vectors voters' choices given as parameters,
 	 * checks if these two vectors yield the same result. If not, false is returned. Otherwise, voters
@@ -116,12 +115,12 @@ public class HonestVotersSetup {
 		}
 	}
 
-    private static void onVote()  {
-        int voter_id = Environment.untrustedInput();
-        if (voter_id>=0 && voter_id<Server.NumberOfVoters) {
-                voters[voter_id].onSendBallot(server);
-        }
-    }
+	private static void onVote()  {
+		int voter_id = Environment.untrustedInput();
+		if (voter_id>=0 && voter_id<Server.NumberOfVoters) {
+			voters[voter_id].onSendBallot(server);
+		}
+	}
 
 
 	/**
@@ -133,12 +132,12 @@ public class HonestVotersSetup {
 			int decision = Environment.untrustedInput();
 			switch (decision) {
 			case 0:	// a voter (determined by the adversary) votes according to voterChoices
-					onVote();
-					break;
+				onVote();
+				break;
 
 			case 1: // the server posts the result of the election (if ready) on the bulletin board
-					server.onPostResult();
-					break;
+				server.onPostResult();
+				break;
 			}
 		}
 	}
