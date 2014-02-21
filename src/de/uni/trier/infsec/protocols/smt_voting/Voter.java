@@ -1,28 +1,25 @@
 package de.uni.trier.infsec.protocols.smt_voting;
 
-import de.uni.trier.infsec.environment.network.NetworkError;
-import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
-import de.uni.trier.infsec.functionalities.smt.ideal.SMT;
-import de.uni.trier.infsec.functionalities.smt.ideal.SMT.SMTError;
+import de.uni.trier.infsec.lib.network.NetworkError;
+import de.uni.trier.infsec.functionalities.pki_nocorrupt.PKIError;
+import de.uni.trier.infsec.functionalities.smt.SMT;
+import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 
-/*
- * Voter client for TrivVoting.
- */
 public class Voter {
 	private final byte vote;
-	private final SMT.Channel channel_to_server;
+	private final SMT.Sender sender;
 
-	public Voter(byte vote, SMT.AgentProxy voter_proxy) throws SMTError, PKIError, NetworkError  {
+	public Voter(byte vote, SMT.Sender sender) throws SMTError, PKIError, NetworkError  {
 		this.vote = vote;
-		// create secure channel to the server
-		this.channel_to_server = voter_proxy.channelTo(Identifiers.SERVER_ID, Parameters.DEFAULT_HOST_SERVER, Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
+		this.sender = sender; 
 	}
 
 	/*
-	 * Prepare the ballot containing the vote and send it using the secure channel to the server.
+	 * Prepare the ballot containing the vote and send it to the server using the secure 
+	 * message transfer functionality.
 	 */
-	public void onSendBallot() throws SMTError {
+	public void onSendBallot() throws PKIError, NetworkError, SMTError {
 		byte [] ballot = new byte[] {vote};
-		channel_to_server.send(ballot);
+		sender.sendTo(ballot,  Identifiers.SERVER_ID, Parameters.DEFAULT_HOST_SERVER, Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
 	}
 }

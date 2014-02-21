@@ -1,12 +1,12 @@
 package de.uni.trier.infsec.protocols.smt_voting;
 
-import de.uni.trier.infsec.environment.network.NetworkError;
+import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.environment.Environment;
-import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
-import de.uni.trier.infsec.functionalities.smt.ideal.SMT;
-import de.uni.trier.infsec.functionalities.smt.ideal.SMT.SMTError;
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
+import de.uni.trier.infsec.functionalities.pki_nocorrupt.PKIError;
+import de.uni.trier.infsec.functionalities.smt.SMT;
+import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
+import de.uni.trier.infsec.functionalities.amt.AMT;
+import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
 
 
 /*
@@ -21,12 +21,13 @@ import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
 public class HonestVotersSetup {
 
 	static class Adversary {
-		public final SMT.Channel channel_to_server;
+		public final SMT.Sender sender;
 		public final AMT.Channel channel_to_BB;
 
 		public Adversary() throws SMTError, PKIError, NetworkError, AMTError {
-			SMT.AgentProxy adversary_samt_proxy = SMT.register(Identifiers.ADVERSARY_ID);
-			channel_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID, "www.server.com", 89);
+			sender = SMT.registerSender(Identifiers.ADVERSARY_ID);
+			// channel_to_server = adversary_samt_proxy.channelTo(Identifiers.SERVER_ID, "www.server.com", 89);
+			// TOTO clean it
 			AMT.AgentProxy adversary_amt_proxy = AMT.register(Identifiers.ADVERSARY_ID);
 			channel_to_BB = adversary_amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID, "www.bulletinboard.com", 89);
 		}
@@ -133,8 +134,8 @@ public class HonestVotersSetup {
 	private static void registerAndCreateVoters(byte[] voterChoices) throws SMTError, PKIError, NetworkError {
 		voters = new Voter[Server.NumberOfVoters];
                 for( int i=0; i<Server.NumberOfVoters; ++i ) {
-			SMT.AgentProxy voter_proxy = SMT.register(i);
-			voters[i] = new Voter(voterChoices[i], voter_proxy);
+			SMT.Sender sender = SMT.registerSender(i);
+			voters[i] = new Voter(voterChoices[i], sender);
 		}
 	}
 
@@ -142,9 +143,9 @@ public class HonestVotersSetup {
 	 * Register and create the server.
 	 */
 	private static void create_server() throws SMTError, PKIError, AMTError, NetworkError {
-		SMT.AgentProxy server_samt_proxy = SMT.register(Identifiers.SERVER_ID);
+		SMT.Receiver receiver = SMT.registerReceiver(Identifiers.SERVER_ID);
 		AMT.AgentProxy server_amt_proxy = AMT.register(Identifiers.SERVER_ID);
-		server = new Server(server_samt_proxy, server_amt_proxy);
+		server = new Server(receiver, server_amt_proxy);
 	}
 
 	/**
@@ -156,7 +157,7 @@ public class HonestVotersSetup {
 		BB = new BulletinBoard(BB_proxy);
 	}
 
-        private static void onVote() throws SMTError {
+        private static void onVote() throws SMTError, PKIError, NetworkError {
                 int voter_id = Environment.untrustedInput();
                 if (voter_id>=0 && voter_id<Server.NumberOfVoters) {
                         voters[voter_id].onSendBallot();
@@ -204,9 +205,12 @@ public class HonestVotersSetup {
 					Environment.untrustedOutputMessage(content);
 					break;
 
-			case 6: // the adversary sends a message using its channel to the server
+			case 6: // the adversary sends a message using its sender
 					message = Environment.untrustedInputMessage();
-					adversary.channel_to_server.send(message);
+					int receiver_id = Environment.untrustedInput();
+					String host = Environment.untrustedInputMessage().toString();
+					int port = Environment.untrustedInput();
+					adversary.sender.sendTo(message, receiver_id, host, port);
 					break;
 
 			case 7: // the adversary sends a message using its channel to the bulletin board

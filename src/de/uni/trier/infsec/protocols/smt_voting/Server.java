@@ -1,12 +1,12 @@
 package de.uni.trier.infsec.protocols.smt_voting;
 
-import de.uni.trier.infsec.environment.network.NetworkClient;
-import de.uni.trier.infsec.environment.network.NetworkError;
-import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
-import de.uni.trier.infsec.functionalities.smt.ideal.SMT;
-import de.uni.trier.infsec.functionalities.smt.ideal.SMT.SMTError;
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
+import de.uni.trier.infsec.lib.network.NetworkClient;
+import de.uni.trier.infsec.lib.network.NetworkError;
+import de.uni.trier.infsec.functionalities.pki_nocorrupt.PKIError;
+import de.uni.trier.infsec.functionalities.smt.SMT;
+import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
+import de.uni.trier.infsec.functionalities.amt.AMT;
+import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
 
 /*
  * The server of TrivVoting. Collects votes send to it directly (via method call).
@@ -19,13 +19,13 @@ public class Server {
 	private final boolean[] ballotCast;  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private int votesForA;
 	private int votesForB;
-	private final SMT.AgentProxy samt_proxy;
+	private final SMT.Receiver receiver;
 	private final AMT.Channel channel_to_BB;
 
-	public Server(SMT.AgentProxy samt_proxy, AMT.AgentProxy amt_proxy) throws AMTError, PKIError, NetworkError {
+	public Server(SMT.Receiver receiver, AMT.AgentProxy amt_proxy) throws AMTError, PKIError, NetworkError {
 		votesForA = 0;
                 votesForB = 0;
-                this.samt_proxy = samt_proxy;
+                this.receiver = receiver;
 		channel_to_BB = amt_proxy.channelTo(Identifiers.BULLETIN_BOARD_ID, Parameters.DEFAULT_HOST_BBOARD, Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
                 ballotCast = new boolean[NumberOfVoters]; // initially no voter has cast her ballot
 	}
@@ -34,7 +34,7 @@ public class Server {
 	 * Collect one ballot (read from a secure channel)
 	 */
 	public void onCollectBallot() throws SMTError {
-		SMT.AuthenticatedMessage am = samt_proxy.getMessage(Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
+		SMT.AuthenticatedMessage am = receiver.getMessage(Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
 		if (am==null) return;
 		int voterID = am.sender_id;
 		byte[] ballot = am.message;

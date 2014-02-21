@@ -1,7 +1,7 @@
 package de.uni.trier.infsec.protocols.smt_voting;
 
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
+import de.uni.trier.infsec.functionalities.amt.AMT;
+import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
 import de.uni.trier.infsec.utils.MessageTools;
 
 /*

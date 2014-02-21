@@ -1,37 +1,36 @@
-package de.uni.trier.infsec.functionalities.smt.ideal;
+package de.uni.trier.infsec.functionalities.amt;
 
 import de.uni.trier.infsec.utils.MessageTools;
-import de.uni.trier.infsec.functionalities.pki.ideal.PKIError;
-import de.uni.trier.infsec.environment.network.NetworkClient;
-import de.uni.trier.infsec.environment.network.NetworkError;
-import de.uni.trier.infsec.environment.smt.SMTEnv;
+import de.uni.trier.infsec.functionalities.pki_nocorrupt.PKIError;
+import de.uni.trier.infsec.lib.network.NetworkClient;
+import de.uni.trier.infsec.lib.network.NetworkError;
+import de.uni.trier.infsec.environment.AMTEnv;
 
 /**
- * Ideal functionality for SAMT (Secure Authenticated Message Transmission).
- * 
+ * Ideal functionality for AMT (Authenticated Message Transmission).
+ *
  * Every party who wants to use this functionality should first register itself:
- * 
- * 		AgentProxy a = SAMT.register(ID_OF_A);
- *  
+ *
+ * 		AgentProxy a = AMT.register(ID_OF_A);
+ *
  * Then, to send messages to a party with identifier ID_OF_B:
- * 
+ *
  * 		Channel channel_to_b = a.channelTo(ID_OF_B);
  * 		channel_to_b.send( message1 );
  * 		channel_to_b.send( message2 );
- * 
- * (It is also possible to create a channel to b by calling a.channelToAgent(b).)
- * 
+ *
  * To read messages sent to the agent a:
- * 
+ *
  * 		AuthenticatedMessage msg = a.getMessage();
  * 		// msg.message contains the received message
  * 		// msg.sender_id contains the id of the sender
  */
-public class SMT {
-	
+public class AMT {
+
 	//// The public interface ////
 
-	static public class SMTError extends Exception {}
+	@SuppressWarnings("serial")
+	static public class AMTError extends Exception {}
 
 	/** 
 	 * Pair (message, sender_id).
@@ -39,9 +38,10 @@ public class SMT {
 	 * Objects of this class are returned when an agent reads a message from its queue.
 	 */
 	static public class AuthenticatedMessage {
-		public final byte[] message;
-		public final int sender_id;
-		public AuthenticatedMessage(byte[] message, int sender) {
+		public byte[] message;
+		public int sender_id;
+
+		private AuthenticatedMessage(byte[] message, int sender) {
 			this.sender_id = sender;  this.message = message;
 		}
 	}
@@ -73,16 +73,16 @@ public class SMT {
 		 * In this ideal implementation the environment decides which message is to be delivered.
 		 * The same message may be delivered several times or not delivered at all.
 		 */
-		public AuthenticatedMessage getMessage(int port) throws SMTError {
-			if (registrationInProgress) throw new SMTError();
-			int index = SMTEnv.getMessage(this.ID, port);
+		public AuthenticatedMessage getMessage(int port) throws AMTError {
+			if (registrationInProgress) throw new AMTError();
+			int index = AMTEnv.getMessage(this.ID, port);
 			if (index < 0) return null;
 			return queue.get(index);
 		}
 
-		public Channel channelTo(int recipient_id, String server, int port) throws SMTError, PKIError, NetworkError {
-			if (registrationInProgress) throw new SMTError();
-			boolean network_ok = SMTEnv.channelTo(ID, recipient_id, server, port);
+		public Channel channelTo(int recipient_id, String server, int port) throws AMTError, PKIError, NetworkError {
+			if (registrationInProgress) throw new AMTError();
+			boolean network_ok = AMTEnv.channelTo(ID, recipient_id, server, port);
 			if (!network_ok) throw new NetworkError();
 			// get the answer from PKI
 			AgentProxy recipient = registeredAgents.fetch(recipient_id);
@@ -113,7 +113,7 @@ public class SMT {
 		}		
 		
 		public void send(byte[] message) {
-			byte[] output_message = SMTEnv.send(message.length, sender.ID, recipient.ID, server, port);
+			byte[] output_message = AMTEnv.send(message, sender.ID, recipient.ID, server, port);
 			recipient.queue.add(MessageTools.copyOf(message), sender.ID);
 			try {
 				NetworkClient.send(output_message, server, port);
@@ -125,11 +125,11 @@ public class SMT {
 	 * Registering an agent with the given id. If this id has been already used (registered), 
 	 * registration fails (the method returns null).
 	 */
-	public static AgentProxy register(int id) throws SMTError, PKIError {
-		if (registrationInProgress) throw new SMTError();
+	public static AgentProxy register(int id) throws AMTError, PKIError {
+		if (registrationInProgress) throw new AMTError();
 		registrationInProgress = true;
 		// call the environment/simulator
-		SMTEnv.register(id);
+		AMTEnv.register(id);
 		// check whether the id has not been claimed
 		if( registeredAgents.fetch(id) != null ) {
 			registrationInProgress = false;

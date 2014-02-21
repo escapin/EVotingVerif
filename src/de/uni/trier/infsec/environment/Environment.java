@@ -9,7 +9,7 @@ class Node {
 }
 
 public class Environment {
-	
+
 	private static boolean result; // the LOW variable
 	
 	private static Node list = null;
