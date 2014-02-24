@@ -2,22 +2,14 @@ package de.uni.trier.infsec.environment;
 
 
 public class AMTEnv {
-	public static void register(int id)	{
-		Environment.untrustedOutput(7801);
+	public static boolean registerSender(int id)	{
+		Environment.untrustedOutput(7901);
 		Environment.untrustedOutput(id);
-	}
-
-	public static boolean channelTo(int sender_id, int recipient_id, String server, int port) {
-		Environment.untrustedOutput(7802);
-		Environment.untrustedOutput(sender_id);
-		Environment.untrustedOutput(recipient_id);
-		Environment.untrustedOutputString(server);
-		Environment.untrustedOutput(port);
 		return Environment.untrustedInput()==0;
 	}
 
-	public static byte[] send(byte[] message, int sender_id, int recipient_id, String server, int port) {
-		Environment.untrustedOutput(7803);
+	public static byte[] sendTo(byte[] message, int sender_id, int recipient_id, String server, int port) {
+		Environment.untrustedOutput(7903);
 		Environment.untrustedOutputMessage(message);
 		Environment.untrustedOutput(sender_id);
 		Environment.untrustedOutput(recipient_id);
@@ -27,9 +19,15 @@ public class AMTEnv {
 	}
 
 	public static int getMessage(int id, int port) {
-		Environment.untrustedOutput(7804);
+		Environment.untrustedOutput(7904);
 		Environment.untrustedOutput(id);
 		Environment.untrustedOutput(port);
 		return Environment.untrustedInput();
+	}
+
+	public static boolean listenOn(int port) {
+		Environment.untrustedOutput(7905);
+		Environment.untrustedOutput(port);
+		return Environment.untrustedInput()==0;
 	}
 }
