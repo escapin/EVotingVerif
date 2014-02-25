@@ -49,7 +49,11 @@ public class Environment {
 		}
 		return returnval;    
     }
-    
+
+    public static String untrustedInputString() {
+    	return untrustedInputMessage().toString();
+    }
+
     public static void untrustedOutputMessage(byte[] t) {
     	untrustedOutput(t.length);
 		for (int i = 0; i < t.length; i++) {

@@ -10,9 +10,8 @@ import de.uni.trier.infsec.utils.MessageTools;
  */
 public class BulletinBoard {
 
-	public BulletinBoard(AMT.AgentProxy proxy) {
+	public BulletinBoard() {
 		content = new MessageList();
-		amt_proxy = proxy;
 	}
 
 	/*
@@ -20,10 +19,9 @@ public class BulletinBoard {
 	 * case, adds it to the maintained list of messages.
 	 */
 	public void onPost() throws AMTError {
-		AMT.AuthenticatedMessage am = amt_proxy.getMessage(Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
+		AMT.AuthenticatedMessage am = AMT.getMessage(Identifiers.SERVER_ID, Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
 		if (am == null) return;
 		if (am.sender_id != Identifiers.SERVER_ID) return;
-
 		byte[] message = am.message;
 		content.add(message);
 	}
@@ -57,5 +55,4 @@ public class BulletinBoard {
 	}
 
 	private MessageList content;
-	private AMT.AgentProxy amt_proxy;
 }
