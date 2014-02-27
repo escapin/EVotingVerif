@@ -12,6 +12,7 @@ public class BulletinBoard {
 
 	public BulletinBoard() {
 		content = new MessageList();
+		AMT.listenOn(Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
 	}
 
 	/*

@@ -22,6 +22,7 @@ public class Server {
 		this.sender = sender_to_BB;
 		votesForCandidates = new int[numberOfCandidates];		
 		ballotCast = new boolean[numberOfVoters]; // initially no voter has cast her ballot
+		receiver.listenOn(Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
 	}
 
 	/*
