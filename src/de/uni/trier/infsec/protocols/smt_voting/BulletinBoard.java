@@ -10,7 +10,7 @@ import de.uni.trier.infsec.utils.MessageTools;
  */
 public class BulletinBoard {
 
-	public BulletinBoard() {
+	public BulletinBoard() throws AMT.ConnectionError {
 		content = new MessageList();
 		AMT.listenOn(Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
 	}

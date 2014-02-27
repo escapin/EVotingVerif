@@ -1,6 +1,5 @@
 package de.uni.trier.infsec.protocols.smt_voting;
 
-import de.uni.trier.infsec.functionalities.pki_nocorrupt.PKIError;
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 import de.uni.trier.infsec.functionalities.amt.AMT;
@@ -15,7 +14,7 @@ public class Server {
 	private final AMT.Sender sender;
 
 	public Server(int numberOfVoters, int numberOfCandidates, 
-			      SMT.Receiver receiver, AMT.Sender sender_to_BB) throws AMTError, PKIError {
+			      SMT.Receiver receiver, AMT.Sender sender_to_BB) throws AMTError, SMT.ConnectionError {
 		this.numberOfVoters = numberOfVoters;
 		this.numberOfCandidates = numberOfCandidates;
 		this.receiver = receiver;
@@ -61,7 +60,7 @@ public class Server {
 	/*
 	 * Post the result (if ready) on the bulletin board.
 	 */
-	public void onPostResult() throws AMTError, PKIError, AMT.ConnectionError {
+	public void onPostResult() throws AMTError, AMT.RegistrationError, AMT.ConnectionError {
 		byte[] result = getResult();
 		if (result != null)
 			sender.sendTo(result, Identifiers.BULLETIN_BOARD_ID, 
