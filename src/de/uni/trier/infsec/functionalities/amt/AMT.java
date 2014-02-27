@@ -1,12 +1,18 @@
 package de.uni.trier.infsec.functionalities.amt;
 
-import de.uni.trier.infsec.utils.MessageTools;
+import static de.uni.trier.infsec.utils.MessageTools.concatenate;
+import static de.uni.trier.infsec.utils.MessageTools.first;
+import static de.uni.trier.infsec.utils.MessageTools.second;
+import de.uni.trier.infsec.functionalities.pkisig.Signer;
+import de.uni.trier.infsec.functionalities.pkisig.Verifier;
+import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
-import de.uni.trier.infsec.environment.AMTEnv;
+import de.uni.trier.infsec.lib.network.NetworkServer;
+import de.uni.trier.infsec.utils.MessageTools;
 
 /**
- * Ideal functionality for AMT (Authenticated Message Transmission).
+ * Real functionality for AMT (Authenticated Message Transmission).
  */
 public class AMT {
 
@@ -16,21 +22,21 @@ public class AMT {
 	static public class AMTError extends Exception {}
 
 	@SuppressWarnings("serial")
-    static public class ConnectionError extends Exception {}
+	static public class RegistrationError extends Exception {}
 
 	@SuppressWarnings("serial")
-    static public class RegistrationError extends Exception {}
+    static public class ConnectionError extends Exception {}
 
 	/** 
-	 * Pair (message, sender_id).
-	 * 
-	 * Objects of this class are returned when a receiver gets a message.
+	 * Pair message, sender_id. 
+	 *
+	 * Objects of this class are returned when an agent try to read a message from its queue. 
 	 */
 	static public class AuthenticatedMessage {
-		public final byte[] message;
-		public final int sender_id;
+		public byte[] message;
+		public int sender_id;
 
-		public AuthenticatedMessage(byte[] message, int sender) {
+		private AuthenticatedMessage(byte[] message, int sender) {
 			this.sender_id = sender;  this.message = message;
 		}
 	}
@@ -38,138 +44,119 @@ public class AMT {
 	static public class Sender 
 	{
 		public final int id;
+		private final Signer signer;
 
 		public void sendTo(byte[] message, int receiver_id, String server, int port) throws AMTError, ConnectionError {
 			if (registrationInProgress) throw new AMTError();
 
-			// get from the simulator a message to be later sent out
-			byte[] output_message = AMTEnv.sendTo(MessageTools.copyOf(message), id, receiver_id, server, port);
-			// log the sent message along with the sender and receiver identifiers			
-			log.add(new LogEntry(MessageTools.copyOf(message), id, receiver_id));
-			// sent out the message from the simulator
+			// format the message
+			byte[] recipient_id_as_bytes = MessageTools.intToByteArray(receiver_id);
+			byte[] message_with_recipient_id = concatenate(recipient_id_as_bytes, message);
+			byte[] signature = signer.sign(message_with_recipient_id);
+			byte[] signed = MessageTools.concatenate(signature, message_with_recipient_id);
+			byte[] sender_id_as_bytes = MessageTools.intToByteArray(id);
+			byte[] outputMessage = MessageTools.concatenate(sender_id_as_bytes, signed);
+
+			// send it out			
 			try {
-				NetworkClient.send(output_message, server, port);
-			}
-			catch (NetworkError e) {
+				NetworkClient.send(outputMessage, server, port);
+			} catch (NetworkError e) {
 				throw new ConnectionError();
 			}
 		}
 
-		private Sender(int id) {
+		private Sender(int id, Signer signer) {
 			this.id = id;
+			this.signer = signer;
 		}
 	}
-	
+
 	public static Sender registerSender(int id) throws AMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new AMTError();
-		registrationInProgress = true;
-		// call the simulator, throw a network error if the simulator says so
-		boolean network_ok = AMTEnv.registerSender(id);
-		if (!network_ok) throw new ConnectionError();
-		// check whether the id has not been claimed
-		if( registeredSenders.exists(id) ) {
+		registrationInProgress = true;	
+		try {
+			// create and register a new signer 
+			Signer signer = new Signer();
+			RegisterSig.registerVerifier(signer.getVerifier(), id, DOMAIN_AMT);
+			// registration successful; return a new Sender object
+			registrationInProgress = false;
+			return new Sender(id, signer);
+		}
+		catch (RegisterSig.PKIError err) {
 			registrationInProgress = false;
 			throw new RegistrationError();
 		}
-		// create a new agent, add it to the list of registered agents, and return it
-		registeredSenders.add(id);
-		Sender sender = new Sender(id);
-		registrationInProgress = false;
-		return sender;
+		catch (NetworkError err) {
+			registrationInProgress = false;
+			throw new ConnectionError();
+		}
 	}
-	
+
 	public static void listenOn(int port) throws ConnectionError {
-		boolean ok = AMTEnv.listenOn(port);
-		if (!ok) throw new ConnectionError();
+		try {
+			NetworkServer.listenForRequests(port);
+		}
+		catch (NetworkError e) {
+			throw new ConnectionError();
+		}
 	}
 
 	public static AuthenticatedMessage getMessage(int id, int port) throws AMTError {
-		if (registrationInProgress) throw new AMTError();			
+		if (registrationInProgress) throw new AMTError();
 
-		// the simulator/environment determines the index of the message to be returned
-		int index = AMTEnv.getMessage(id, port);
-		if (index < 0) return null;
-		LogEntry smtmsg = log.get(index);
-		if (smtmsg == null) return null;
-		// check whether the message was sent to *this* receiver
-		if (smtmsg.receiver_id != id) return null;
-		// return new authenticated message
-		return new AuthenticatedMessage(MessageTools.copyOf(smtmsg.message), smtmsg.sender_id);
-	}
+		try {
+			// read a message from the network
+			// (it may end up with a network error)
+			byte[] inputMessage = NetworkServer.read(port);
+			if (inputMessage == null) return null;
 
+			// get the sender id and her verifier
+			byte[] sender_id_as_bytes = MessageTools.first(inputMessage);
+			int sender_id = MessageTools.byteArrayToInt(sender_id_as_bytes);
+			Verifier sender_verifier = RegisterSig.getVerifier(sender_id, DOMAIN_AMT);
 
-	//// Implementation ////
+			// retrieve the recipient id and the signature
+			byte[] signed = MessageTools.second(inputMessage);
+			byte[] signature = MessageTools.first(signed);
+			byte[] message_with_recipient_id = MessageTools.second(signed);
 
-	private static boolean registrationInProgress = false;
+			// verify the signature
+			if( !sender_verifier.verify(signature, message_with_recipient_id) )
+				return null; // invalid signature
 
-	private static class LogEntry {
-		final byte[] message;
-		final int sender_id;
-		final int receiver_id;
-
-		LogEntry(byte[] message, int sender_id, int receiver_id) {
-			this.message = message;
-			this.sender_id = sender_id;
-			this.receiver_id = receiver_id;
+			// make sure that the message is intended for this receiver
+			byte[] recipient_id_as_bytes = MessageTools.first(message_with_recipient_id);
+			int recipient_id = MessageTools.byteArrayToInt(recipient_id_as_bytes);
+			if( recipient_id != id )
+				return null; // message not intended for this receiver
+			byte[] message = MessageTools.second(message_with_recipient_id);
+			return new AuthenticatedMessage(message, sender_id);
 		}
-	}
-
-	// A queue of messages along with the identifier of senders and receivers.
-	private static class Log 
-	{
-		private static class Node {
-			final LogEntry msg;
-			final Node next;
-
-			Node(LogEntry msg, Node next) {
-				this.msg = msg;
-				this.next = next;
-			}
-		}		
-		private Node first = null;
-
-		void add(LogEntry msg) {
-			first = new Node(msg, first);
-		}
-
-		LogEntry get(int index) {
-			int i = 0;
-			for( Node node = first;  node != null;  node = node.next ) {
-				if(i == index) return node.msg;
-				++i;
-			}
+		catch (NetworkError | RegisterSig.PKIError e) {
 			return null;
 		}
 	}
 
-	static Log log = new Log();
 
-	// Collection of (registered) identifiers.
-	private static class IdQueue
-	{	
-		private static class Node {
-			final int id;
-			final Node next;
+	////////////////////////////////////////////////////////////////////////////
 
-			Node(int id, Node next) {
-				this.id = id;
-				this.next = next;
-			}
-		}			
-		private Node first = null;
+	private static boolean registrationInProgress = false;
+	public static final byte[] DOMAIN_AMT = new byte[] {0x03, 0x01};
 
-		public void add(int id) {
-			first = new Node(id, first);
-		}
-
-		boolean exists(int id) {
-			for( Node node = first;  node != null;  node = node.next )
-				if( id == node.id )
-					return true;
-			return false;
-		}
+	// Serialization Sender -> Bytes
+	public static byte[] senderToBytes(Sender sender) {
+		byte[] id = MessageTools.intToByteArray(sender.id);
+		byte[] signer = sender.signer.toBytes();
+		byte[] out = concatenate(id, signer);
+		return out;
 	}
 
-	// static lists of registered agents:
-	private static IdQueue registeredSenders = new IdQueue();
+	// Deserialization Sender <- Bytes
+	public static Sender senderFromBytes(byte[] bytes) {
+		byte[] bId = first(bytes);
+		int id = MessageTools.byteArrayToInt(bId);
+		byte[] bSigner = second(bytes);
+		Signer signer = Signer.fromBytes(bSigner);
+		return new Sender(id, signer);
+	}
 }
