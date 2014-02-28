@@ -24,7 +24,9 @@ How-To run the voting process:
     This will run the bulletin board. It will keep listening for
     messages from the server and for requests for its content
 
-6.1. In order to submit a vote, you first have to register the voter
+6.1. Run class de.uni.trier.infsec.eVotingVerif.apps.RegisterVoter
+
+  	In order to submit a vote, you first have to register the voter
     by running class de.uni.trier.infsec.protocols.smt_voting.VoterRegisterStandalone
     with parameter <voter-id> which is expected as number in range 0 to 49
 
@@ -63,7 +65,7 @@ Run following commands from bin-folder of the compiled project:
 4. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingVerif.apps.AppBulletinBoard
 
 
-6.1. java -cp ".:../lib/*" de.uni.trier.infsec.protocols.smt_voting.VoterRegisterStandalone 0
+6.1. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingVerif.apps.RegisterVoter
 6.2. java -cp ".:../lib/*" de.uni.trier.infsec.protocols.smt_voting.VoterVoteStandalone 01 0
 
 7. java -cp ".:../lib/*" de.uni.trier.infsec.protocols.smt_voting.BulletinBoardRequestTool
