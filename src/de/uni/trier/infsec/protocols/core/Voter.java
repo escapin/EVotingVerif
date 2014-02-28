@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.protocols.smt_voting;
+package de.uni.trier.infsec.protocols.core;
 
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
@@ -20,6 +20,6 @@ public class Voter {
 	 */
 	public void onSendBallot() throws RegistrationError, ConnectionError, SMTError {
 		byte [] ballot = new byte[] {choice};
-		sender.sendTo(ballot,  Identifiers.SERVER_ID, Parameters.DEFAULT_HOST_SERVER, Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
+		sender.sendTo(ballot,  Params.SERVER_ID, Params.DEFAULT_HOST_SERVER, Params.DEFAULT_LISTEN_PORT_SERVER_SMT);
 	}
 }

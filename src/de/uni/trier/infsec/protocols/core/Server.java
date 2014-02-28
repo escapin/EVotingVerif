@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.protocols.smt_voting;
+package de.uni.trier.infsec.protocols.core;
 
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
@@ -21,14 +21,14 @@ public class Server {
 		this.sender = sender_to_BB;
 		votesForCandidates = new int[numberOfCandidates];		
 		ballotCast = new boolean[numberOfVoters]; // initially no voter has cast her ballot
-		receiver.listenOn(Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
+		receiver.listenOn(Params.DEFAULT_LISTEN_PORT_SERVER_SMT);
 	}
 
 	/*
 	 * Collect one ballot (read from a secure channel)
 	 */
 	public void onCollectBallot() throws SMTError {
-		SMT.AuthenticatedMessage authMsg = receiver.getMessage(Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
+		SMT.AuthenticatedMessage authMsg = receiver.getMessage(Params.DEFAULT_LISTEN_PORT_SERVER_SMT);
 		onCollectBallot(authMsg);
 	}
 	
@@ -63,8 +63,8 @@ public class Server {
 	public void onPostResult() throws AMTError, AMT.RegistrationError, AMT.ConnectionError {
 		byte[] result = getResult();
 		if (result != null)
-			sender.sendTo(result, Identifiers.BULLETIN_BOARD_ID, 
-					      Parameters.DEFAULT_HOST_BBOARD, Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
+			sender.sendTo(result, Params.BULLETIN_BOARD_ID, 
+					      Params.DEFAULT_HOST_BBOARD, Params.DEFAULT_LISTEN_PORT_BBOARD_AMT);
 	}
 
 	private byte[] getResult() {

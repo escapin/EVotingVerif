@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.protocols.smt_voting;
+package de.uni.trier.infsec.protocols.core;
 
 import de.uni.trier.infsec.functionalities.amt.AMT;
 import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
@@ -12,7 +12,7 @@ public class BulletinBoard {
 
 	public BulletinBoard() throws AMT.ConnectionError {
 		content = new MessageList();
-		AMT.listenOn(Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
+		AMT.listenOn(Params.DEFAULT_LISTEN_PORT_BBOARD_AMT);
 	}
 
 	/*
@@ -20,9 +20,9 @@ public class BulletinBoard {
 	 * case, adds it to the maintained list of messages.
 	 */
 	public void onPost() throws AMTError {
-		AMT.AuthenticatedMessage am = AMT.getMessage(Identifiers.SERVER_ID, Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
+		AMT.AuthenticatedMessage am = AMT.getMessage(Params.SERVER_ID, Params.DEFAULT_LISTEN_PORT_BBOARD_AMT);
 		if (am == null) return;
-		if (am.sender_id != Identifiers.SERVER_ID) return;
+		if (am.sender_id != Params.SERVER_ID) return;
 		byte[] message = am.message;
 		content.add(message);
 	}
