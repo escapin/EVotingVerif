@@ -1,17 +1,17 @@
 How-To run the voting process:
 
- 1. Run class de.uni.trier.infsec.functionalities.pki.real.PKIServer
+ 1. Run class de.uni.trier.infsec.functionalities.pki.PKIServer
 
     This starts the public key environment which is needed for
     registration and lookup of public and verification keys.  The
     PKIServer stores the registered keys at %TEMP%/evoting_server.db -
-    if you want to delete registered keys, you´ll have to delete this
+    if you want to delete registered keys, you'll have to delete this
     file.
 
  2. Run class de.uni.trier.infsec.protocols.smt_voting.ServerRegisterStandalone
 
     This will run the servers registration process. Server will
-    register it´s keys at the PKI environment and store the serialized
+    register it's keys at the PKI environment and store the serialized
     keys to folder %TEMP%/smtvote
 
  3. Run class de.uni.trier.infsec.protocols.smt_voting.ServerStandalone
@@ -21,7 +21,7 @@ How-To run the voting process:
  4. Run class de.uni.trier.infsec.protocols.smt_voting.BulletinBoardRegisterStandalone
 
     This will run the bulletin boards registration process. It will
-    register it´s keys at the PKI environment and store the serialized
+    register it's keys at the PKI environment and store the serialized
     keys to folder %TEMP%/smtvote
 
  5. Run class de.uni.trier.infsec.protocols.smt_voting.BulletinBoardStandalone
@@ -48,7 +48,7 @@ How-To run the voting process:
     ID is expected as number in range 0 to 49
 
     After all votes have been cast, the server automatically posts
-    it´s content and the result to the bulletin board and terminates.
+    itï¿½s content and the result to the bulletin board and terminates.
 
  7. By running class de.uni.trier.infsec.protocols.smt_voting.BulletinBoardRequestTool, 
     the bulletin board will send its content and the request tool will
