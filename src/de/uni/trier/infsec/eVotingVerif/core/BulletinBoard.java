@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.protocols.core;
+package de.uni.trier.infsec.eVotingVerif.core;
 
 import de.uni.trier.infsec.functionalities.amt.AMT;
 import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;

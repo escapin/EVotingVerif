@@ -1,6 +1,6 @@
 How-To run the voting process:
 
- 1. Run class de.uni.trier.infsec.functionalities.pki.PKIServer
+ 1. Run class de.uni.trier.infsec.functionalities.pki.PKIServerApp
 
     This starts the public key environment which is needed for
     registration and lookup of public and verification keys.  The
@@ -8,23 +8,18 @@ How-To run the voting process:
     if you want to delete registered keys, you'll have to delete this
     file.
 
- 2. Run class de.uni.trier.infsec.apps.RegisterServer
+ 2. Run class de.uni.trier.infsec.eVotingVerif.apps.RegisterServer
 
     This will run the servers registration process. Server will
     register it's keys at the PKI environment and store the serialized
     keys to folder %TEMP%/smtvote
 
- 3. Run class de.uni.trier.infsec.protocols.smt_voting.ServerStandalone
+ 3. Run class de.uni.trier.infsec.eVotingVerif.apps.AppServer
 
     The server will read the stored credentials and start listening for votes
 
- 4. Run class de.uni.trier.infsec.protocols.smt_voting.BulletinBoardRegisterStandalone
 
-    This will run the bulletin boards registration process. It will
-    register it's keys at the PKI environment and store the serialized
-    keys to folder %TEMP%/smtvote
-
- 5. Run class de.uni.trier.infsec.protocols.smt_voting.BulletinBoardStandalone
+ 4. Run class de.uni.trier.infsec.eVotingVerif.apps.AppBulletinBoard
 
     This will run the bulletin board. It will keep listening for
     messages from the server and for requests for its content
@@ -61,11 +56,12 @@ EXAMPLE:
 
 Run following commands from bin-folder of the compiled project:
 
-1. java -cp ".:../lib/*" de.uni.trier.infsec.functionalities.pki.real.PKIServer
-2. java -cp ".:../lib/*" de.uni.trier.infsec.protocols.smt_voting.ServerRegisterStandalone
-3. java -cp ".:../lib/*" de.uni.trier.infsec.protocols.smt_voting.ServerStandalone
-4. java -cp ".:../lib/*" de.uni.trier.infsec.protocols.smt_voting.BulletinBoardRegisterStandalone
-5. java -cp ".:../lib/*" de.uni.trier.infsec.protocols.smt_voting.BulletinBoardStandalone
+1. java -cp ".:../lib/*" de.uni.trier.infsec.functionalities.pki.PKIServerApp
+2. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingVerif.apps.RegisterServer
+3. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingVerif.apps.AppServer
+
+4. java -cp ".:../lib/*" de.uni.trier.infsec.eVotingVerif.apps.AppBulletinBoard
+
 
 6.1. java -cp ".:../lib/*" de.uni.trier.infsec.protocols.smt_voting.VoterRegisterStandalone 0
 6.2. java -cp ".:../lib/*" de.uni.trier.infsec.protocols.smt_voting.VoterVoteStandalone 01 0

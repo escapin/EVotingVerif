@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.apps;
+package de.uni.trier.infsec.eVotingVerif.apps;
 
 // import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 
