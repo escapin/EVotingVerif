@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.protocols.smt_voting;
+package de.uni.trier.infsec.eVotingVerif.core;
 
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
@@ -21,14 +21,16 @@ public class Server {
 		this.sender = sender_to_BB;
 		votesForCandidates = new int[numberOfCandidates];		
 		ballotCast = new boolean[numberOfVoters]; // initially no voter has cast her ballot
-		receiver.listenOn(Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
+		receiver.listenOn(Params.LISTEN_PORT_SERVER_SMT);
 	}
 
 	/*
 	 * Collect one ballot (read from a secure channel)
 	 */
+	int i=0;
 	public void onCollectBallot() throws SMTError {
-		SMT.AuthenticatedMessage authMsg = receiver.getMessage(Parameters.DEFAULT_LISTEN_PORT_SERVER_SMT);
+		SMT.AuthenticatedMessage authMsg = receiver.getMessage(Params.LISTEN_PORT_SERVER_SMT);
+		//System.out.println(++i);
 		onCollectBallot(authMsg);
 	}
 	
@@ -63,20 +65,20 @@ public class Server {
 	public void onPostResult() throws AMTError, AMT.RegistrationError, AMT.ConnectionError {
 		byte[] result = getResult();
 		if (result != null)
-			sender.sendTo(result, Identifiers.BULLETIN_BOARD_ID, 
-					      Parameters.DEFAULT_HOST_BBOARD, Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
+			sender.sendTo(result, Params.BULLETIN_BOARD_ID, 
+					      Params.DEFAULT_HOST_BBOARD, Params.LISTEN_PORT_BBOARD_AMT);		
 	}
 
 	private byte[] getResult() {
 		if (!resultReady()) return null; // the result is only returned when all the voters have voted
 		
-		// CONSERVATIVE EXTENSION:
-		for( int i=0; i<votesForCandidates.length; ++i ) {
-			// PROVE THAT THE FOLLOWING ASSIGNMENT DOES NOT CHANGE THE STATE
-			// (i.e. votesForCandidates[i] == HonestVotersSetup.correctResult[i])
-			votesForCandidates[i] = Setup.correctResult[i];
-		}
-		//TODO: Is this enough for Joana? We need to check it. 
+//		// CONSERVATIVE EXTENSION:
+//		for( int i=0; i<votesForCandidates.length; ++i ) {
+//			// PROVE THAT THE FOLLOWING ASSIGNMENT DOES NOT CHANGE THE STATE
+//			// (i.e. votesForCandidates[i] == HonestVotersSetup.correctResult[i])
+//			votesForCandidates[i] = Setup.correctResult[i];
+//		}
+//		//TODO: Is this enough for Joana? We need to check it. 
 
 		return formatResult(votesForCandidates);
 	}

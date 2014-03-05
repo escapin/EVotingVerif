@@ -1,4 +1,4 @@
-package de.uni.trier.infsec.protocols.smt_voting;
+package de.uni.trier.infsec.eVotingVerif.core;
 
 import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.functionalities.smt.SMT;
@@ -49,8 +49,8 @@ public final class Setup
 		}
 
 		// create the server
-		SMT.Receiver serverReceiver = SMT.registerReceiver(Identifiers.SERVER_ID);
-		AMT.Sender serverSender = AMT.registerSender(Identifiers.SERVER_ID);
+		SMT.Receiver serverReceiver = SMT.registerReceiver(Params.SERVER_ID);
+		AMT.Sender serverSender = AMT.registerSender(Params.SERVER_ID);
 		server = new Server(numberOfVoters, numberOfCandidates, serverReceiver, serverSender);
 
 		// create the bulletin board
