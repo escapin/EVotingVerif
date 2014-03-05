@@ -26,19 +26,22 @@ public class AppBulletinBoard {
 			bb = new BulletinBoard();
 			
 			
-			NetworkServer.listenForRequests(Params.DEFAULT_LISTEN_PORT_BBOARD_REQUEST);
+			NetworkServer.listenForRequests(Params.LISTEN_PORT_BBOARD_REQUEST);
 			System.out.println("Bulletin Board: ready to collect election outcome...");
 			while (true) {							
 				bb.onPost();
 				
 				try {					
-					byte[] req = NetworkServer.nextRequest(Params.DEFAULT_LISTEN_PORT_BBOARD_REQUEST);
-					if (req == null || req.length == 0) {
+					byte[] req = NetworkServer.nextRequest(Params.LISTEN_PORT_BBOARD_REQUEST);
+					// if (req == null || req.length == 0){ 
+					if(req!=null && req.length!=0){
 						NetworkServer.response(bb.onRequestContent());
+						System.out.println("Election outcome requested.");
 					}
-				} catch (Exception e) {e.printStackTrace();}
-				
-				Thread.sleep(2000);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				Thread.sleep(500);
 			}
 		} catch (AMTError e) {
 			e.printStackTrace();

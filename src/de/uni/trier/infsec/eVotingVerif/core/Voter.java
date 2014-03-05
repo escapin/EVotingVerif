@@ -20,6 +20,7 @@ public class Voter {
 	 */
 	public void onSendBallot() throws RegistrationError, ConnectionError, SMTError {
 		byte [] ballot = new byte[] {choice};
-		sender.sendTo(ballot,  Params.SERVER_ID, Params.DEFAULT_HOST_SERVER, Params.DEFAULT_LISTEN_PORT_SERVER_SMT);
+		sender.sendTo(ballot,  Params.SERVER_ID, Params.DEFAULT_HOST_SERVER, 
+				Params.LISTEN_PORT_SERVER_SMT);
 	}
 }

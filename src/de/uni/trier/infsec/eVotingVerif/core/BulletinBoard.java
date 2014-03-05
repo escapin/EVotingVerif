@@ -12,7 +12,7 @@ public class BulletinBoard {
 
 	public BulletinBoard() throws AMT.ConnectionError {
 		content = new MessageList();
-		AMT.listenOn(Params.DEFAULT_LISTEN_PORT_BBOARD_AMT);
+		AMT.listenOn(Params.LISTEN_PORT_BBOARD_AMT);
 	}
 
 	/*
@@ -20,7 +20,7 @@ public class BulletinBoard {
 	 * case, adds it to the maintained list of messages.
 	 */
 	public void onPost() throws AMTError {
-		AMT.AuthenticatedMessage am = AMT.getMessage(Params.SERVER_ID, Params.DEFAULT_LISTEN_PORT_BBOARD_AMT);
+		AMT.AuthenticatedMessage am = AMT.getMessage(Params.BULLETIN_BOARD_ID, Params.LISTEN_PORT_BBOARD_AMT);
 		if (am == null) return;
 		if (am.sender_id != Params.SERVER_ID) return;
 		byte[] message = am.message;

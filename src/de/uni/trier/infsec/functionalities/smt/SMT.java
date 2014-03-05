@@ -125,7 +125,7 @@ public class SMT {
 				byte[] message_with_recipient_id = MessageTools.second(signed);
 
 				// verify the signature
-				if( !sender_verifier.verify(signature, message_with_recipient_id) )
+				if(!sender_verifier.verify(signature, message_with_recipient_id))
 					return null; // invalid signature
 
 				// make sure that the message is intended for this receiver

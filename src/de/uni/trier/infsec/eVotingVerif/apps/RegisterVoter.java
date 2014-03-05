@@ -1,6 +1,5 @@
 package de.uni.trier.infsec.eVotingVerif.apps;
 
-import java.io.File;
 import java.io.IOException;
 
 import de.uni.trier.infsec.functionalities.pki.PKI;
@@ -12,7 +11,9 @@ public class RegisterVoter {
 		//System.setProperty("remotemode", Boolean.toString(true));
 		PKI.useRemoteMode();
 		if (args.length < 1) {
-			System.out.println("Wrong number of Arguments!\nExpected: RegisterVoter <voter_id [int]>\nExample: RegisterVoter 42");
+			System.out.println("Wrong number of Arguments!\n" +
+					"Expected: RegisterVoter <voter_id [int]>\n" +
+					"Example: RegisterVoter 42");
 		} else {
 			try {				
 				int id  = Integer.parseInt(args[0]);
@@ -20,7 +21,9 @@ public class RegisterVoter {
 				byte[] serialized = SMT.senderToBytes(sender);
 				UtilsApp.storeAsFile(serialized, ParamsApp.PATH_VOTER.replaceAll("%%%%", "" + id));
 			} catch (Exception e) {
-				System.out.println("Something is wrong with arguments.!\nExpected: RegisterVoter <voter_id [int]>\nExample: RegisterVoter 42");
+				System.out.println("Something is wrong with arguments!\n" +
+						"Expected: RegisterVoter <voter_id [int]>\n" +
+						"Example: RegisterVoter 42");
 				e.printStackTrace();
 			}
 		}

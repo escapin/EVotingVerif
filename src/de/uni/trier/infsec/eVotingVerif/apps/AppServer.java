@@ -42,8 +42,6 @@ public class AppServer {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}		
 	}
-	
-	
 }
