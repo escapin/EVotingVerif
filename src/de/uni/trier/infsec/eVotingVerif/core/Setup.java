@@ -61,7 +61,8 @@ public final class Setup
 	}
 
 	private static int[] computeResult (byte[] choices) {
-		int[] res = new int[numberOfCandidates];
+		// int[] res = new int[numberOfCandidates];
+		int[] res = new int[choices.length];
 		for (int i=0; i<choices.length; i++) 
 			++res[choices[i]];
 		return res;
@@ -81,13 +82,14 @@ public final class Setup
 			throw new Throwable();	// abort 
 		Setup s = new Setup(numberOfCandidates, numberOfVoters);
         int N = Environment.untrustedInput(); // the environment decides how long the system runs
-        votingPhase(N);
-        afterVotingPhase(N);
+        s.votingPhase(N);
+        s.afterVotingPhase();
 	}
 
 	public void votingPhase(int N) throws Throwable {
+		
         int voter = 0;
-        for( i=0; i<N; ++i ) {
+        for(int i=0; i<N; ++i ) {
 			int decision = Environment.untrustedInput();
             if (decision >= 0) { // a voter (determined by the adversary) votes
 				final Voter v = voters[voter++]; // better: v = voters[decision]
@@ -100,16 +102,16 @@ public final class Setup
         server.onPostResult();
     }
 
-    public void afterVotingPhase() {
+    public void afterVotingPhase() throws Throwable {
         while( Environment.untrustedInput() != 0 ) {
-			case 3: // the bulletin board reads a message:
+			int decision = Environment.untrustedInput();
+            if (decision >= 0){ // the bulletin board reads a message:
 				BB.onPost();
-				break;
-
-			case 4: // the bulletin board sends its content (over the network):
-				byte[] content = BB.onRequestContent();
-				Environment.untrustedOutputMessage(content);
-				break;
+            }
+			else {
+            	byte[] content = BB.onRequestContent();
+            	Environment.untrustedOutputMessage(content);
+            }
         }
     }
 
