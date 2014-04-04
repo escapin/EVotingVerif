@@ -4,7 +4,7 @@ public final class Environment {
 
 	private static boolean result; // the LOW variable
     private static int[] input = {1,7,2}; // an example only; the information-flow property should hold for all possible values
-    private static counter = 0;
+    private static int counter = 0;
 
     public static int untrustedInput() {
         if (counter >= input.length)
@@ -28,20 +28,20 @@ public final class Environment {
         return a;
 	}
     
-//    public static byte[] untrustedInputMessage() {
-//		int len = untrustedInput();
-//		if (len<0) return null;
-//		byte[] returnval = new byte[len];
-//		for (int i = 0; i < len; i++) {
-//			returnval[i] = (byte) Environment.untrustedInput();
-//		}
-//		return returnval;    
-//    }
-//
-//    public static String untrustedInputString() {
-//    	return untrustedInputMessage().toString();
-//    }
-//
+    public static byte[] untrustedInputMessage() {
+		int len = untrustedInput();
+		if (len<0) return null;
+		byte[] returnval = new byte[len];
+		for (int i = 0; i < len; i++) {
+			returnval[i] = (byte) Environment.untrustedInput();
+		}
+		return returnval;    
+    }
+
+    public static String untrustedInputString() {
+    	return untrustedInputMessage().toString();
+    }
+
 
     public static void untrustedOutputMessage(byte[] t) {
     	untrustedOutput(t.length);
@@ -50,11 +50,11 @@ public final class Environment {
 		}
     }
 
-//    
-//    public static void untrustedOutputString(String s) {
-//    	untrustedOutput(s.length());
-//    	for (int i = 0; i < s.length(); i++) {
-//    		untrustedOutput((int)s.charAt(i));
-//    	}
-//    }
+    
+    public static void untrustedOutputString(String s) {
+    	untrustedOutput(s.length());
+    	for (int i = 0; i < s.length(); i++) {
+    		untrustedOutput((int)s.charAt(i));
+    	}
+    }
 }        
