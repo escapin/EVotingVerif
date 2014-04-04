@@ -5,7 +5,7 @@ import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 import de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError;
 import de.uni.trier.infsec.functionalities.smt.SMT.RegistrationError;
 
-public class Voter {
+public final class Voter {
 	private final byte choice;
 	private final SMT.Sender sender;
     private boolean voted;

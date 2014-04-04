@@ -8,7 +8,7 @@ import de.uni.trier.infsec.environment.SMTEnv;
 /**
  * Ideal functionality for SMT (Secure Authenticated Message Transmission).
  */
-public class SMT {
+public final class SMT {
 
 	//// The public interface ////
 
@@ -37,7 +37,7 @@ public class SMT {
 	 * 
 	 * Objects of this class are returned when a receiver gets a message.
 	 */
-	static public class AuthenticatedMessage {
+	static final public class AuthenticatedMessage {
 		public final byte[] message;
 		public final int sender_id;
 
@@ -46,7 +46,7 @@ public class SMT {
 		}
 	}
 
-	static public class Sender 
+	static final public class Sender 
 	{
 		/*@ invariant 
 		  @ (\exists int i; 0 <= i && i < registered_sender_ids.length; (int)registered_sender_ids[i]==id);
@@ -93,7 +93,7 @@ public class SMT {
 		}
 	}
 
-	static public class Receiver {
+	static final public class Receiver {
 		public final int id;
 		/*@ invariant 
 		  @ (\exists int i; 0 <= i && i < registered_receiver_ids.length; (int)registered_receiver_ids[i]==id);

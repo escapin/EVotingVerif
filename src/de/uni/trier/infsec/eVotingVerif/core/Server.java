@@ -5,7 +5,7 @@ import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 import de.uni.trier.infsec.functionalities.amt.AMT;
 import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
 
-public class Server {
+public final class Server {
 	private final int numberOfVoters;
     private final int numberOfCandidates;
 	private final boolean[] ballotCast;  // ballotCast[i]==true iff the i-th voter has already cast her ballot
