@@ -6,9 +6,6 @@ import de.uni.trier.infsec.functionalities.amt.AMT;
 
 public final class Setup 
 {
-	private static int numberOfVoters = 50;
-	private static int numberOfCandidates = 5;
-
 	private final Voter[] voters;
 	private final Server server;
 	private final BulletinBoard BB;
@@ -21,7 +18,7 @@ public final class Setup
 	// the correct result
 	static int[] correctResult; // CONSERVATIVE EXTENSION
 
-	private Setup() throws Throwable {
+	private Setup(int numberOfCandidates, int numberOfVoters) throws Throwable {
 		// let the environment determine two vectors of choices
 		byte[] choices0 = new byte[numberOfVoters];
 		byte[] choices1 = new byte[numberOfVoters];
@@ -78,37 +75,33 @@ public final class Setup
 
 
 	public static void main (String[] a) throws Throwable {
-		Setup s = new Setup();
-		s.main();
+        int numberOfCandidates = Environment.untrustedInput();
+        int numberOfVoters = Environment.untrustedInput();
+        if (numberOfVoters<=0 || numberOfCandidates<=0)
+			throw new Throwable();	// abort 
+		Setup s = new Setup(numberOfCandidates, numberOfVoters);
+        int N = Environment.untrustedInput(); // the environment decides how long the system runs
+        votingPhase(N);
+        afterVotingPhase(N);
 	}
 
-	// end hybrid approach extensions
-	////////////////////////////////////////////////////////////////////
-
-	public void main () throws Throwable {
-		byte[] message;
-		int rec_id;
-		int port;
-		String host;
-		
-		// let adversary decide how long the election runs
-		while( Environment.untrustedInput() != 0 )  {
+	public void votingPhase(int N) throws Throwable {
+        int voter = 0;
+        for( i=0; i<N; ++i ) {
 			int decision = Environment.untrustedInput();
-			switch (decision) {
-			case 0:	// a voter (determined by the adversary) votes
-				final int k = Environment.untrustedInput();
-				final Voter v = voters[k];
+            if (decision >= 0) { // a voter (determined by the adversary) votes
+				final Voter v = voters[voter++]; // better: v = voters[decision]
 				v.onSendBallot();
-				break;
-
-			case 1: // the server reads a message from a secure channel
+            }
+            else { // the server reads a message from a secure channel
 				server.onCollectBallot();
-				break;
+            }
+        }
+        server.onPostResult();
+    }
 
-			case 2: // the server posts the result of the election (if ready) on the bulletin board
-				server.onPostResult();
-				break;
-
+    public void afterVotingPhase() {
+        while( Environment.untrustedInput() != 0 ) {
 			case 3: // the bulletin board reads a message:
 				BB.onPost();
 				break;
@@ -117,21 +110,7 @@ public final class Setup
 				byte[] content = BB.onRequestContent();
 				Environment.untrustedOutputMessage(content);
 				break;
-				
-			case 5: // the adversary sends a message of his choice using SMT:
-				message = Environment.untrustedInputMessage();
-				rec_id = Environment.untrustedInput();
-				host = Environment.untrustedInputString();
-				port = Environment.untrustedInput();
-				adversarySMTSender.sendTo(message, rec_id, host, port);
+        }
+    }
 
-			case 6: // the adversary sends a message of his choice using AMT:
-				message = Environment.untrustedInputMessage();
-				rec_id = Environment.untrustedInput();
-				host = Environment.untrustedInputString();
-				port = Environment.untrustedInput();
-				adversaryAMTSender.sendTo(message, rec_id, host, port);
-			}
-		}
-	}
 }

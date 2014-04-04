@@ -30,8 +30,8 @@ public class Server {
 	int i=0;
 	public void onCollectBallot() throws SMTError {
 		SMT.AuthenticatedMessage authMsg = receiver.getMessage(Params.LISTEN_PORT_SERVER_SMT);
-		//System.out.println(++i);
-		onCollectBallot(authMsg);
+		if (authMsg != null)
+            onCollectBallot(authMsg);
 	}
 	
 	private void onCollectBallot(SMT.AuthenticatedMessage authMsg) {
@@ -72,16 +72,20 @@ public class Server {
 	private byte[] getResult() {
 		if (!resultReady()) return null; // the result is only returned when all the voters have voted
 		
-//		// CONSERVATIVE EXTENSION:
-//		for( int i=0; i<votesForCandidates.length; ++i ) {
-//			// PROVE THAT THE FOLLOWING ASSIGNMENT DOES NOT CHANGE THE STATE
-//			// (i.e. votesForCandidates[i] == HonestVotersSetup.correctResult[i])
-//			votesForCandidates[i] = Setup.correctResult[i];
-//		}
-//		//TODO: Is this enough for Joana? We need to check it. 
-
-		return formatResult(votesForCandidates);
+        int[] result = new int[numberOfCandidates];
+        for (int i=0; i<numberOfCandidates; ++i) {
+            int x = votesForCandidates[i];
+            // CONSERVATIVE EXTENSION:
+            // PROVE THAT THE FOLLOWING ASSINGMENT IS REDUNDANT
+            x = consExt(i);
+            result[i] = x;
+        }
+        return formatResult(result);
 	}
+
+    private int consExt(int i) {
+        return Setup.correctResult[i];
+    }
 
 	/*
 	 * Format the result of the election.
