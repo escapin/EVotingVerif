@@ -38,6 +38,9 @@ public final class Voter {
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures voted;
 	  @ assignable voted, SMT.rep, SMT.messages, SMT.receiver_ids, SMT.sender_ids, Environment.counter; // what can be changed
+	  @ also normal_behavior
+	  @ requires voted;
+	  @ assignable \nothing;
 	  @*/
 	public void onSendBallot() throws RegistrationError, ConnectionError, SMTError {
         if (voted) return;

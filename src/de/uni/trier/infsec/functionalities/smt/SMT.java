@@ -40,6 +40,7 @@ public final class SMT {
 	static final public class AuthenticatedMessage {
 		public final byte[] message;
 		public final int sender_id;
+		//@ public invariant message.length > 0;
 
 		public AuthenticatedMessage(byte[] message, int sender) {
 			this.sender_id = sender;  this.message = message;
@@ -57,7 +58,8 @@ public final class SMT {
 		public final int id;
 
 		/*@ behavior // the following must be true if no exception is thrown
-		  @ ensures messages == \seq_concat(\old(messages),\seq_singleton(message));
+		  @ requires message.length > 0;
+		  @ ensures messages == \seq_concat(\old(messages),\seq_singleton(message[0]));
 		  @ ensures receiver_ids == \seq_concat(\old(receiver_ids),\seq_singleton(receiver_id));
 		  @ ensures sender_ids == \seq_concat(\old(sender_ids),\seq_singleton(id));
 		  @ ensures (\exists int i; 0 <= i && i < registered_receiver_ids.length; registered_receiver_ids[i]==receiver_id);
@@ -75,7 +77,7 @@ public final class SMT {
 				throw new RegistrationError();
 			// log the sent message along with the sender and receiver identifiers			
 			log.add(new LogEntry(MessageTools.copyOf(message), id, receiver_id));
-		  	//@ set messages = \seq_concat(\old(messages),\seq_singleton(message));
+		  	//@ set messages = \seq_concat(\old(messages),\seq_singleton(message[0]));
 			//@ set receiver_ids = \seq_concat(\old(receiver_ids),\seq_singleton(receiver_id));
 			//@ set sender_ids = \seq_concat(\old(sender_ids),\seq_singleton(id));
 
@@ -110,8 +112,7 @@ public final class SMT {
 		}
 
 		/*@ ensures \result==null || (\exists int i; 0 <= i && i < messages.length;
-		  @	\result.message.length == ((byte[])messages[i]).length 
-		  @	&& (\forall int j; 0 <= j && j < ((byte[])messages[i]).length; \result.message[j] == ((byte[])messages[i])[j]);
+		  @	\result.message[0] == (byte)messages[i]);
 		  @	&& (int)receiver_ids[i] == id && (int)sender_ids[i] == \result.sender_id;
 		  @ ensures \result==null || (\fresh(\result) && \invariant_for(\result));
 		  @ ensures \disjoint(SMT.rep, \result.*);
