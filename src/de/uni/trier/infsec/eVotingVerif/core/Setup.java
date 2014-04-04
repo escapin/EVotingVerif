@@ -9,8 +9,6 @@ public final class Setup
 	private final Voter[] voters;
 	private final Server server;
 	private final BulletinBoard BB;
-	private final SMT.Sender adversarySMTSender;
-	private final AMT.Sender adversaryAMTSender;
 
 	// one secret bit
 	private static boolean secret;
@@ -52,12 +50,6 @@ public final class Setup
 
 		// create the bulletin board
 		BB = new BulletinBoard();
-		
-		// create SMT and AMD functionalities for the adversary
-		int adv_smt_id = Environment.untrustedInput();
-		adversarySMTSender = SMT.registerSender(adv_smt_id);
-		int adv_amt_id = Environment.untrustedInput();
-		adversaryAMTSender = AMT.registerSender(adv_amt_id);
 	}
 
 	private static int[] computeResult (byte[] choices) {
@@ -87,7 +79,6 @@ public final class Setup
 	}
 
 	public void votingPhase(int N) throws Throwable {
-		
         int voter = 0;
         for(int i=0; i<N; ++i ) {
 			int decision = Environment.untrustedInput();
