@@ -6,6 +6,10 @@ public final class Environment {
     private static int[] input = {1,7,2}; // an example only; the information-flow property should hold for all possible values
     private static int counter = 0;
 
+    /*@ normal_behavior
+      @ ensures true;
+      @ assignable counter;
+      @*/
     public static int untrustedInput() {
         if (counter >= input.length)
             return 0;
@@ -20,6 +24,10 @@ public final class Environment {
 		}
 	}
 
+    /*@ normal_behavior
+      @ ensures 0 <= \result && \result < x;
+      @ assignable counter;
+      @*/
     public static int untrustedInput(int n) {
         int a;
         do {

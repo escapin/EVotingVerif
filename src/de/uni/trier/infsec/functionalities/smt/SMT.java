@@ -18,6 +18,20 @@ public class SMT {
 
 	static public class RegistrationError extends Exception {}
 
+	// what locations belong to the network/SMT, what may be changed upon sending
+	//@ public static ghost \locset rep;
+
+	// the abstract state (message queue)
+	//@ public static ghost \seq receiver_ids;
+	//@ public static ghost \seq messages;
+	//@ public static ghost \seq sender_ids;
+
+	//@ public static invariant receiver_ids.length == sender_ids.length;
+	//@ public static invariant receiver_ids.length == messages.length;
+
+	//@ public static ghost \seq registered_sender_ids;
+	//@ public static ghost \seq registered_receiver_ids;
+
 	/** 
 	 * Pair (message, sender_id).
 	 * 
@@ -34,9 +48,23 @@ public class SMT {
 
 	static public class Sender 
 	{
+		/*@ invariant 
+		  @ (\exists int i; 0 <= i && i < registered_sender_ids.length; (int)registered_sender_ids[i]==id);
+		  @ invariant 
+		  @ (\forall Sender s; s.id == id; s == this);
+		  @ invariant \disjoint(SMT.rep, \singleton(this.id));
+		  @*/
 		public final int id;
 
-		public void sendTo(byte[] message, int receiver_id, String server, int port) throws SMTError, RegistrationError, ConnectionError {
+		/*@ behavior // the following must be true if no exception is thrown
+		  @ ensures messages == \seq_concat(\old(messages),\seq_singleton(message));
+		  @ ensures receiver_ids == \seq_concat(\old(receiver_ids),\seq_singleton(receiver_id));
+		  @ ensures sender_ids == \seq_concat(\old(sender_ids),\seq_singleton(id));
+		  @ ensures (\exists int i; 0 <= i && i < registered_receiver_ids.length; registered_receiver_ids[i]==receiver_id);
+	  	  @ ensures \new_elems_fresh(SMT.rep);
+		  @ assignable SMT.rep, messages, receiver_ids, sender_ids, Environment.counter; // what can be changed
+		  @*/
+		public void sendTo(/*@nullable@*/ byte[] message, int receiver_id, /*@ nullable @*/ String server, int port) throws SMTError, RegistrationError, ConnectionError {
 			if (registrationInProgress) throw new SMTError();
 
 			// get from the simulator a message to be later sent out
@@ -47,6 +75,10 @@ public class SMT {
 				throw new RegistrationError();
 			// log the sent message along with the sender and receiver identifiers			
 			log.add(new LogEntry(MessageTools.copyOf(message), id, receiver_id));
+		  	//@ set messages = \seq_concat(\old(messages),\seq_singleton(message));
+			//@ set receiver_ids = \seq_concat(\old(receiver_ids),\seq_singleton(receiver_id));
+			//@ set sender_ids = \seq_concat(\old(sender_ids),\seq_singleton(id));
+
 			// sent out the message from the simulator
 			try {
 				NetworkClient.send(output_message, server, port);
@@ -63,13 +95,30 @@ public class SMT {
 
 	static public class Receiver {
 		public final int id;
+		/*@ invariant 
+		  @ (\exists int i; 0 <= i && i < registered_receiver_ids.length; (int)registered_receiver_ids[i]==id);
+		  @ invariant 
+		  @ (\forall Receiver s; r.id == id; r == this);
+		  @ invariant \disjoint(SMT.rep, \singleton(this.id));
+		  @*/
 
+		//@ ensures true;
+		//@ pure
 		public void listenOn(int port) throws ConnectionError {
 			boolean ok = SMTEnv.listenOn(port);
 			if (!ok) throw new ConnectionError();
 		}
 
-		public AuthenticatedMessage getMessage(int port) throws SMTError {
+		/*@ ensures \result==null || (\exists int i; 0 <= i && i < messages.length;
+		  @	\result.message.length == ((byte[])messages[i]).length 
+		  @	&& (\forall int j; 0 <= j && j < ((byte[])messages[i]).length; \result.message[j] == ((byte[])messages[i])[j]);
+		  @	&& (int)receiver_ids[i] == id && (int)sender_ids[i] == \result.sender_id;
+		  @ ensures \result==null || (\fresh(\result) && \invariant_for(\result));
+		  @ ensures \disjoint(SMT.rep, \result.*);
+	  	  @ ensures \new_elems_fresh(SMT.rep);
+		  @ assignable SMT.rep, Environment.counter;
+		  @*/
+		public /*@ nullable @*/ AuthenticatedMessage getMessage(int port) throws SMTError {
 			if (registrationInProgress) throw new SMTError();			
 
 			// the simulator/environment determines the index of the message to be returned
@@ -88,6 +137,11 @@ public class SMT {
 		}
 	}
 
+	/*@ ensures \invariant_for(\result) && \fresh(\result);
+	  @ ensures \new_elems_fresh(SMT.rep);
+	  @ ensures SMT.registered_sender_ids == \seq_concat(\old(SMT.registered_sender_ids),\seq_singleton(id));
+	  @ assignable SMT.rep, SMT.registered_sender_ids;
+	  @*/
 	public static Sender registerSender(int id) throws SMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new SMTError();
 		registrationInProgress = true;
@@ -106,6 +160,11 @@ public class SMT {
 		return sender;
 	}
 
+	/*@ ensures \invariant_for(\result) && \fresh(\result);
+	  @ ensures \new_elems_fresh(SMT.rep);
+	  @ ensures SMT.registered_receiver_ids == \seq_concat(\old(SMT.registered_receiver_ids),\seq_singleton(id));
+	  @ assignable SMT.rep;
+	  @*/
 	public static Receiver registerReceiver(int id) throws SMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new SMTError();
 		registrationInProgress = true;
