@@ -2,26 +2,26 @@ package de.uni.trier.infsec.utils;
 
 public class Utilities {
 	
-	public static final String byteArrayToHexString(byte[] b) {
-		final String hexChar = "0123456789ABCDEF";
-
-		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < b.length; i++)
-		{
-			sb.append(hexChar.charAt((b[i] >> 4) & 0x0f));
-			sb.append(hexChar.charAt(b[i] & 0x0f));
-		}
-		return sb.toString();
-	}
-	
-	public static byte[] hexStringToByteArray(String s) {
-	    int len = s.length();
-	    byte[] data = new byte[len / 2];
-	    for (int i = 0; i < len; i += 2) {
-	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
-	    }
-	    return data;
-	}
+//	public static final String byteArrayToHexString(byte[] b) {
+//		final String hexChar = "0123456789ABCDEF";
+//
+//		StringBuffer sb = new StringBuffer();
+//		for (int i = 0; i < b.length; i++)
+//		{
+//			sb.append(hexChar.charAt((b[i] >> 4) & 0x0f));
+//			sb.append(hexChar.charAt(b[i] & 0x0f));
+//		}
+//		return sb.toString();
+//	}
+//	
+//	public static byte[] hexStringToByteArray(String s) {
+//	    int len = s.length();
+//	    byte[] data = new byte[len / 2];
+//	    for (int i = 0; i < len; i += 2) {
+//	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i+1), 16));
+//	    }
+//	    return data;
+//	}
 	
 //	/**
 //	 *	Helper to enlarge the Array which stores the credentials. Used to avoid usage of Lists 
