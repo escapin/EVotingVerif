@@ -1,5 +1,6 @@
 package de.uni.trier.infsec.eVotingVerif.core;
 
+import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 import de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError;
