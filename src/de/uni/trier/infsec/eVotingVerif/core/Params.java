@@ -1,6 +1,5 @@
 package de.uni.trier.infsec.eVotingVerif.core;
 
-import java.io.File;
 
 public class Params {
 	/*

@@ -12,13 +12,10 @@ public class AMT {
 
 	//// The public interface ////
 
-	@SuppressWarnings("serial")
 	static public class AMTError extends Exception {}
 
-	@SuppressWarnings("serial")
     static public class ConnectionError extends Exception {}
 
-	@SuppressWarnings("serial")
     static public class RegistrationError extends Exception {}
 
 	/** 
