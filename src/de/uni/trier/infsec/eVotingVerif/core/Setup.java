@@ -23,20 +23,20 @@ public final class Setup
 		byte[] choices0 = new byte[numberOfVoters];
 		byte[] choices1 = new byte[numberOfVoters];
 		for (int i=0; i<numberOfVoters; ++i) {
-			choices0[i] = (byte)Environment.untrustedInput();
-			choices1[i] = (byte)Environment.untrustedInput();
+			choices0[i] = (byte)(Environment.untrustedInput() % numberOfCandidates);
+			choices1[i] = (byte)(Environment.untrustedInput() % numberOfCandidates);
 		}
 
 		// check that those vectors give the same result
-		int[] r0 = computeResult(choices0);
-		int[] r1 = computeResult(choices1);
+		int[] r0 = computeResult(choices0, numberOfCandidates);
+		int[] r1 = computeResult(choices1, numberOfCandidates);
 		if (!equalResult(r0,r1))
 			throw new Throwable();	// abort if the vectors do not yield the same result
 
 		// store correct result
 		correctResult = r1; // CONSERVATIVE EXTENSION
 
-		// create voters, using the choices from on of the vectors
+		// create voters, using the choices from the vectors
 		// according to the secret bit        
 		voters = new Voter[numberOfVoters];
 		for( int i=0; i<numberOfVoters; ++i ) {
@@ -54,9 +54,8 @@ public final class Setup
 		BB = new BulletinBoard();
 	}
 
-	private static int[] computeResult (byte[] choices) {
-		// int[] res = new int[numberOfCandidates];
-		int[] res = new int[choices.length];
+	private static int[] computeResult (byte[] choices, int numberOfCandidates) {
+		int[] res = new int[numberOfCandidates];
 		for (int i=0; i<choices.length; i++) 
 			++res[choices[i]];
 		return res;
