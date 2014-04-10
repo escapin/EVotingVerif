@@ -1,7 +1,9 @@
 package de.uni.trier.infsec.eVotingVerif.core;
 
 import de.uni.trier.infsec.environment.Environment;
+import de.uni.trier.infsec.functionalities.smt.Receiver;
 import de.uni.trier.infsec.functionalities.smt.SMT;
+import de.uni.trier.infsec.functionalities.smt.Sender;
 import de.uni.trier.infsec.functionalities.amt.AMT;
 
 public final class Setup 
@@ -38,13 +40,13 @@ public final class Setup
 		// according to the secret bit        
 		voters = new Voter[numberOfVoters];
 		for( int i=0; i<numberOfVoters; ++i ) {
-			SMT.Sender sender = SMT.registerSender(i); // sender with identifier i
+			Sender sender = SMT.registerSender(i); // sender with identifier i
 			byte choice = secret ? choices0[i] : choices1[i];
 			voters[i] = new Voter(choice, sender);
 		}
 
 		// create the server
-		SMT.Receiver serverReceiver = SMT.registerReceiver(Params.SERVER_ID);
+		Receiver serverReceiver = SMT.registerReceiver(Params.SERVER_ID);
 		AMT.Sender serverSender = AMT.registerSender(Params.SERVER_ID);
 		server = new Server(numberOfVoters, numberOfCandidates, serverReceiver, serverSender);
 

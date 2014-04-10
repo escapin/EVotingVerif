@@ -1,14 +1,12 @@
 package de.uni.trier.infsec.eVotingVerif.core;
 
 import de.uni.trier.infsec.environment.Environment;
-import de.uni.trier.infsec.functionalities.smt.SMT;
-import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
-import de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError;
-import de.uni.trier.infsec.functionalities.smt.SMT.RegistrationError;
+import de.uni.trier.infsec.functionalities.smt.*;
+import de.uni.trier.infsec.functionalities.smt.SMT.*;
 
 public final class Voter {
 	private /*@ spec_public @*/ final byte choice;
-	private /*@ spec_public @*/ final SMT.Sender sender;
+	private /*@ spec_public @*/ final Sender sender;
     private /*@ spec_public @*/ boolean voted;
 
 	//@ public invariant \invariant_for(sender);
@@ -20,7 +18,7 @@ public final class Voter {
 	  @ ensures !voted;
 	  @ pure
 	  @*/
-	public Voter(byte choice, SMT.Sender sender) throws SMTError, RegistrationError, ConnectionError  {
+	public Voter(byte choice, Sender sender) throws SMTError, RegistrationError, ConnectionError  {
 		this.choice = choice;
 		this.sender = sender; 
         this.voted = false;

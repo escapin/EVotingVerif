@@ -53,11 +53,11 @@ public class MessageTools {
 	 * de-concatenation).
 	 */
 	public static byte[] raw_concatenate(byte[] a, byte[] b) {
-		byte[] result = new byte[a.length + b.length];
+		byte[] _result = new byte[a.length + b.length];
 		int j = 0;
-		for( int i=0; i<a.length; ++i ) result[j++] = a[i];
-		for( int i=0; i<b.length; ++i ) result[j++] = b[i];
-		return result;
+		for( int i=0; i<a.length; ++i ) _result[j++] = a[i];
+		for( int i=0; i<b.length; ++i ) _result[j++] = b[i];
+		return _result;
 	}
 
 	/**

@@ -1,5 +1,8 @@
 package de.uni.trier.infsec.eVotingVerif.core;
 
+import de.uni.trier.infsec.environment.Environment;
+import de.uni.trier.infsec.functionalities.smt.AuthenticatedMessage;
+import de.uni.trier.infsec.functionalities.smt.Receiver;
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 import de.uni.trier.infsec.functionalities.amt.AMT;
@@ -10,14 +13,14 @@ public final class Server {
     private final int numberOfCandidates;
 	private final boolean[] ballotCast;  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private final int[] votesForCandidates;
-	private final SMT.Receiver receiver;
+	private final Receiver receiver;
 	private final AMT.Sender sender;
 
 	//@ invariant \disjoint(SMT.rep, this.*);
 	//@ invariant numberOfVoters == ballotCast.length;
 	//@ invariant numberOfCandidates == votesForCandidates.length;
 	//@ invariant 0 <= numberOfVoters;
-	//@ invarinat 0 <= numberOfCandidates;
+	//@ invariant 0 <= numberOfCandidates;
 
 	/*@ ensures numberOfVoters == this.numberOfVoters;
 	  @ ensures numberOfCandidates == this.numberOfCandidates;
@@ -28,7 +31,7 @@ public final class Server {
 	  @ pure
 	  @*/
 	public Server(int numberOfVoters, int numberOfCandidates, 
-			      SMT.Receiver receiver, AMT.Sender sender_to_BB) throws AMTError, SMT.ConnectionError {
+			      Receiver receiver, AMT.Sender sender_to_BB) throws AMTError, SMT.ConnectionError {
 		this.numberOfVoters = numberOfVoters;
 		this.numberOfCandidates = numberOfCandidates;
 		this.receiver = receiver;
@@ -43,20 +46,20 @@ public final class Server {
 	 */
 	int i=0;
 	public void onCollectBallot() throws SMTError {
-		SMT.AuthenticatedMessage authMsg = receiver.getMessage(Params.LISTEN_PORT_SERVER_SMT);
+		AuthenticatedMessage authMsg = receiver.getMessage(Params.LISTEN_PORT_SERVER_SMT);
 		if (authMsg != null)
             onCollectBallot(authMsg);
 	}
 	
 	/*@ 
-	  @ ensures 0 <= authMsg.sender_id && authMsg.sender_id < numberOfVoters && !ballotCast[autMsg.sender_id]
-	  @	&& authMsg.message != null && authMsg.ballot.length == 1
+	  @ ensures 0 <= authMsg.sender_id && authMsg.sender_id < numberOfVoters && !ballotCast[authMsg.sender_id]
+	  @	&& authMsg.message != null && authMsg.message.length == 1
 	  @	==> (votesForCandidates[authMsg.message[0]] == \old(votesForCandidates[authMsg.message[0]])+1
 	  @         && (\forall int i; 0 <= i && i < numberOfCandidates; i != authMsg.message[0] ==>
 	  @		votesForCandidates[i] == \old(votesForCandidates[i])));
 	  @ assignable votesForCandidates[*];
           @*/
-	private void onCollectBallot(SMT.AuthenticatedMessage authMsg) {
+	private void onCollectBallot(AuthenticatedMessage authMsg) {
 		if (authMsg == null) return;
 		int voterID = authMsg.sender_id;
 		byte[] ballot = authMsg.message;
@@ -76,7 +79,7 @@ public final class Server {
 	/*@ normal_behavior
 	  @ ensures \result ==
 	  @	(\forall int i; 0 <= i && i < numberOfVoters; ballotCast[i]);
-	  @ strictly_pure;
+	  @ strictly_pure
 	  @*/
 	public boolean resultReady() {
 		for( int i=0; i<numberOfVoters; ++i ) {
@@ -93,24 +96,24 @@ public final class Server {
 	  @ assignable SMT.rep, Environment.counter;
 	  @*/
 	public void onPostResult() throws AMTError, AMT.RegistrationError, AMT.ConnectionError {
-		byte[] result = getResult();
-		if (result != null)
-			sender.sendTo(result, Params.BULLETIN_BOARD_ID, 
+		byte[] _result = getResult();
+		if (_result != null)
+			sender.sendTo(_result, Params.BULLETIN_BOARD_ID, 
 					      Params.DEFAULT_HOST_BBOARD, Params.LISTEN_PORT_BBOARD_AMT);		
 	}
 
 	private byte[] getResult() {
 		if (!resultReady()) return null; // the result is only returned when all the voters have voted
 		
-        int[] result = new int[numberOfCandidates];
+        int[] _result = new int[numberOfCandidates];
         for (int i=0; i<numberOfCandidates; ++i) {
             int x = votesForCandidates[i];
             // CONSERVATIVE EXTENSION:
             // PROVE THAT THE FOLLOWING ASSINGMENT IS REDUNDANT
             x = consExt(i);
-            result[i] = x;
+            _result[i] = x;
         }
-        return formatResult(result);
+        return formatResult(_result);
 	}
 
 	/*@ ensures \result == votesForCandidates[i];
@@ -126,10 +129,10 @@ public final class Server {
 	/*@ ensures true;
 	  @ pure
 	  @*/
-	private static byte[] formatResult(int[] result) {
+	private static byte[] formatResult(int[] _result) {
 		String s = "Result of the election:\n";
-		for( int i=0; i<result.length; ++i ) {
-			s += "  Number of votes for candidate " + i + ": " + result[i] + "\n";
+		for( int i=0; i<_result.length; ++i ) {
+			s += "  Number of votes for candidate " + i + ": " + _result[i] + "\n";
 		}
 		return s.getBytes();
 	}

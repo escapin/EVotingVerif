@@ -1,6 +1,6 @@
 package de.uni.trier.infsec.functionalities.smt;
 
-import de.uni.trier.infsec.environment.SMTEnv;
+import de.uni.trier.infsec.environment.*;
 import de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError;
 import de.uni.trier.infsec.functionalities.smt.SMT.RegistrationError;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
