@@ -41,7 +41,6 @@ public final class Server {
 	/*
 	 * Collect one ballot (read from a secure channel)
 	 */
-	int i=0;
 	public void onCollectBallot() throws SMTError {
 		SMT.AuthenticatedMessage authMsg = receiver.getMessage(Params.LISTEN_PORT_SERVER_SMT);
 		if (authMsg != null)
