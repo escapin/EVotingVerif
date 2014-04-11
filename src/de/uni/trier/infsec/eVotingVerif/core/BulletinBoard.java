@@ -1,7 +1,7 @@
-package de.uni.trier.infsec.protocols.smt_voting;
+package de.uni.trier.infsec.eVotingVerif.core;
 
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT;
-import de.uni.trier.infsec.functionalities.amt.ideal.AMT.AMTError;
+import de.uni.trier.infsec.functionalities.amt.AMT;
+import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
 import de.uni.trier.infsec.utils.MessageTools;
 
 /*
@@ -10,9 +10,9 @@ import de.uni.trier.infsec.utils.MessageTools;
  */
 public class BulletinBoard {
 
-	public BulletinBoard(AMT.AgentProxy proxy) {
+	public BulletinBoard() throws AMT.ConnectionError {
 		content = new MessageList();
-		amt_proxy = proxy;
+		AMT.listenOn(Params.LISTEN_PORT_BBOARD_AMT);
 	}
 
 	/*
@@ -20,10 +20,9 @@ public class BulletinBoard {
 	 * case, adds it to the maintained list of messages.
 	 */
 	public void onPost() throws AMTError {
-		AMT.AuthenticatedMessage am = amt_proxy.getMessage(Parameters.DEFAULT_LISTEN_PORT_BBOARD_AMT);
+		AMT.AuthenticatedMessage am = AMT.getMessage(Params.BULLETIN_BOARD_ID, Params.LISTEN_PORT_BBOARD_AMT);
 		if (am == null) return;
-		if (am.sender_id != Identifiers.SERVER_ID) return;
-
+		if (am.sender_id != Params.SERVER_ID) return;
 		byte[] message = am.message;
 		content.add(message);
 	}
@@ -57,5 +56,4 @@ public class BulletinBoard {
 	}
 
 	private MessageList content;
-	private AMT.AgentProxy amt_proxy;
 }

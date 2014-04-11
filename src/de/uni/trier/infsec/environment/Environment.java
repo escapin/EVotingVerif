@@ -1,43 +1,39 @@
 package de.uni.trier.infsec.environment;
 
-class Node {
-	int value;
-	Node next;
-	Node(int v, Node n) {
-		value = v; next = n;
-	}
-}
+public final class Environment {
 
-public class Environment {
-	
-	private static boolean result; // the LOW variable
-	
-	private static Node list = null;
-	private static boolean listInitialized = false;
-		
-	private static Node initialValue() {
-		// Unknown specification of the following form:
-		// return new Node(U1, new Node(U2, ...));
-		// where U1, U2, ...Un are constant integers.
-		return new Node(1, new Node(7,null));  // just an example
-	}
+	private /*@ spec_public @*/ static boolean RESULT; // the LOW variable
+    private /*@ spec_public @*/ static int[] input = {1,7,2}; // an example only; the information-flow property should hold for all possible values
+    private /*@ spec_public @*/ static int counter = 0;
 
+    /*@ normal_behavior
+      @ ensures true;
+      @ assignable counter;
+      @*/
     public static int untrustedInput() {
-    	if (!listInitialized) {
-    		list = initialValue();
-    	    listInitialized = true;        
-    	}
-    	if (list==null) return 0;
-    	int tmp = list.value;
-    	list = list.next;
-    	return tmp;
+        if (counter >= input.length)
+            return 0;
+        else
+            return input[counter++];
 	}
-		
+	
     public static void untrustedOutput(int x) {
 		if (untrustedInput()==0) {
-			result = (x==untrustedInput());
+			RESULT = (x==untrustedInput());
 			throw new Error();  // abort
 		}
+	}
+
+    /*@ normal_behavior
+      @ ensures 0 <= \result && \result < n;
+      @ assignable counter;
+      @*/
+    public static int untrustedInput(int n) {
+        int a;
+        do {
+            a = untrustedInput();
+        } while (a<0 || a>=n);
+        return a;
 	}
     
     public static byte[] untrustedInputMessage() {
@@ -49,13 +45,19 @@ public class Environment {
 		}
 		return returnval;    
     }
-    
+
+    public static String untrustedInputString() {
+    	return untrustedInputMessage().toString();
+    }
+
+
     public static void untrustedOutputMessage(byte[] t) {
     	untrustedOutput(t.length);
 		for (int i = 0; i < t.length; i++) {
 			untrustedOutput(t[i]);
 		}
     }
+
     
     public static void untrustedOutputString(String s) {
     	untrustedOutput(s.length());
