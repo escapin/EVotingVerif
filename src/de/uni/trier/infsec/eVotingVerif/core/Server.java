@@ -16,7 +16,7 @@ public final class Server {
 	private final Receiver receiver;
 	private final AMT.Sender sender;
 
-	//@ invariant \disjoint(SMT.rep, this.*);
+	//@ invariant \disjoint(SMT.rep, this.*, ballotCast[*], votesForCandidates[*]);
 	//@ invariant numberOfVoters == ballotCast.length;
 	//@ invariant numberOfCandidates == votesForCandidates.length;
 	//@ invariant 0 <= numberOfVoters;
@@ -91,7 +91,10 @@ public final class Server {
 	/*
 	 * Post the result (if ready) on the bulletin board.
 	 */
-	/*@ ensures true;
+	/*@ requires resultReady();
+      @ requires (\forall int j; 0 <= j && j < numberOfCandidates;
+      @            Setup.correctResult[j] == votesForCandidates[j]);
+	  @ ensures true;
 	  @ assignable SMT.rep, Environment.counter;
 	  @*/
 	public void onPostResult() throws AMTError, AMT.RegistrationError, AMT.ConnectionError {
@@ -101,10 +104,20 @@ public final class Server {
 					      Params.DEFAULT_HOST_BBOARD, Params.LISTEN_PORT_BBOARD_AMT);		
 	}
 
-	private byte[] getResult() {
+	/*@ requires resultReady();
+	  @ requires (\forall int j; 0 <= j && j < numberOfCandidates;
+	  @            Setup.correctResult[j] == votesForCandidates[j]);
+	  @ ensures \result != null;
+	  @*/
+	private /*@ pure nullable @*/ byte[] getResult() {
 		if (!resultReady()) return null; // the result is only returned when all the voters have voted
 		
         int[] _result = new int[numberOfCandidates];
+        /*@ maintaining 0 <= i && i <= numberOfCandidates;
+          @ maintaining (\forall int j; 0 <= j && j < numberOfCandidates;
+          @             Setup.correctResult[j] == votesForCandidates[j]);
+          @ assignable _result[*];
+          @*/
         for (int i=0; i<numberOfCandidates; ++i) {
             int x = votesForCandidates[i];
             // CONSERVATIVE EXTENSION:
@@ -115,7 +128,8 @@ public final class Server {
         return formatResult(_result);
 	}
 
-	/*@ ensures \result == votesForCandidates[i];
+	/*@ requires Setup.correctResult[i] == votesForCandidates[i];
+	  @ ensures \result == votesForCandidates[i];
 	  @ strictly_pure
 	  @*/
     private int consExt(int i) {

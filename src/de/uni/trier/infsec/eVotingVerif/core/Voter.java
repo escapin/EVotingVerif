@@ -10,6 +10,7 @@ public final class Voter {
     private /*@ spec_public @*/ boolean voted;
 
 	//@ public invariant \invariant_for(sender);
+    //@ public invariant \disjoint(SMT.rep, this.*);
 
 	/*@ normal_behavior
 	  @ requires \invariant_for(sender);

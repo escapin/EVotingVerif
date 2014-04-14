@@ -37,6 +37,9 @@ public class AMT {
 	{
 		public final int id;
 
+	    /*@ ensures true;
+	      @ assignable Environment.counter;
+	      @*/
 		public void sendTo(byte[] message, int receiver_id, String server, int port) throws AMTError, ConnectionError {
 			if (registrationInProgress) throw new AMTError();
 
