@@ -19,12 +19,17 @@ final public class Sender
 	public final int id;
 
 	/*@ behavior // the following must be true if no exception is thrown
-	  @ requires message.length > 0;
+	  @ requires message == null || message.length > 0;
+	  @ requires SMT.messages.length == SMT.receiver_ids.length;
+      @ requires SMT.messages.length == SMT.sender_ids.length;
+	  @ ensures message != null;
 	  @ ensures SMT.messages == \seq_concat(\old(SMT.messages),\seq_singleton(message[0]));
 	  @ ensures SMT.receiver_ids == \seq_concat(\old(SMT.receiver_ids),\seq_singleton(receiver_id));
 	  @ ensures SMT.sender_ids == \seq_concat(\old(SMT.sender_ids),\seq_singleton(id));
 	  @ ensures (\exists int i; 0 <= i && i < SMT.registered_receiver_ids.length; SMT.registered_receiver_ids[i]==receiver_id);
   	  @ ensures \new_elems_fresh(SMT.rep);
+      @ ensures SMT.messages.length == SMT.receiver_ids.length;
+      @ ensures SMT.messages.length == SMT.sender_ids.length;
 	  @ assignable SMT.rep, SMT.messages, SMT.receiver_ids, SMT.sender_ids, Environment.counter; // what can be changed
 	  @*/
 	public void sendTo(/*@nullable@*/ byte[] message, int receiver_id, /*@ nullable @*/ String server, int port) throws SMTError, RegistrationError, ConnectionError {

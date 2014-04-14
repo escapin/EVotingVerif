@@ -15,17 +15,20 @@ final public class Receiver {
 	  @*/
 
 	//@ ensures true;
-	//@ pure
+	//@ assignable Environment.counter;
 	public void listenOn(int port) throws ConnectionError {
 		boolean ok = SMTEnv.listenOn(port);
 		if (!ok) throw new ConnectionError();
 	}
 
-	/*@ ensures \result==null || (\exists int i; 0 <= i && i < SMT.messages.length;
-	  @	\result.message[0] == (byte)SMT.messages[i]
-	  @	&& (int)SMT.receiver_ids[i] == id && (int)SMT.sender_ids[i] == \result.sender_id);
+	/*@ 
+      @ requires SMT.messages.length == SMT.receiver_ids.length;
+      @ requires SMT.messages.length == SMT.sender_ids.length;
+      @ ensures \result==null || (\exists int i; 0 <= i && i < SMT.messages.length;
+	  @	       \result.message[0] == (byte)SMT.messages[i]
+	  @	       && (int)SMT.receiver_ids[i] == id && (int)SMT.sender_ids[i] == \result.sender_id);
 	  @ ensures \result==null || (\fresh(\result) && \invariant_for(\result));
-	  @ ensures \disjoint(SMT.rep, \result.*);
+	  @ ensures \result==null || \disjoint(SMT.rep, \result.*);
   	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ assignable SMT.rep, Environment.counter;
 	  @*/

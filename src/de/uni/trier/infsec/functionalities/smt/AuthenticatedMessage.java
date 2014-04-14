@@ -5,7 +5,6 @@ package de.uni.trier.infsec.functionalities.smt;
  * 
  * Objects of this class are returned when a receiver gets a message.
  */
-//@ spec_public
 final public class AuthenticatedMessage {
 	public final byte[] message;
 	public final int sender_id;

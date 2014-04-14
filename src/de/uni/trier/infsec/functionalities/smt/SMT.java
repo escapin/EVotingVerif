@@ -1,5 +1,6 @@
 package de.uni.trier.infsec.functionalities.smt;
 
+import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.environment.SMTEnv;
 
 /**
@@ -15,7 +16,7 @@ public final class SMT {
 
 	static public class RegistrationError extends Exception {}
 
-	// what locations belong to the network/SMT, what may be changed upon sending
+	// what locations belong to the SMT component, what may be changed upon sending
 	//@ public static ghost \locset rep;
 
 	// the abstract state (message queue)
@@ -32,7 +33,7 @@ public final class SMT {
 	/*@ ensures \invariant_for(\result) && \fresh(\result);
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures SMT.registered_sender_ids == \seq_concat(\old(SMT.registered_sender_ids),\seq_singleton(id));
-	  @ assignable SMT.rep, SMT.registered_sender_ids;
+	  @ assignable SMT.rep, SMT.registered_sender_ids, Environment.counter;
 	  @*/
 	public static Sender registerSender(int id) throws SMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new SMTError();
@@ -55,7 +56,7 @@ public final class SMT {
 	/*@ ensures \invariant_for(\result) && \fresh(\result);
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures SMT.registered_receiver_ids == \seq_concat(\old(SMT.registered_receiver_ids),\seq_singleton(id));
-	  @ assignable SMT.rep;
+	  @ assignable SMT.rep, registered_receiver_ids, Environment.counter;
 	  @*/
 	public static Receiver registerReceiver(int id) throws SMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new SMTError();
