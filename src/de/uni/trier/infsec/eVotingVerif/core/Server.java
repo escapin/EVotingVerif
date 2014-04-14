@@ -105,6 +105,7 @@ public final class Server {
 	}
 
 	/*@ requires resultReady();
+	  @ requires Setup.correctResult != null && Setup.correctResult.length == numberOfCandidates;
 	  @ requires (\forall int j; 0 <= j && j < numberOfCandidates;
 	  @            Setup.correctResult[j] == votesForCandidates[j]);
 	  @ ensures \result != null;
@@ -114,6 +115,9 @@ public final class Server {
 		
         int[] _result = new int[numberOfCandidates];
         /*@ maintaining 0 <= i && i <= numberOfCandidates;
+          @ maintaining Setup.correctResult != null;
+          @ maintaining Setup.correctResult.length == numberOfCandidates;
+          @ maintaining \invariant_for(this);
           @ maintaining (\forall int j; 0 <= j && j < numberOfCandidates;
           @             Setup.correctResult[j] == votesForCandidates[j]);
           @ assignable _result[*];
@@ -128,7 +132,10 @@ public final class Server {
         return formatResult(_result);
 	}
 
-	/*@ requires Setup.correctResult[i] == votesForCandidates[i];
+	/*@ requires 0 <= i && i < numberOfCandidates;
+	  @ requires Setup.correctResult != null;
+	  @ requires Setup.correctResult.length == numberOfCandidates;
+	  @ requires Setup.correctResult[i] == votesForCandidates[i];
 	  @ ensures \result == votesForCandidates[i];
 	  @ strictly_pure
 	  @*/
