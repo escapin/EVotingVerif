@@ -34,7 +34,7 @@ public final class SMT {
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures SMT.registered_sender_ids == \seq_concat(\old(SMT.registered_sender_ids),\seq_singleton(id));
       @ diverges true;
-	  @ assignable SMT.rep, SMT.registered_sender_ids, Environment.counter;
+	  @ assignable \set_union(SMT.rep, \set_union(\singleton(SMT.registered_sender_ids), \singleton(Environment.counter)));
 	  @*/
 	public static Sender registerSender(int id) throws SMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new SMTError();
@@ -58,7 +58,7 @@ public final class SMT {
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures SMT.registered_receiver_ids == \seq_concat(\old(SMT.registered_receiver_ids),\seq_singleton(id));
       @ diverges true;
-	  @ assignable SMT.rep, registered_receiver_ids, Environment.counter;
+	  @ assignable \set_union(SMT.rep, \set_union(\singleton(registered_receiver_ids), \singleton(Environment.counter)));
 	  @*/
 	public static Receiver registerReceiver(int id) throws SMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new SMTError();

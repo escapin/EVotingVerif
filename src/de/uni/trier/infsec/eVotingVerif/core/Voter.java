@@ -38,7 +38,7 @@ public final class Voter {
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures voted;
       @ diverges true;
-	  @ assignable voted, SMT.rep, SMT.messages, SMT.receiver_ids, SMT.sender_ids, Environment.counter; // what can be changed
+	  @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(\singleton(voted), SMT.rep), \singleton(SMT.messages)), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter)); // what can be changed
 	  @ also normal_behavior
 	  @ requires voted;
       @ diverges true;

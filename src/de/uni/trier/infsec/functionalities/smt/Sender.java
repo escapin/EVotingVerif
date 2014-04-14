@@ -31,7 +31,7 @@ final public class Sender
       @ ensures SMT.messages.length == SMT.receiver_ids.length;
       @ ensures SMT.messages.length == SMT.sender_ids.length;
       @ diverges true;
-	  @ assignable SMT.rep, SMT.messages, SMT.receiver_ids, SMT.sender_ids, Environment.counter; // what can be changed
+	  @ assignable \set_union(SMT.rep, \set_union(\set_union(\set_union(\singleton(SMT.messages), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter))); // what can be changed
 	  @*/
 	public void sendTo(/*@nullable@*/ byte[] message, int receiver_id, /*@ nullable @*/ String server, int port) throws SMTError, RegistrationError, ConnectionError {
 		if (SMT.registrationInProgress) throw new SMTError();

@@ -5,6 +5,7 @@ import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.environment.AMTEnv;
+import de.uni.trier.infsec.functionalities.smt.SMT;
 
 /**
  * Ideal functionality for AMT (Authenticated Message Transmission).
@@ -38,7 +39,7 @@ public class AMT {
 		public final int id;
 
 	    /*@ ensures true;
-	      @ assignable Environment.counter;
+	      @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
 	      @*/
 		public void sendTo(byte[] message, int receiver_id, String server, int port) throws AMTError, ConnectionError {
 			if (registrationInProgress) throw new AMTError();
@@ -62,7 +63,7 @@ public class AMT {
 	}
 	
 	/*@ ensures true;
-	  @ assignable Environment.counter;
+	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
 	  @*/
 	public static Sender registerSender(int id) throws AMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new AMTError();

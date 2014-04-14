@@ -28,8 +28,7 @@ public final class Server {
 	  @ ensures sender == this.sender;
 	  @ ensures (\forall int i; 0 <= i && i < numberOfVoters; !ballotCast[i]);
 	  @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; votesForCandidates[i]==0);
-      @ diverges true;
-	  @ pure
+	  @ assignable Environment.counter;
 	  @*/
 	public Server(int numberOfVoters, int numberOfCandidates, 
 			      Receiver receiver, AMT.Sender sender_to_BB) throws AMTError, SMT.ConnectionError {
@@ -42,7 +41,7 @@ public final class Server {
 		receiver.listenOn(Params.LISTEN_PORT_SERVER_SMT);
 	}
 
-	/*
+	/**
 	 * Collect one ballot (read from a secure channel)
 	 */
 	public void onCollectBallot() throws SMTError {
@@ -104,7 +103,7 @@ public final class Server {
       @            Setup.correctResult[j] == votesForCandidates[j]);
 	  @ ensures true;
       @ diverges true;
-	  @ assignable SMT.rep, Environment.counter;
+	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
 	  @*/
 	public void onPostResult() throws AMTError, AMT.RegistrationError, AMT.ConnectionError {
 		byte[] _result = getResult();

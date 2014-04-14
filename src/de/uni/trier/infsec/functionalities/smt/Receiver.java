@@ -33,7 +33,7 @@ final public class Receiver {
 	  @ ensures \result==null || \disjoint(SMT.rep, \result.*);
   	  @ ensures \new_elems_fresh(SMT.rep);
       @ diverges true;
-	  @ assignable SMT.rep, Environment.counter;
+	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
 	  @*/
 	public /*@ nullable @*/ AuthenticatedMessage getMessage(int port) throws SMTError {
 		if (SMT.registrationInProgress) throw new SMTError();			
