@@ -3,12 +3,16 @@ package de.uni.trier.infsec.eVotingVerif.core;
 import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.functionalities.smt.Receiver;
 import de.uni.trier.infsec.functionalities.smt.SMT;
+import de.uni.trier.infsec.functionalities.smt.SMT.RegistrationError;
+import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 import de.uni.trier.infsec.functionalities.smt.Sender;
 import de.uni.trier.infsec.functionalities.amt.AMT;
+import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
+import de.uni.trier.infsec.functionalities.amt.AMT.ConnectionError;
 
 public final class Setup 
 {
-	private final Voter[] voters;
+	private Voter[] voters;
 	private final Server server;
 	private final BulletinBoard BB;
 
@@ -20,13 +24,8 @@ public final class Setup
 
 	private Setup(int numberOfCandidates, int numberOfVoters) throws Throwable {
 		// let the environment determine two vectors of choices
-		byte[] choices0 = new byte[numberOfVoters];
-		byte[] choices1 = new byte[numberOfVoters];
-		for (int i=0; i<numberOfVoters; ++i) {
-		    // Daniel: this cast is really ugly; why not use byte from the beginning?
-			choices0[i] = (byte)(Environment.untrustedInput(numberOfCandidates));
-			choices1[i] = (byte)(Environment.untrustedInput(numberOfCandidates));
-		}
+		byte[] choices0 = createChoices(numberOfVoters, numberOfCandidates);
+        byte[] choices1 = createChoices(numberOfVoters, numberOfCandidates);
 
 		// check that those vectors give the same result
 		int[] r0 = computeResult(choices0, numberOfCandidates);
@@ -39,21 +38,50 @@ public final class Setup
 
 		// create voters, using the choices from the vectors
 		// according to the secret bit        
-		voters = new Voter[numberOfVoters];
+		createVoters(numberOfVoters, choices0, choices1);
+
+		// create the server
+		server = createServer(numberOfCandidates, numberOfVoters);
+
+		// create the bulletin board
+		BB = createBulltetinBoard();
+	}
+	
+	private byte[] createChoices(int numberOfVoters, int numberOfCandidates) {
+	    final byte[] choices = new byte[numberOfVoters];
+        for (int i=0; i<numberOfVoters; ++i) {
+            // Daniel: this cast is really ugly; why not use byte from the beginning?
+            choices[i] = (byte)(Environment.untrustedInput(numberOfCandidates));
+        }
+        return choices;
+	}
+
+    private void createVoters(int numberOfVoters, byte[] choices0,
+                    byte[] choices1) throws SMTError, RegistrationError,
+                    de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError {
+        voters = new Voter[numberOfVoters];
 		for( int i=0; i<numberOfVoters; ++i ) {
 			Sender sender = SMT.registerSender(i); // sender with identifier i
 			byte choice = secret ? choices0[i] : choices1[i];
 			voters[i] = new Voter(choice, sender);
 		}
+    }
 
-		// create the server
-		Receiver serverReceiver = SMT.registerReceiver(Params.SERVER_ID);
+    private Server createServer(int numberOfCandidates, int numberOfVoters)
+                    throws SMTError,
+                    RegistrationError,
+                    de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError,
+                    AMTError,
+                    de.uni.trier.infsec.functionalities.amt.AMT.RegistrationError,
+                    ConnectionError {
+        Receiver serverReceiver = SMT.registerReceiver(Params.SERVER_ID);
 		AMT.Sender serverSender = AMT.registerSender(Params.SERVER_ID);
-		server = new Server(numberOfVoters, numberOfCandidates, serverReceiver, serverSender);
+		return new Server(numberOfVoters, numberOfCandidates, serverReceiver, serverSender);
+    }
 
-		// create the bulletin board
-		BB = new BulletinBoard();
-	}
+    private BulletinBoard createBulltetinBoard() throws ConnectionError {
+        return new BulletinBoard();
+    }
 
 	private static int[] computeResult (byte[] choices, int numberOfCandidates) {
 		int[] res = new int[numberOfCandidates];
