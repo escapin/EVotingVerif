@@ -57,7 +57,7 @@ public final class Server {
 	  @         && (\forall int i; 0 <= i && i < numberOfCandidates; i != authMsg.message[0] ==>
 	  @		votesForCandidates[i] == \old(votesForCandidates[i])));
 	  @ assignable votesForCandidates[*];
-          @*/
+      @*/
 	private void onCollectBallot(AuthenticatedMessage authMsg) {
 		if (authMsg == null) return;
 		int voterID = authMsg.sender_id;

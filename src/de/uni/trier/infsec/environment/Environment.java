@@ -65,4 +65,13 @@ public final class Environment {
     		untrustedOutput((int)s.charAt(i));
     	}
     }
+
+    /*@ public normal_behavior
+      @ ensures true;
+      @ strictly_pure
+      @*/
+    public static boolean evalUntrustedInput(int n) {
+        // or any other implementation
+        return n % 5 == 3;
+    }
 }        

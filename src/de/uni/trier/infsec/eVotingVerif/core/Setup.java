@@ -82,8 +82,8 @@ public final class Setup
 	public void votingPhase(int N) throws Throwable {
         int voter = 0;
         for(int i=0; i<N; ++i ) {
-			int decision = Environment.untrustedInput();
-            if (decision >= 0) { // a voter (determined by the adversary) votes
+            // the choice is already encoded in N
+            if (Environment.evalUntrustedInput(N)) { // a voter (determined by the adversary) votes
 				final Voter v = voters[voter++]; // better: v = voters[decision]
 				v.onSendBallot();
             }
