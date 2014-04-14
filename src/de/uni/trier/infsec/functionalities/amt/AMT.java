@@ -3,6 +3,7 @@ package de.uni.trier.infsec.functionalities.amt;
 import de.uni.trier.infsec.utils.MessageTools;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
+import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.environment.AMTEnv;
 
 /**
@@ -57,6 +58,9 @@ public class AMT {
 		}
 	}
 	
+	/*@ ensures true;
+	  @ assignable Environment.counter;
+	  @*/
 	public static Sender registerSender(int id) throws AMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new AMTError();
 		registrationInProgress = true;
