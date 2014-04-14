@@ -23,6 +23,7 @@ public final class Setup
 		byte[] choices0 = new byte[numberOfVoters];
 		byte[] choices1 = new byte[numberOfVoters];
 		for (int i=0; i<numberOfVoters; ++i) {
+		    // Daniel: this cast is really ugly; why not use byte from the beginning?
 			choices0[i] = (byte)(Environment.untrustedInput(numberOfCandidates));
 			choices1[i] = (byte)(Environment.untrustedInput(numberOfCandidates));
 		}
