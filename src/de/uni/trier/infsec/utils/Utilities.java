@@ -39,6 +39,11 @@ public class Utilities {
 	/**
 	 *	Checks two Arrays for equality 
 	 */
+    /*@ public normal_behavior
+      @ ensures \result == voter.length == tmpVoter.length
+      @         && (\forall int i; 0 <= i && i < voter.length; voter[i] == tmpVoter[i]);
+      @ strictly_pure
+      @*/
 	public static boolean arrayEqual(byte[] voter, byte[] tmpVoter) {
 		if (voter.length != tmpVoter.length) return false;
 		for (int i = 0; i < voter.length; i++) {
@@ -47,6 +52,10 @@ public class Utilities {
 		return true;
 	}
 	
+	/*@ public normal_behavior
+	  @ ensures \result == (\forall int i; 0 <= i && i < array.length; array[i] == 0);
+	  @ strictly_pure
+	  @*/
 	public static boolean arrayEmpty(byte[] array) {
 		for (int i = 0; i < array.length; i++) {
 			if (array[i] != 0x00) return false;
