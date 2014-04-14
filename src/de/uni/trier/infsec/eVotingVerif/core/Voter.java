@@ -24,7 +24,7 @@ public final class Voter {
         this.voted = false;
 	}
 
-	/*
+	/**
 	 * Prepare the ballot containing the vote and send it to the server using the secure 
 	 * message transfer functionality (the Sender object).
 	 */

@@ -23,8 +23,8 @@ public final class Setup
 		byte[] choices0 = new byte[numberOfVoters];
 		byte[] choices1 = new byte[numberOfVoters];
 		for (int i=0; i<numberOfVoters; ++i) {
-			choices0[i] = (byte)(Environment.untrustedInput() % numberOfCandidates);
-			choices1[i] = (byte)(Environment.untrustedInput() % numberOfCandidates);
+			choices0[i] = (byte)(Environment.untrustedInput(numberOfCandidates));
+			choices1[i] = (byte)(Environment.untrustedInput(numberOfCandidates));
 		}
 
 		// check that those vectors give the same result

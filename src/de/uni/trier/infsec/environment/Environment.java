@@ -24,6 +24,10 @@ public final class Environment {
 		}
 	}
 
+    /**
+     * Sanitized untrustedInput().
+     * @return some value in the interval [0,n)
+     */
     /*@ normal_behavior
       @ ensures 0 <= \result && \result < n;
       @ assignable counter;
