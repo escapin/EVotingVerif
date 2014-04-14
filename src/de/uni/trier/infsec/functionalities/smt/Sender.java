@@ -30,6 +30,7 @@ final public class Sender
   	  @ ensures \new_elems_fresh(SMT.rep);
       @ ensures SMT.messages.length == SMT.receiver_ids.length;
       @ ensures SMT.messages.length == SMT.sender_ids.length;
+      @ diverges true;
 	  @ assignable SMT.rep, SMT.messages, SMT.receiver_ids, SMT.sender_ids, Environment.counter; // what can be changed
 	  @*/
 	public void sendTo(/*@nullable@*/ byte[] message, int receiver_id, /*@ nullable @*/ String server, int port) throws SMTError, RegistrationError, ConnectionError {

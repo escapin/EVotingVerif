@@ -14,8 +14,10 @@ final public class Receiver {
 	  @ invariant \disjoint(SMT.rep, \singleton(this.id));
 	  @*/
 
-	//@ ensures true;
-	//@ assignable Environment.counter;
+	/*@ ensures true;
+      @ diverges true;
+	  @ assignable Environment.counter;
+	  @*/
 	public void listenOn(int port) throws ConnectionError {
 		boolean ok = SMTEnv.listenOn(port);
 		if (!ok) throw new ConnectionError();
@@ -30,6 +32,7 @@ final public class Receiver {
 	  @ ensures \result==null || (\fresh(\result) && \invariant_for(\result));
 	  @ ensures \result==null || \disjoint(SMT.rep, \result.*);
   	  @ ensures \new_elems_fresh(SMT.rep);
+      @ diverges true;
 	  @ assignable SMT.rep, Environment.counter;
 	  @*/
 	public /*@ nullable @*/ AuthenticatedMessage getMessage(int port) throws SMTError {

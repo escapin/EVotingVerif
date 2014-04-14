@@ -28,6 +28,7 @@ public final class Server {
 	  @ ensures sender == this.sender;
 	  @ ensures (\forall int i; 0 <= i && i < numberOfVoters; !ballotCast[i]);
 	  @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; votesForCandidates[i]==0);
+      @ diverges true;
 	  @ pure
 	  @*/
 	public Server(int numberOfVoters, int numberOfCandidates, 
@@ -56,6 +57,7 @@ public final class Server {
 	  @	==> (votesForCandidates[authMsg.message[0]] == \old(votesForCandidates[authMsg.message[0]])+1
 	  @         && (\forall int i; 0 <= i && i < numberOfCandidates; i != authMsg.message[0] ==>
 	  @		votesForCandidates[i] == \old(votesForCandidates[i])));
+      @ diverges true;
 	  @ assignable votesForCandidates[*];
       @*/
 	private void onCollectBallot(AuthenticatedMessage authMsg) {
@@ -77,10 +79,16 @@ public final class Server {
 	 */
 	/*@ normal_behavior
 	  @ ensures \result ==
-	  @	(\forall int i; 0 <= i && i < numberOfVoters; ballotCast[i]);
+	  @	(\forall int j; 0 <= j && j < numberOfVoters; ballotCast[j]);
 	  @ strictly_pure
 	  @*/
 	public boolean resultReady() {
+	    /*@ maintaining 0 <= i && i <= numberOfVoters;
+	      @ maintaining \invariant_for(this);
+	      @ maintaining (\forall int j; 0 <= j && j < i; ballotCast[j]);
+	      @ decreasing numberOfVoters-i;
+	      @ assignable \strictly_nothing;
+	      @*/
 		for( int i=0; i<numberOfVoters; ++i ) {
 			if( !ballotCast[i] )
 				return false;
@@ -95,6 +103,7 @@ public final class Server {
       @ requires (\forall int j; 0 <= j && j < numberOfCandidates;
       @            Setup.correctResult[j] == votesForCandidates[j]);
 	  @ ensures true;
+      @ diverges true;
 	  @ assignable SMT.rep, Environment.counter;
 	  @*/
 	public void onPostResult() throws AMTError, AMT.RegistrationError, AMT.ConnectionError {
@@ -120,6 +129,7 @@ public final class Server {
           @ maintaining \invariant_for(this);
           @ maintaining (\forall int j; 0 <= j && j < numberOfCandidates;
           @             Setup.correctResult[j] == votesForCandidates[j]);
+          @ decreasing numberOfCandidates-i;
           @ assignable _result[*];
           @*/
         for (int i=0; i<numberOfCandidates; ++i) {
@@ -132,7 +142,8 @@ public final class Server {
         return formatResult(_result);
 	}
 
-	/*@ requires 0 <= i && i < numberOfCandidates;
+	/*@ normal_behavior
+	  @ requires 0 <= i && i < numberOfCandidates;
 	  @ requires Setup.correctResult != null;
 	  @ requires Setup.correctResult.length == numberOfCandidates;
 	  @ requires Setup.correctResult[i] == votesForCandidates[i];

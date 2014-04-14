@@ -37,9 +37,11 @@ public final class Voter {
 	  @ ensures (\exists int i; 0 <= i && i < SMT.registered_receiver_ids.length; SMT.registered_receiver_ids[i]==Params.SERVER_ID);
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures voted;
+      @ diverges true;
 	  @ assignable voted, SMT.rep, SMT.messages, SMT.receiver_ids, SMT.sender_ids, Environment.counter; // what can be changed
 	  @ also normal_behavior
 	  @ requires voted;
+      @ diverges true;
 	  @ assignable \nothing;
 	  @*/
 	public void onSendBallot() throws RegistrationError, ConnectionError, SMTError {
