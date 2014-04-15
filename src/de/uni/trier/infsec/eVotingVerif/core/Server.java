@@ -7,6 +7,7 @@ import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 import de.uni.trier.infsec.functionalities.amt.AMT;
 import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
+import de.uni.trier.infsec.functionalities.amt.Sender;
 
 public final class Server {
 	private final int numberOfVoters;
@@ -14,7 +15,7 @@ public final class Server {
 	private final boolean[] ballotCast;  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private final int[] votesForCandidates;
 	private final Receiver receiver;
-	private final AMT.Sender sender;
+	private final Sender sender;
 
 	//@ invariant \disjoint(SMT.rep, this.*, ballotCast[*], votesForCandidates[*]);
 	//@ invariant numberOfVoters == ballotCast.length;
@@ -31,7 +32,7 @@ public final class Server {
 	  @ assignable Environment.counter;
 	  @*/
 	public Server(int numberOfVoters, int numberOfCandidates, 
-			      Receiver receiver, AMT.Sender sender_to_BB) throws AMTError, SMT.ConnectionError {
+			      Receiver receiver, Sender sender_to_BB) throws AMTError, SMT.ConnectionError {
 		this.numberOfVoters = numberOfVoters;
 		this.numberOfCandidates = numberOfCandidates;
 		this.receiver = receiver;

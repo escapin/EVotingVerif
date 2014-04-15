@@ -5,7 +5,6 @@ import de.uni.trier.infsec.functionalities.smt.Receiver;
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.RegistrationError;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
-import de.uni.trier.infsec.functionalities.smt.Sender;
 import de.uni.trier.infsec.functionalities.amt.AMT;
 import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
 import de.uni.trier.infsec.functionalities.amt.AMT.ConnectionError;
@@ -61,7 +60,7 @@ public final class Setup
                     de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError {
         voters = new Voter[numberOfVoters];
 		for( int i=0; i<numberOfVoters; ++i ) {
-			Sender sender = SMT.registerSender(i); // sender with identifier i
+			de.uni.trier.infsec.functionalities.smt.Sender sender = SMT.registerSender(i); // sender with identifier i
 			byte choice = secret ? choices0[i] : choices1[i];
 			voters[i] = new Voter(choice, sender);
 		}
@@ -75,7 +74,7 @@ public final class Setup
                     de.uni.trier.infsec.functionalities.amt.AMT.RegistrationError,
                     ConnectionError {
         Receiver serverReceiver = SMT.registerReceiver(Params.SERVER_ID);
-		AMT.Sender serverSender = AMT.registerSender(Params.SERVER_ID);
+		de.uni.trier.infsec.functionalities.amt.Sender serverSender = AMT.registerSender(Params.SERVER_ID);
 		return new Server(numberOfVoters, numberOfCandidates, serverReceiver, serverSender);
     }
 
