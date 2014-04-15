@@ -10,6 +10,7 @@ final public class Receiver {
 	  @ invariant 
 	  @ (\forall Receiver r; r.id == id; r == this);
 	  @ invariant \disjoint(SMT.rep, \singleton(this.id));
+	  @ accessible \inv: \set_union(SMT.rep, \singleton(this.id));
 	  @*/
 
 	/*@ ensures true;

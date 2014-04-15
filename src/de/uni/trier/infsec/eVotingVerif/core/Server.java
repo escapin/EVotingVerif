@@ -125,13 +125,14 @@ public final class Server {
 					      Params.DEFAULT_HOST_BBOARD, Params.LISTEN_PORT_BBOARD_AMT);		
 	}
 
-	/*@ requires resultReady();
+	/*@ requires \invariant_for(this);
+	  @ requires resultReady();
 	  @ requires Setup.correctResult != null && Setup.correctResult.length == numberOfCandidates;
 	  @ requires (\forall int j; 0 <= j && j < numberOfCandidates;
 	  @            Setup.correctResult[j] == votesForCandidates[j]);
 	  @ ensures \result != null;
 	  @*/
-	private /*@ pure nullable @*/ byte[] getResult() {
+	private /*@ pure helper nullable @*/ byte[] getResult() {
 		if (!resultReady()) return null; // the result is only returned when all the voters have voted
 		
         int[] _result = new int[numberOfCandidates];
