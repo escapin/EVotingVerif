@@ -17,19 +17,28 @@ public final class Server {
 	private final Receiver receiver;
 	private final Sender sender;
 
-	//@ invariant \disjoint(SMT.rep, this.*, ballotCast[*], votesForCandidates[*]);
-	//@ invariant numberOfVoters == ballotCast.length;
-	//@ invariant numberOfCandidates == votesForCandidates.length;
-	//@ invariant 0 <= numberOfVoters;
-	//@ invariant 0 <= numberOfCandidates;
+	/*@ invariant \disjoint(SMT.rep, this.*, ballotCast[*], votesForCandidates[*]);
+	  @ invariant numberOfVoters == ballotCast.length;
+	  @ invariant numberOfCandidates == votesForCandidates.length;
+	  @ invariant 0 <= numberOfVoters;
+	  @ invariant 0 <= numberOfCandidates;
+	  @ invariant \invariant_for(receiver);
+	  @*/
 
-	/*@ ensures numberOfVoters == this.numberOfVoters;
+	/*@ requires 0 <= numberOfVoters;
+	  @ requires 0 <= numberOfCandidates;
+	  @ requires \invariant_for(receiver);
+	  @ ensures numberOfVoters == this.numberOfVoters;
 	  @ ensures numberOfCandidates == this.numberOfCandidates;
 	  @ ensures receiver == this.receiver;
 	  @ ensures sender == this.sender;
+	  @ ensures \invariant_for(this);
 	  @ ensures (\forall int i; 0 <= i && i < numberOfVoters; !ballotCast[i]);
 	  @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; votesForCandidates[i]==0);
+	  @ diverges true;
+	  @ signals_only Error, RuntimeException, AMTError, SMT.ConnectionError;
 	  @ assignable Environment.counter;
+	  @ helper
 	  @*/
 	public Server(int numberOfVoters, int numberOfCandidates, 
 			      Receiver receiver, Sender sender_to_BB) throws AMTError, SMT.ConnectionError {
@@ -96,7 +105,7 @@ public final class Server {
 		return true;
 	}
 	
-	/*
+	/**
 	 * Post the result (if ready) on the bulletin board.
 	 */
 	/*@ requires \invariant_for(this);
