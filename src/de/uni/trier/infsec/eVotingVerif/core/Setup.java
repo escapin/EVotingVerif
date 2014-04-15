@@ -2,12 +2,12 @@ package de.uni.trier.infsec.eVotingVerif.core;
 
 import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.functionalities.smt.Receiver;
+import de.uni.trier.infsec.functionalities.smt.RegistrationError;
 import de.uni.trier.infsec.functionalities.smt.SMT;
-import de.uni.trier.infsec.functionalities.smt.SMT.RegistrationError;
-import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
+import de.uni.trier.infsec.functionalities.smt.SMTError;
 import de.uni.trier.infsec.functionalities.amt.AMT;
-import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
-import de.uni.trier.infsec.functionalities.amt.AMT.ConnectionError;
+import de.uni.trier.infsec.functionalities.amt.AMTError;
+import de.uni.trier.infsec.functionalities.amt.ConnectionError;
 
 public final class Setup 
 {
@@ -57,7 +57,7 @@ public final class Setup
 
     private void createVoters(int numberOfVoters, byte[] choices0,
                     byte[] choices1) throws SMTError, RegistrationError,
-                    de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError {
+                    de.uni.trier.infsec.functionalities.smt.ConnectionError {
         voters = new Voter[numberOfVoters];
 		for( int i=0; i<numberOfVoters; ++i ) {
 			de.uni.trier.infsec.functionalities.smt.Sender sender = SMT.registerSender(i); // sender with identifier i
@@ -69,9 +69,9 @@ public final class Setup
     private Server createServer(int numberOfCandidates, int numberOfVoters)
                     throws SMTError,
                     RegistrationError,
-                    de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError,
+                    de.uni.trier.infsec.functionalities.smt.ConnectionError,
                     AMTError,
-                    de.uni.trier.infsec.functionalities.amt.AMT.RegistrationError,
+                    de.uni.trier.infsec.functionalities.amt.RegistrationError,
                     ConnectionError {
         Receiver serverReceiver = SMT.registerReceiver(Params.SERVER_ID);
 		de.uni.trier.infsec.functionalities.amt.Sender serverSender = AMT.registerSender(Params.SERVER_ID);

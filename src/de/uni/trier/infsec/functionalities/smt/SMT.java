@@ -10,11 +10,7 @@ public final class SMT {
 
 	//// The public interface ////
 
-	static public class SMTError extends Exception {}
-
-	static public class ConnectionError extends Exception {}
-
-	static public class RegistrationError extends Exception {}
+	
 
 	// what locations belong to the SMT component, what may be changed upon sending
 	//@ public static ghost \locset rep;

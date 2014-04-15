@@ -12,12 +12,6 @@ public class AMT {
 
 	//// The public interface ////
 
-	static public class AMTError extends Exception {}
-
-    static public class ConnectionError extends Exception {}
-
-    static public class RegistrationError extends Exception {}
-
 	/** 
 	 * Pair (message, sender_id).
 	 * 

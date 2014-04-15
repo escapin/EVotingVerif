@@ -2,11 +2,11 @@ package de.uni.trier.infsec.eVotingVerif.core;
 
 import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.functionalities.smt.AuthenticatedMessage;
-import de.uni.trier.infsec.functionalities.smt.Receiver;
 import de.uni.trier.infsec.functionalities.smt.SMT;
-import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
-import de.uni.trier.infsec.functionalities.amt.AMT;
-import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
+import de.uni.trier.infsec.functionalities.smt.Receiver;
+import de.uni.trier.infsec.functionalities.smt.SMTError;
+import de.uni.trier.infsec.functionalities.amt.AMTError;
+import de.uni.trier.infsec.functionalities.amt.RegistrationError;
 import de.uni.trier.infsec.functionalities.amt.Sender;
 
 public final class Server {
@@ -36,12 +36,12 @@ public final class Server {
 	  @ ensures (\forall int i; 0 <= i && i < numberOfVoters; !ballotCast[i]);
 	  @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; votesForCandidates[i]==0);
 	  @ diverges true;
-	  @ signals_only Error, RuntimeException, AMTError, SMT.ConnectionError;
+	  @ signals_only Error, RuntimeException, AMTError, de.uni.trier.infsec.functionalities.smt.ConnectionError;
 	  @ assignable Environment.counter;
 	  @ helper
 	  @*/
 	public Server(int numberOfVoters, int numberOfCandidates, 
-			      Receiver receiver, Sender sender_to_BB) throws AMTError, SMT.ConnectionError {
+			      Receiver receiver, Sender sender_to_BB) throws AMTError, de.uni.trier.infsec.functionalities.smt.ConnectionError {
 		this.numberOfVoters = numberOfVoters;
 		this.numberOfCandidates = numberOfCandidates;
 		this.receiver = receiver;
@@ -118,7 +118,7 @@ public final class Server {
 	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
 	  @ helper
 	  @*/
-	public void onPostResult() throws AMTError, AMT.RegistrationError, AMT.ConnectionError {
+	public void onPostResult() throws AMTError, RegistrationError, de.uni.trier.infsec.functionalities.amt.ConnectionError {
 		byte[] _result = getResult();
 		if (_result != null)
 			sender.sendTo(_result, Params.BULLETIN_BOARD_ID, 

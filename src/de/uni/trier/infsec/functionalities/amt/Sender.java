@@ -2,8 +2,6 @@ package de.uni.trier.infsec.functionalities.amt;
 
 import de.uni.trier.infsec.environment.Environment;
 import de.uni.trier.infsec.environment.AMTEnv;
-import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
-import de.uni.trier.infsec.functionalities.amt.AMT.ConnectionError;
 import de.uni.trier.infsec.functionalities.amt.AMT.LogEntry;
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.lib.network.NetworkClient;

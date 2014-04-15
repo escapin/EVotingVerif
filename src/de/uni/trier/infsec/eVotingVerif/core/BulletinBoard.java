@@ -1,7 +1,8 @@
 package de.uni.trier.infsec.eVotingVerif.core;
 
 import de.uni.trier.infsec.functionalities.amt.AMT;
-import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
+import de.uni.trier.infsec.functionalities.amt.AMTError;
+import de.uni.trier.infsec.functionalities.amt.ConnectionError;
 import de.uni.trier.infsec.utils.MessageTools;
 
 /*
@@ -10,7 +11,7 @@ import de.uni.trier.infsec.utils.MessageTools;
  */
 public class BulletinBoard {
 
-	public BulletinBoard() throws AMT.ConnectionError {
+	public BulletinBoard() throws ConnectionError {
 		content = new MessageList();
 		AMT.listenOn(Params.LISTEN_PORT_BBOARD_AMT);
 	}
