@@ -6,6 +6,7 @@ import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError;
 import de.uni.trier.infsec.functionalities.smt.SMT.RegistrationError;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
+import de.uni.trier.infsec.functionalities.smt.Sender;
 import de.uni.trier.infsec.utils.Utilities;
 
 public class AppVoter {
@@ -23,7 +24,7 @@ public class AppVoter {
 				// Take first byte in case there are is more than one byte
 				int id    = Integer.parseInt(args[1]);		
 				byte[] serialized = UtilsApp.readFromFile(ParamsApp.PATH_VOTER.replaceAll("%%%%", "" + id)); 
-				SMT.Sender agent = SMT.senderFromBytes(serialized);
+				Sender agent = SMT.senderFromBytes(serialized);
 				submitVote(vote, id, agent);
 			} catch (Exception e) {				
 				System.out.println("Something is wrong with arguments!\n" +
@@ -35,7 +36,7 @@ public class AppVoter {
 	}
 
 
-	private static void submitVote(byte vote, int id, SMT.Sender sender) {
+	private static void submitVote(byte vote, int id, Sender sender) {
 		try {
 			Voter v = new Voter(vote, sender);
 			v.onSendBallot();

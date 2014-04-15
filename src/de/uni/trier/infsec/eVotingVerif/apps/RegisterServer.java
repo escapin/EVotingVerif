@@ -4,6 +4,7 @@ import de.uni.trier.infsec.eVotingVerif.core.Params;
 import de.uni.trier.infsec.functionalities.amt.AMT;
 import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
 import de.uni.trier.infsec.functionalities.pki.PKI;
+import de.uni.trier.infsec.functionalities.smt.Receiver;
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 
@@ -16,7 +17,7 @@ public class RegisterServer {
 	}
 
 	private static void registerAndSave() {
-		SMT.Receiver serverReceiver;
+		Receiver serverReceiver;
 		AMT.Sender serverSender;
 		try {
 			serverReceiver = SMT.registerReceiver(Params.SERVER_ID);

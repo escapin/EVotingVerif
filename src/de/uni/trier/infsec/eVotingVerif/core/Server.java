@@ -1,5 +1,7 @@
 package de.uni.trier.infsec.eVotingVerif.core;
 
+import de.uni.trier.infsec.functionalities.smt.AuthenticatedMessage;
+import de.uni.trier.infsec.functionalities.smt.Receiver;
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 import de.uni.trier.infsec.functionalities.amt.AMT;
@@ -10,11 +12,11 @@ public class Server {
     private final int numberOfCandidates;
 	private final boolean[] ballotCast;  // ballotCast[i]==true iff the i-th voter has already cast her ballot
 	private final int[] votesForCandidates;
-	private final SMT.Receiver receiver;
+	private final Receiver receiver;
 	private final AMT.Sender sender;
 
 	public Server(int numberOfVoters, int numberOfCandidates, 
-			      SMT.Receiver receiver, AMT.Sender sender_to_BB) throws AMTError, SMT.ConnectionError {
+			      Receiver receiver, AMT.Sender sender_to_BB) throws AMTError, SMT.ConnectionError {
 		this.numberOfVoters = numberOfVoters;
 		this.numberOfCandidates = numberOfCandidates;
 		this.receiver = receiver;
@@ -29,12 +31,12 @@ public class Server {
 	 */
 	int i=0;
 	public void onCollectBallot() throws SMTError {
-		SMT.AuthenticatedMessage authMsg = receiver.getMessage(Params.LISTEN_PORT_SERVER_SMT);
+		AuthenticatedMessage authMsg = receiver.getMessage(Params.LISTEN_PORT_SERVER_SMT);
 		//System.out.println(++i);
 		onCollectBallot(authMsg);
 	}
 	
-	private void onCollectBallot(SMT.AuthenticatedMessage authMsg) {
+	private void onCollectBallot(AuthenticatedMessage authMsg) {
 		if (authMsg == null) return;
 		int voterID = authMsg.sender_id;
 		byte[] ballot = authMsg.message;

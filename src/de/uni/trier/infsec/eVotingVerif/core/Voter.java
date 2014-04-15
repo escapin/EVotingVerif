@@ -1,15 +1,15 @@
 package de.uni.trier.infsec.eVotingVerif.core;
 
-import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 import de.uni.trier.infsec.functionalities.smt.SMT.ConnectionError;
 import de.uni.trier.infsec.functionalities.smt.SMT.RegistrationError;
+import de.uni.trier.infsec.functionalities.smt.Sender;
 
 public class Voter {
 	private final byte choice;
-	private final SMT.Sender sender;
+	private final Sender sender;
 
-	public Voter(byte choice, SMT.Sender sender) throws SMTError, RegistrationError, ConnectionError  {
+	public Voter(byte choice, Sender sender) throws SMTError, RegistrationError, ConnectionError  {
 		this.choice = choice;
 		this.sender = sender; 
 	}

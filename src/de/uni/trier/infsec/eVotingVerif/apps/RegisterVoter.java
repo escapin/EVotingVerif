@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import de.uni.trier.infsec.functionalities.pki.PKI;
 import de.uni.trier.infsec.functionalities.smt.SMT;
+import de.uni.trier.infsec.functionalities.smt.Sender;
 
 public class RegisterVoter {
 
@@ -17,7 +18,7 @@ public class RegisterVoter {
 		} else {
 			try {				
 				int id  = Integer.parseInt(args[0]);
-				SMT.Sender sender = SMT.registerSender(id);
+				Sender sender = SMT.registerSender(id);
 				byte[] serialized = SMT.senderToBytes(sender);
 				UtilsApp.storeAsFile(serialized, ParamsApp.PATH_VOTER.replaceAll("%%%%", "" + id));
 			} catch (Exception e) {

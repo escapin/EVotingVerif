@@ -4,6 +4,7 @@ import de.uni.trier.infsec.eVotingVerif.core.Server;
 import de.uni.trier.infsec.functionalities.amt.AMT;
 import de.uni.trier.infsec.functionalities.amt.AMT.AMTError;
 import de.uni.trier.infsec.functionalities.pki.PKI;
+import de.uni.trier.infsec.functionalities.smt.Receiver;
 import de.uni.trier.infsec.functionalities.smt.SMT;
 import de.uni.trier.infsec.functionalities.smt.SMT.SMTError;
 
@@ -17,7 +18,7 @@ public class AppServer {
 	}
 
 	private static void run() {
-		SMT.Receiver serverReceiver;
+		Receiver serverReceiver;
 		AMT.Sender serverSender;
 		try {
 			

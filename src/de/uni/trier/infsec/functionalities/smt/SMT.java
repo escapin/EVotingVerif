@@ -4,14 +4,10 @@ import static de.uni.trier.infsec.utils.MessageTools.concatenate;
 import static de.uni.trier.infsec.utils.MessageTools.first;
 import static de.uni.trier.infsec.utils.MessageTools.second;
 import de.uni.trier.infsec.functionalities.pkienc.Decryptor;
-import de.uni.trier.infsec.functionalities.pkienc.Encryptor;
 import de.uni.trier.infsec.functionalities.pkienc.RegisterEnc;
 import de.uni.trier.infsec.functionalities.pkisig.Signer;
-import de.uni.trier.infsec.functionalities.pkisig.Verifier;
 import de.uni.trier.infsec.functionalities.pkisig.RegisterSig;
-import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
-import de.uni.trier.infsec.lib.network.NetworkServer;
 import de.uni.trier.infsec.utils.MessageTools;
 
 /**
@@ -30,123 +26,6 @@ public class SMT {
 
 	@SuppressWarnings("serial")
 	static public class ConnectionError extends Exception {}
-
-	/** 
-	 * Pair message, sender_id. 
-	 *
-	 * Objects of this class are returned when an agent try to read a message from its queue. 
-	 */
-	static public class AuthenticatedMessage {
-		public byte[] message;
-		public int sender_id;
-
-		private AuthenticatedMessage(byte[] message, int sender) {
-			this.sender_id = sender;  this.message = message;
-		}
-	}
-
-	static public class Sender 
-	{
-		public final int id;
-		private final Signer signer;
-
-		public void sendTo(byte[] message, int receiver_id, String server, int port) throws SMTError, RegistrationError, ConnectionError {
-			if (registrationInProgress) throw new SMTError();
-
-			// get the encryptor for the receiver
-			Encryptor recipient_encryptor;
-			try {
-				recipient_encryptor = RegisterEnc.getEncryptor(receiver_id, DOMAIN_SMT_ENCRYPTION);
-			}
-			catch (RegisterEnc.PKIError e) {
-				throw new RegistrationError();
-			} 
-			catch (NetworkError e) {
-				throw new ConnectionError();
-			}
-			
-
-			// format the message (sign and encrypt)
-			byte[] recipient_id_as_bytes = MessageTools.intToByteArray(receiver_id);
-			byte[] message_with_recipient_id = concatenate(recipient_id_as_bytes, message);
-			byte[] signature = signer.sign(message_with_recipient_id);
-			byte[] signed = MessageTools.concatenate(signature, message_with_recipient_id);
-			byte[] signedAndEncrypted = recipient_encryptor.encrypt(signed);
-			byte[] sender_id_as_bytes = MessageTools.intToByteArray(id);
-			byte[] outputMessage = MessageTools.concatenate(sender_id_as_bytes, signedAndEncrypted);
-
-			// send it out			
-			try {
-				NetworkClient.send(outputMessage, server, port);
-			} 
-			catch (NetworkError e) {
-				throw new ConnectionError();
-			}
-		}
-
-		private Sender(int id, Signer signer) {
-			this.id = id;
-			this.signer = signer;
-		}
-	}
-
-
-	static public class Receiver {
-		public final int id;
-		private final Decryptor decryptor;
-		
-		public void listenOn(int port) throws ConnectionError {
-			try {
-				NetworkServer.listenForRequests(port);
-			}
-			catch (NetworkError e) {
-				throw new ConnectionError();
-			}
-		}
-
-		public AuthenticatedMessage getMessage(int port) throws SMTError {
-			if (registrationInProgress) throw new SMTError();
-
-			try {
-				// read a message from the network
-				// (it may end up with a network error)
-				byte[] inputMessage = NetworkServer.read(port);
-				if (inputMessage == null) return null;
-
-				// get the sender id and her verifier
-				byte[] sender_id_as_bytes = MessageTools.first(inputMessage);
-				int sender_id = MessageTools.byteArrayToInt(sender_id_as_bytes);
-				Verifier sender_verifier = RegisterSig.getVerifier(sender_id, DOMAIN_SMT_VERIFICATION);
-
-				// retrieve the recipient id and the signature
-				byte[] signedAndEncrypted = MessageTools.second(inputMessage);
-				byte[] signed = decryptor.decrypt(signedAndEncrypted);
-				byte[] signature = MessageTools.first(signed);
-				byte[] message_with_recipient_id = MessageTools.second(signed);
-
-				// verify the signature
-				if(!sender_verifier.verify(signature, message_with_recipient_id))
-					return null; // invalid signature
-
-				// make sure that the message is intended for this receiver
-				byte[] recipient_id_as_bytes = MessageTools.first(message_with_recipient_id);
-				int recipient_id = MessageTools.byteArrayToInt(recipient_id_as_bytes);
-				if( recipient_id != id )
-					return null; // message not intended for this receiver
-				byte[] message = MessageTools.second(message_with_recipient_id);
-				return new AuthenticatedMessage(message, sender_id);
-			}
-			catch (NetworkError | RegisterSig.PKIError e) {
-				return null;
-			}
-		}
-
-		private Receiver(int id, Decryptor decryptor)  {
-			this.id = id;
-			this.decryptor = decryptor;
-		}
-	}	
-
 
 	public static Sender registerSender(int id) throws SMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new SMTError();
@@ -193,7 +72,7 @@ public class SMT {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private static boolean registrationInProgress = false;
+	static boolean registrationInProgress = false;
 	public static final byte[] DOMAIN_SMT_VERIFICATION  = new byte[] {0x02, 0x01};
 	public static final byte[] DOMAIN_SMT_ENCRYPTION  = new byte[] {0x02, 0x02};
 
