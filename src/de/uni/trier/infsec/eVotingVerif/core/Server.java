@@ -99,6 +99,7 @@ public final class Server {
 	 * Post the result (if ready) on the bulletin board.
 	 */
 	/*@ requires resultReady();
+      @ requires Setup.correctResult != null && Setup.correctResult.length == numberOfCandidates;
       @ requires (\forall int j; 0 <= j && j < numberOfCandidates;
       @            Setup.correctResult[j] == votesForCandidates[j]);
 	  @ ensures true;
@@ -161,6 +162,10 @@ public final class Server {
 	  @*/
 	private static byte[] formatResult(int[] _result) {
 		String s = "Result of the election:\n";
+		/*@ maintaining 0 <= i && i <= _result.length;
+		  @ decreasing _result.length-i;
+		  @ assignable \nothing;
+		  @*/
 		for( int i=0; i<_result.length; ++i ) {
 			s += "  Number of votes for candidate " + i + ": " + _result[i] + "\n";
 		}

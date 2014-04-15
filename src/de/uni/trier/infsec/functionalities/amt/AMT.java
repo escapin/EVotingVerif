@@ -38,7 +38,8 @@ public class AMT {
 	{
 		public final int id;
 
-	    /*@ ensures true;
+	    /*@ ensures \new_elems_fresh(SMT.rep);
+	      @ diverges true;
 	      @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
 	      @*/
 		public void sendTo(byte[] message, int receiver_id, String server, int port) throws AMTError, ConnectionError {
@@ -62,7 +63,8 @@ public class AMT {
 		}
 	}
 	
-	/*@ ensures true;
+	/*@ ensures \new_elems_fresh(SMT.rep);
+	  @ diverges true;
 	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
 	  @*/
 	public static Sender registerSender(int id) throws AMTError, RegistrationError, ConnectionError {
