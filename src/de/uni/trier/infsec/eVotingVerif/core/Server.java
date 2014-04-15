@@ -99,13 +99,15 @@ public final class Server {
 	/*
 	 * Post the result (if ready) on the bulletin board.
 	 */
-	/*@ requires resultReady();
+	/*@ requires \invariant_for(this);
+	  @ requires resultReady();
       @ requires Setup.correctResult != null && Setup.correctResult.length == numberOfCandidates;
       @ requires (\forall int j; 0 <= j && j < numberOfCandidates;
       @            Setup.correctResult[j] == votesForCandidates[j]);
 	  @ ensures true;
       @ diverges true;
 	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
+	  @ helper
 	  @*/
 	public void onPostResult() throws AMTError, AMT.RegistrationError, AMT.ConnectionError {
 		byte[] _result = getResult();
