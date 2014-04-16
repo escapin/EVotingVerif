@@ -31,20 +31,27 @@ public final class Voter {
 	 */
 	/*@ behavior // the following must be true if no exception is thrown
 	  @ requires !voted;
+	  @ requires \invariant_for(this);
+      @ requires SMT.messages.length == SMT.receiver_ids.length;
+      @ requires SMT.messages.length == SMT.sender_ids.length;
 	  @ ensures SMT.messages == \seq_concat(\old(SMT.messages),\seq_singleton(choice));
 	  @ ensures SMT.receiver_ids == \seq_concat(\old(SMT.receiver_ids),\seq_singleton(Params.SERVER_ID));
 	  @ ensures SMT.sender_ids == \seq_concat(\old(SMT.sender_ids),\seq_singleton(sender.id));
 	  @ ensures (\exists int i; 0 <= i && i < SMT.registered_receiver_ids.length; SMT.registered_receiver_ids[i]==Params.SERVER_ID);
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures voted;
+	  @ ensures \invariant_for(this);
       @ diverges true;
 	  @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(\singleton(voted), SMT.rep), \singleton(SMT.messages)), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter)); // what can be changed
+	  @ 
 	  @ also normal_behavior
+	  @ requires \invariant_for(this);
 	  @ requires voted;
+	  @ ensures \invariant_for(this);
       @ diverges true;
 	  @ assignable \nothing;
 	  @*/
-	public void onSendBallot() throws RegistrationError, ConnectionError, SMTError {
+	public void /*@ helper @*/ onSendBallot() throws RegistrationError, ConnectionError, SMTError {
         if (voted) return;
         voted = true;
 		byte [] ballot = new byte[] {choice};

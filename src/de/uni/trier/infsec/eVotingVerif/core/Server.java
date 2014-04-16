@@ -10,12 +10,12 @@ import de.uni.trier.infsec.functionalities.amt.RegistrationError;
 import de.uni.trier.infsec.functionalities.amt.Sender;
 
 public final class Server {
-	private final int numberOfVoters;
-    private final int numberOfCandidates;
-	private final boolean[] ballotCast;  // ballotCast[i]==true iff the i-th voter has already cast her ballot
-	private final int[] votesForCandidates;
-	private final Receiver receiver;
-	private final Sender sender;
+	private /*@ spec_public @*/ final int numberOfVoters;
+    private /*@ spec_public @*/ final int numberOfCandidates;
+	private /*@ spec_public @*/ final boolean[] ballotCast;  // ballotCast[i]==true iff the i-th voter has already cast her ballot
+	private /*@ spec_public @*/ final int[] votesForCandidates;
+	private /*@ spec_public @*/ final Receiver receiver;
+	private /*@ spec_public @*/ final Sender sender;
 
 	/*@ invariant \disjoint(SMT.rep, this.*, ballotCast[*], votesForCandidates[*]);
 	  @ invariant numberOfVoters == ballotCast.length;
@@ -109,16 +109,20 @@ public final class Server {
 	 * Post the result (if ready) on the bulletin board.
 	 */
 	/*@ requires \invariant_for(this);
-	  @ requires resultReady();
+	  @ requires (\forall int j; 0 <= j && j < numberOfVoters; ballotCast[j]);
       @ requires Setup.correctResult != null && Setup.correctResult.length == numberOfCandidates;
       @ requires (\forall int j; 0 <= j && j < numberOfCandidates;
       @            Setup.correctResult[j] == votesForCandidates[j]);
 	  @ ensures true;
       @ diverges true;
 	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
-	  @ helper
+	  @
+	  @ also
+	  @ requires \invariant_for(this);
+	  @ requires !(\forall int j; 0 <= j && j < numberOfVoters; ballotCast[j]);
+	  @ ensures true;
 	  @*/
-	public void onPostResult() throws AMTError, RegistrationError, de.uni.trier.infsec.functionalities.amt.ConnectionError {
+	public void /*@ helper @*/ onPostResult() throws AMTError, RegistrationError, de.uni.trier.infsec.functionalities.amt.ConnectionError {
 		byte[] _result = getResult();
 		if (_result != null)
 			sender.sendTo(_result, Params.BULLETIN_BOARD_ID, 
@@ -126,7 +130,7 @@ public final class Server {
 	}
 
 	/*@ requires \invariant_for(this);
-	  @ requires resultReady();
+	  @ requires (\forall int j; 0 <= j && j < numberOfVoters; ballotCast[j]);
 	  @ requires Setup.correctResult != null && Setup.correctResult.length == numberOfCandidates;
 	  @ requires (\forall int j; 0 <= j && j < numberOfCandidates;
 	  @            Setup.correctResult[j] == votesForCandidates[j]);

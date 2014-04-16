@@ -107,8 +107,30 @@ public final class Setup
         s.afterVotingPhase();
 	}
 
+    /*@ requires \invariant_for(server);
+      @ requires Setup.correctResult != null && Setup.correctResult.length == server.numberOfCandidates;
+      @ requires (\forall int j; 0 <= j && j < server.numberOfCandidates; 0 == server.votesForCandidates[j]);
+      @ requires (\forall int j; 0 <= j && j < server.numberOfCandidates;
+      @            (\num_of int k; 0 <= k && k < server.numberOfVoters; voters[k].choice==j) == correctResult[j]);
+      @ diverges true;
+      @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
+      // not complete yet, so far only derived from onPostResult contract
+      @*/
 	public void votingPhase(int N) throws Throwable {
         int voter = 0;
+        /*@ maintaining 0 <= voter && voter <= voters.length;
+          @ maintaining \invariant_for(server);
+          @ maintaining Setup.correctResult != null && Setup.correctResult.length == server.numberOfCandidates;
+          @ maintaining server.numberOfCandidates == \old(server.numberOfCandidates);
+          @ maintaining server.numberOfVoters == \old(server.numberOfVoters);
+          @ maintaining (\forall int k; 0 <= k && k < \old(server.numberOfVoters); voters[k].choice == \old(voters[k].choice));
+          @ maintaining (\forall int j; 0 <= j && j < \old(server.numberOfCandidates);
+          @            (\num_of int k; 0 <= k && k < voter; \old(voters[k].choice)==j) == server.votesForCandidates[j]);
+          @ maintaining (\forall int j; 0 <= j && j < \old(server.numberOfCandidates);
+          @            (\num_of int k; 0 <= k && k < \old(server.numberOfVoters); \old(voters[k].choice)==j) == correctResult[j]);
+          @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
+          // not complete yet, so far only derived from onPostResult contract
+          @*/
         for(int i=0; i<N; ++i ) {
             // the choice is already encoded in N
             if (Environment.evalUntrustedInput(N)) { // a voter (determined by the adversary) votes
@@ -122,6 +144,7 @@ public final class Setup
         server.onPostResult();
     }
 
+	//@ ensures true;
     public void afterVotingPhase() throws Throwable {
         while( Environment.untrustedInput() != 0 ) {
 			int decision = Environment.untrustedInput();
