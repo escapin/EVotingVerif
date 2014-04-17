@@ -1,16 +1,19 @@
 package de.uni.trier.infsec.functionalities.smt;
 
+import de.uni.trier.infsec.eVotingVerif.core.Server;
 import de.uni.trier.infsec.environment.*;
 import de.uni.trier.infsec.utils.MessageTools;
 
 final public class Receiver {
 	public final int id;
+	//@ public ghost nullable Server server;
+	
 	/*@ invariant 
 	  @ (\exists int i; 0 <= i && i < SMT.registered_receiver_ids.length; (int)SMT.registered_receiver_ids[i]==id);
 	  @ invariant 
 	  @ (\forall Receiver r; r.id == id; r == this);
-	  @ invariant \disjoint(SMT.rep, \singleton(this.id));
-	  @ accessible \inv: \set_union(SMT.rep, \singleton(this.id));
+	  @ invariant \disjoint(SMT.rep, this.*);
+	  @ accessible \inv: \set_union(SMT.rep, this.*);
 	  @*/
 
 	/*@ ensures true;
@@ -25,16 +28,20 @@ final public class Receiver {
 	/*@ 
       @ requires SMT.messages.length == SMT.receiver_ids.length;
       @ requires SMT.messages.length == SMT.sender_ids.length;
-      @ ensures \result==null || (\exists int i; 0 <= i && i < SMT.messages.length;
+      @ ensures (\exists int i; 0 <= i && i < SMT.messages.length;
 	  @	       \result.message[0] == (byte)SMT.messages[i]
 	  @	       && (int)SMT.receiver_ids[i] == id && (int)SMT.sender_ids[i] == \result.sender_id);
-	  @ ensures \result==null || (\fresh(\result) && \invariant_for(\result));
-	  @ ensures \result==null || \disjoint(SMT.rep, \result.*);
+	  @ ensures \fresh(\result) && \invariant_for(\result);
+	  @ ensures \disjoint(SMT.rep, \result.*);
   	  @ ensures \new_elems_fresh(SMT.rep);
+      @ ensures 0 <= \result.sender_id && \result.sender_id < server.numberOfVoters;
+      @ ensures \result.message != null;
+      @ ensures \result.message.length == 1;
+      @ ensures 0 <= \result.message[0] && \result.message[0] < server.numberOfCandidates;
       @ diverges true;
 	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
 	  @*/
-	public /*@ nullable @*/ AuthenticatedMessage getMessage(int port) throws SMTError {
+	public AuthenticatedMessage getMessage(int port) throws SMTError {
 		if (SMT.registrationInProgress) throw new SMTError();			
 
 		// the simulator/environment determines the index of the message to be returned

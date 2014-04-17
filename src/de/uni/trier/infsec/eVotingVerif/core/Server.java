@@ -22,6 +22,7 @@ public final class Server {
 	  @ invariant numberOfCandidates == votesForCandidates.length;
 	  @ invariant 0 <= numberOfVoters;
 	  @ invariant 0 <= numberOfCandidates;
+	  @ invariant receiver.server == this;
 	  @ invariant \invariant_for(receiver);
 	  @*/
 
@@ -45,6 +46,7 @@ public final class Server {
 		this.numberOfVoters = numberOfVoters;
 		this.numberOfCandidates = numberOfCandidates;
 		this.receiver = receiver;
+		//@ set receiver.server = this;
 		this.sender = sender_to_BB;
 		votesForCandidates = new int[numberOfCandidates];		
 		ballotCast = new boolean[numberOfVoters]; // initially no voter has cast her ballot
@@ -60,16 +62,24 @@ public final class Server {
             onCollectBallot(authMsg);
 	}
 	
-	/*@ 
-	  @ ensures 0 <= authMsg.sender_id && authMsg.sender_id < numberOfVoters && !ballotCast[authMsg.sender_id]
-	  @	&& authMsg.message != null && authMsg.message.length == 1
-	  @	==> (votesForCandidates[authMsg.message[0]] == \old(votesForCandidates[authMsg.message[0]])+1
-	  @         && (\forall int i; 0 <= i && i < numberOfCandidates; i != authMsg.message[0] ==>
-	  @		votesForCandidates[i] == \old(votesForCandidates[i])));
+	/*@ requires \invariant_for(this);
+	  @ requires 0 <= authMsg.sender_id && authMsg.sender_id < numberOfVoters;
+	  @ requires !ballotCast[authMsg.sender_id];
+	  @ requires \invariant_for(authMsg);
+	  @ requires authMsg.message != null;
+	  @ requires authMsg.message.length == 1;
+	  @ requires 0 <= authMsg.message[0] && authMsg.message[0] < numberOfCandidates;
+	  @	ensures votesForCandidates[authMsg.message[0]] == \old(votesForCandidates[authMsg.message[0]])+1;
+	  @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; i != authMsg.message[0] ==>
+	  @		   votesForCandidates[i] == \old(votesForCandidates[i]));
+	  @ ensures ballotCast[authMsg.sender_id];
+	  @ ensures (\forall int j; 0 <= j && j < numberOfCandidates; j != authMsg.sender_id ==>
+	  @        ballotCast[j] == \old(ballotCast[j]));
+	  @ ensures \invariant_for(this);
       @ diverges true;
-	  @ assignable votesForCandidates[*];
+	  @ assignable votesForCandidates[*], ballotCast[*];
       @*/
-	private void onCollectBallot(AuthenticatedMessage authMsg) {
+	private /*@ helper @*/ void onCollectBallot(AuthenticatedMessage authMsg) {
 		if (authMsg == null) return;
 		int voterID = authMsg.sender_id;
 		byte[] ballot = authMsg.message;
