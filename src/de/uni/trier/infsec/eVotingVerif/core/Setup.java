@@ -122,34 +122,35 @@ public final class Setup
       // not complete yet, so far only derived from onPostResult contract
       @*/
 	public /*@ helper @*/ void votingPhase(int N) throws Throwable {
-        /*@ maintaining 0 <= i && i <= voters.length && i <= N;
+	    int voter = 0;
+        /*@ maintaining 0 <= voter && voter <= voters.length;
           @ maintaining \invariant_for(this);
           @ maintaining \invariant_for(server);
           @ maintaining Setup.correctResult != null && Setup.correctResult.length == server.numberOfCandidates;
           @ maintaining server.numberOfCandidates == \old(server.numberOfCandidates);
           @ maintaining server.numberOfVoters == \old(server.numberOfVoters);
           @ maintaining (\forall int k; 0 <= k && k < \old(server.numberOfVoters); \invariant_for(voters[k]) && voters[k].choice == \old(voters[k].choice));
-          @ maintaining (\forall int k; 0 <= k && k < i; voters[k].voted);
+          @ maintaining (\forall int k; 0 <= k && k < voter; voters[k].voted);
           @ maintaining (\forall int k; i <= k && k < \old(server.numberOfVoters); !voters[k].voted);
           @ maintaining (\forall int j; 0 <= j && j < \old(server.numberOfCandidates);
-          @                 (\num_of int k; 0 <= k && k < i; \old(voters[k].choice)==j) == server.votesForCandidates[j]);
+          @                 (\num_of int k; 0 <= k && k < voter; \old(voters[k].choice)==j) == server.votesForCandidates[j]);
           @ maintaining (\forall int j; 0 <= j && j < \old(server.numberOfCandidates);
           @                 (\num_of int k; 0 <= k && k < \old(server.numberOfVoters); \old(voters[k].choice)==j) == correctResult[j]);     
           @ maintaining SMT.messages.length == SMT.receiver_ids.length;
           @ maintaining SMT.messages.length == SMT.sender_ids.length;
-          @ maintaining SMT.messages == (\seq_def int k; 0; i; \old(voters[k].choice));
-          @ maintaining SMT.receiver_ids == (\seq_def int k; 0; i; \old(Params.SERVER_ID));
-          @ maintaining SMT.sender_ids == (\seq_def int k; 0; i; \old(voters[k].sender.id));
+          @ maintaining SMT.messages == (\seq_def int k; 0; voter; \old(voters[k].choice));
+          @ maintaining SMT.receiver_ids == (\seq_def int k; 0; voter; \old(Params.SERVER_ID));
+          @ maintaining SMT.sender_ids == (\seq_def int k; 0; voter; \old(voters[k].sender.id));
           @ maintaining \new_elems_fresh(SMT.rep);
           @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(
           @                             \infinite_union(int k; (0 <= k && k < server.numberOfVoters)?\singleton(voters[k].voted):\empty), 
           @                             SMT.rep), \singleton(SMT.messages)), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter));
           // not complete yet, so far only derived from onPostResult contract
           @*/
-        for(int i=0; i<N && i<voters.length; ++i ) {
+        for(int i=0; i<N; ++i ) {
             // the choice is already encoded in N
-            if (Environment.evalUntrustedInput(N)) { // a voter (determined by the adversary) votes
-				final Voter v = voters[i]; // better: v = voters[decision]
+            if (Environment.evalUntrustedInput(N) && voter < voters.length) { // a voter (determined by the adversary) votes
+				final Voter v = voters[voter++]; // better: v = voters[decision]
 				v.onSendBallot();
             }
             else { // the server reads a message from a secure channel
