@@ -119,9 +119,6 @@ public final class Setup
       @ requires SMT.receiver_ids == \seq_empty;
       @ requires SMT.sender_ids == \seq_empty;
       @ diverges true;
-      @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(
-      @                             \infinite_union(int k; (0 <= k && k < server.numberOfVoters)?\singleton(voters[k].voted):\empty), 
-      @                             SMT.rep), \singleton(SMT.messages)), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter));
       // not complete yet, so far only derived from onPostResult contract
       @*/
 	public /*@ helper @*/ void votingPhase(int N) throws Throwable {
