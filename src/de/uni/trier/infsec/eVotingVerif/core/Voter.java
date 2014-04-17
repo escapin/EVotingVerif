@@ -37,7 +37,7 @@ public final class Voter {
 	  @ ensures SMT.messages == \seq_concat(\old(SMT.messages),\seq_singleton(choice));
 	  @ ensures SMT.receiver_ids == \seq_concat(\old(SMT.receiver_ids),\seq_singleton(Params.SERVER_ID));
 	  @ ensures SMT.sender_ids == \seq_concat(\old(SMT.sender_ids),\seq_singleton(sender.id));
-	  @ ensures (\exists int i; 0 <= i && i < SMT.registered_receiver_ids.length; SMT.registered_receiver_ids[i]==Params.SERVER_ID);
+	  @ ensures (\exists int i; 0 <= i && i < SMT.registered_receiver_ids.length; SMT.registered_receiver_ids[i]==Params.SERVER_ID); // not propagated -- needed?
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures voted;
 	  @ ensures \invariant_for(this);

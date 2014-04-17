@@ -107,28 +107,47 @@ public final class Setup
         s.afterVotingPhase();
 	}
 
-    /*@ requires \invariant_for(server);
+    /*@ requires \invariant_for(this);
+      @ requires \invariant_for(server);
       @ requires Setup.correctResult != null && Setup.correctResult.length == server.numberOfCandidates;
+      @ requires (\forall int k; 0 <= k && k < server.numberOfVoters; \invariant_for(voters[k]));
+      @ requires (\forall int k; 0 <= k && k < server.numberOfVoters; !voters[k].voted);
       @ requires (\forall int j; 0 <= j && j < server.numberOfCandidates; 0 == server.votesForCandidates[j]);
       @ requires (\forall int j; 0 <= j && j < server.numberOfCandidates;
       @            (\num_of int k; 0 <= k && k < server.numberOfVoters; voters[k].choice==j) == correctResult[j]);
+      @ requires SMT.messages == \seq_empty;
+      @ requires SMT.receiver_ids == \seq_empty;
+      @ requires SMT.sender_ids == \seq_empty;
       @ diverges true;
-      @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
+      @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(
+      @                             \infinite_union(int k; (0 <= k && k < \old(server.numberOfVoters))?\singleton(voters[k].voted):\empty), 
+      @                             SMT.rep), \singleton(SMT.messages)), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter));
       // not complete yet, so far only derived from onPostResult contract
       @*/
-	public void votingPhase(int N) throws Throwable {
+	public /*@ helper @*/ void votingPhase(int N) throws Throwable {
         int voter = 0;
         /*@ maintaining 0 <= voter && voter <= voters.length;
+          @ maintaining \invariant_for(this);
           @ maintaining \invariant_for(server);
           @ maintaining Setup.correctResult != null && Setup.correctResult.length == server.numberOfCandidates;
           @ maintaining server.numberOfCandidates == \old(server.numberOfCandidates);
           @ maintaining server.numberOfVoters == \old(server.numberOfVoters);
-          @ maintaining (\forall int k; 0 <= k && k < \old(server.numberOfVoters); voters[k].choice == \old(voters[k].choice));
+          @ maintaining (\forall int k; 0 <= k && k < \old(server.numberOfVoters); \invariant_for(voters[k]) && voters[k].choice == \old(voters[k].choice));
+          @ maintaining (\forall int k; 0 <= k && k < voter; voters[k].voted);
+          @ maintaining (\forall int k; voter <= k && k < \old(server.numberOfVoters); !voters[k].voted);
           @ maintaining (\forall int j; 0 <= j && j < \old(server.numberOfCandidates);
-          @            (\num_of int k; 0 <= k && k < voter; \old(voters[k].choice)==j) == server.votesForCandidates[j]);
+          @                 (\num_of int k; 0 <= k && k < voter; \old(voters[k].choice)==j) == server.votesForCandidates[j]);
           @ maintaining (\forall int j; 0 <= j && j < \old(server.numberOfCandidates);
-          @            (\num_of int k; 0 <= k && k < \old(server.numberOfVoters); \old(voters[k].choice)==j) == correctResult[j]);
-          @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
+          @                 (\num_of int k; 0 <= k && k < \old(server.numberOfVoters); \old(voters[k].choice)==j) == correctResult[j]);     
+          @ maintaining SMT.messages.length == SMT.receiver_ids.length;
+          @ maintaining SMT.messages.length == SMT.sender_ids.length;
+          @ maintaining SMT.messages == (\seq_def int k; 0; voter; \old(voters[k].choice));
+          @ maintaining SMT.receiver_ids == (\seq_def int k; 0; voter; \old(Params.SERVER_ID));
+          @ maintaining SMT.sender_ids == (\seq_def int k; 0; voter; \old(voters[k].sender.id));
+          @ maintaining \new_elems_fresh(SMT.rep);
+          @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(
+          @                             \infinite_union(int k; (0 <= k && k < \old(server.numberOfVoters))?\singleton(voters[k].voted):\empty), 
+          @                             SMT.rep), \singleton(SMT.messages)), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter));
           // not complete yet, so far only derived from onPostResult contract
           @*/
         for(int i=0; i<N; ++i ) {
