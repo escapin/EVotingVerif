@@ -27,6 +27,7 @@ public final class SMT {
 	  @ requires receiver_ids.length == messages.length;
 	  @ ensures \invariant_for(\result) && \fresh(\result);
 	  @ ensures \new_elems_fresh(SMT.rep);
+      @ ensures SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
 	  @ ensures SMT.registered_sender_ids == \seq_concat(\old(SMT.registered_sender_ids),\seq_singleton(id));
 	  @ ensures receiver_ids == \old(receiver_ids);
 	  @ ensures sender_ids == \old(sender_ids);
@@ -57,6 +58,7 @@ public final class SMT {
       @ requires receiver_ids.length == messages.length;
 	  @ ensures \invariant_for(\result) && \fresh(\result);
 	  @ ensures \new_elems_fresh(SMT.rep);
+      @ ensures SMT.registered_sender_ids == \old(SMT.registered_sender_ids);
 	  @ ensures SMT.registered_receiver_ids == \seq_concat(\old(SMT.registered_receiver_ids),\seq_singleton(id));
       @ ensures receiver_ids == \old(receiver_ids);
       @ ensures sender_ids == \old(sender_ids);

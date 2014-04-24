@@ -27,6 +27,11 @@ public class AMT {
 	}
 
 	/*@ ensures \new_elems_fresh(SMT.rep);
+	  @ ensures SMT.receiver_ids == \old(SMT.receiver_ids);
+      @ ensures SMT.sender_ids == \old(SMT.sender_ids);
+      @ ensures SMT.messages == \old(SMT.messages);
+      @ ensures SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
+      @ ensures SMT.registered_sender_ids == \old(SMT.registered_sender_ids);
 	  @ diverges true;
 	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
 	  @ helper

@@ -77,6 +77,10 @@ public final class Setup
       @ ensures (\forall int i; 0 <= i && i < numberOfVoters; !\result.ballotCast[i]);
       @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; \result.votesForCandidates[i]==0);
       @ ensures SMT.registered_receiver_ids == \seq_concat(\old(SMT.registered_receiver_ids),\seq_singleton(Params.SERVER_ID));
+      @ ensures SMT.registered_sender_ids == \old(SMT.registered_sender_ids);
+      @ ensures SMT.receiver_ids == \old(SMT.receiver_ids);
+      @ ensures SMT.sender_ids == \old(SMT.sender_ids);
+      @ ensures SMT.messages == \old(SMT.messages);
       @ ensures \new_elems_fresh(SMT.rep);
       @ diverges true;
       @ assignable \set_union(SMT.rep, \set_union(\singleton(SMT.registered_receiver_ids), \singleton(Environment.counter)));
