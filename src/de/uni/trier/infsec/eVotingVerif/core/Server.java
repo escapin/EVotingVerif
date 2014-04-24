@@ -62,7 +62,7 @@ public final class Server {
       @ requires SMT.messages.length == SMT.receiver_ids.length;
       @ requires SMT.messages.length == SMT.sender_ids.length;
       @ ensures (\exists int i; 0 <= i && i < SMT.messages.length;
-      @     \old(ballotCast[(int)SMT.sender_ids[i]])?
+      @     \old(!ballotCast[(int)SMT.sender_ids[i]])?
       @     ( votesForCandidates[(byte)SMT.messages[i]] == \old(votesForCandidates[(byte)SMT.messages[i]])+1
       @     && (\forall int j; 0 <= j && j < numberOfCandidates; j != (byte)SMT.messages[i] ==>
       @             votesForCandidates[j] == \old(votesForCandidates[j]))
