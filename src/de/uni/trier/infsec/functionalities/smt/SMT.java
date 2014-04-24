@@ -20,13 +20,12 @@ public final class SMT {
 	//@ public static ghost \seq messages;
 	//@ public static ghost \seq sender_ids;
 
-	//@ public static invariant receiver_ids.length == sender_ids.length;
-	//@ public static invariant receiver_ids.length == messages.length;
-
 	//@ public static ghost \seq registered_sender_ids;
 	//@ public static ghost \seq registered_receiver_ids;
 
-	/*@ ensures \invariant_for(\result) && \fresh(\result);
+	/*@ requires receiver_ids.length == sender_ids.length;
+	  @ requires receiver_ids.length == messages.length;
+	  @ ensures \invariant_for(\result) && \fresh(\result);
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures SMT.registered_sender_ids == \seq_concat(\old(SMT.registered_sender_ids),\seq_singleton(id));
       @ diverges true;
@@ -50,7 +49,9 @@ public final class SMT {
 		return sender;
 	}
 
-	/*@ ensures \invariant_for(\result) && \fresh(\result);
+    /*@ requires receiver_ids.length == sender_ids.length;
+      @ requires receiver_ids.length == messages.length;
+	  @ ensures \invariant_for(\result) && \fresh(\result);
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures SMT.registered_receiver_ids == \seq_concat(\old(SMT.registered_receiver_ids),\seq_singleton(id));
       @ diverges true;

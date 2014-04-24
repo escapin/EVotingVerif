@@ -68,6 +68,8 @@ public final class Setup
 
     /*@ requires 0 <= numberOfVoters;
       @ requires 0 <= numberOfCandidates;
+      @ requires SMT.receiver_ids.length == SMT.sender_ids.length;
+      @ requires SMT.receiver_ids.length == SMT.messages.length;
       @ requires \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: make part of invariant
       @ ensures numberOfVoters == \result.numberOfVoters;
       @ ensures numberOfCandidates == \result.numberOfCandidates;
