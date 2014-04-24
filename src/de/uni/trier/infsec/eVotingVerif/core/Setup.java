@@ -66,6 +66,20 @@ public final class Setup
 		}
     }
 
+    /*@ requires 0 <= numberOfVoters;
+      @ requires 0 <= numberOfCandidates;
+      @ requires \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: make part of invariant
+      @ ensures numberOfVoters == \result.numberOfVoters;
+      @ ensures numberOfCandidates == \result.numberOfCandidates;
+      @ ensures \invariant_for(\result);
+      @ ensures (\forall int i; 0 <= i && i < numberOfVoters; !\result.ballotCast[i]);
+      @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; \result.votesForCandidates[i]==0);
+      @ ensures SMT.registered_receiver_ids == \seq_concat(\old(SMT.registered_receiver_ids),\seq_singleton(Params.SERVER_ID));
+      @ ensures \new_elems_fresh(SMT.rep);
+      @ diverges true;
+      @ assignable \set_union(SMT.rep, \set_union(\singleton(SMT.registered_receiver_ids), \singleton(Environment.counter)));
+      @ helper
+      @*/
     private Server createServer(int numberOfCandidates, int numberOfVoters)
                     throws SMTError,
                     RegistrationError,
@@ -78,6 +92,9 @@ public final class Setup
 		return new Server(numberOfVoters, numberOfCandidates, serverReceiver, serverSender);
     }
 
+    /*@ ensures true;
+      @ pure
+      @*/
     private BulletinBoard createBulltetinBoard() throws ConnectionError {
         return new BulletinBoard();
     }
