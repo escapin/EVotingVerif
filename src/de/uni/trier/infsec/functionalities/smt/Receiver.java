@@ -13,7 +13,7 @@ final public class Receiver {
 	  @ invariant 
 	  @ (\forall Receiver r; r.id == id; r == this);
 	  @ invariant \disjoint(SMT.rep, this.*);
-	  @ accessible \inv: \set_union(SMT.rep, this.*);
+	  @ accessible \inv: \set_union(SMT.rep, this.id);
 	  @*/
 
 	/*@ ensures true;

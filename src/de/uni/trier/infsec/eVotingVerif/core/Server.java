@@ -29,6 +29,7 @@ public final class Server {
 	/*@ requires 0 <= numberOfVoters;
 	  @ requires 0 <= numberOfCandidates;
 	  @ requires \invariant_for(receiver);
+	  @ requires \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: make part of invariant
 	  @ ensures numberOfVoters == this.numberOfVoters;
 	  @ ensures numberOfCandidates == this.numberOfCandidates;
 	  @ ensures receiver == this.receiver;
@@ -38,7 +39,7 @@ public final class Server {
 	  @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; votesForCandidates[i]==0);
 	  @ diverges true;
 	  @ signals_only Error, RuntimeException, AMTError, de.uni.trier.infsec.functionalities.smt.ConnectionError;
-	  @ assignable Environment.counter;
+	  @ assignable Environment.counter, receiver.server;
 	  @ helper
 	  @*/
 	public Server(int numberOfVoters, int numberOfCandidates, 
