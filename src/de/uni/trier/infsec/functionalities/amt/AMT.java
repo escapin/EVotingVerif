@@ -29,6 +29,7 @@ public class AMT {
 	/*@ ensures \new_elems_fresh(SMT.rep);
 	  @ diverges true;
 	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
+	  @ helper
 	  @*/
 	public static Sender registerSender(int id) throws AMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new AMTError();

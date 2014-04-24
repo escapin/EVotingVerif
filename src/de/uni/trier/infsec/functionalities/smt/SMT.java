@@ -28,8 +28,12 @@ public final class SMT {
 	  @ ensures \invariant_for(\result) && \fresh(\result);
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures SMT.registered_sender_ids == \seq_concat(\old(SMT.registered_sender_ids),\seq_singleton(id));
+	  @ ensures receiver_ids == \old(receiver_ids);
+	  @ ensures sender_ids == \old(sender_ids);
+	  @ ensures messages == \old(messages);
       @ diverges true;
 	  @ assignable \set_union(SMT.rep, \set_union(\singleton(SMT.registered_sender_ids), \singleton(Environment.counter)));
+	  @ helper
 	  @*/
 	public static Sender registerSender(int id) throws SMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new SMTError();
@@ -54,8 +58,12 @@ public final class SMT {
 	  @ ensures \invariant_for(\result) && \fresh(\result);
 	  @ ensures \new_elems_fresh(SMT.rep);
 	  @ ensures SMT.registered_receiver_ids == \seq_concat(\old(SMT.registered_receiver_ids),\seq_singleton(id));
+      @ ensures receiver_ids == \old(receiver_ids);
+      @ ensures sender_ids == \old(sender_ids);
+      @ ensures messages == \old(messages);
       @ diverges true;
 	  @ assignable \set_union(SMT.rep, \set_union(\singleton(registered_receiver_ids), \singleton(Environment.counter)));
+	  @ helper
 	  @*/
 	public static Receiver registerReceiver(int id) throws SMTError, RegistrationError, ConnectionError {
 		if (registrationInProgress) throw new SMTError();
