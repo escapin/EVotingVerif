@@ -39,7 +39,7 @@ final public class Receiver {
       @ ensures \result.message.length == 1;
       @ ensures 0 <= \result.message[0] && \result.message[0] < server.numberOfCandidates;
       @ diverges true;
-	  @ assignable \set_union(SMT.rep, \singleton(Environment.counter));
+	  @ assignable Environment.counter;
 	  @*/
 	public AuthenticatedMessage getMessage(int port) throws SMTError {
 		if (SMT.registrationInProgress) throw new SMTError();			

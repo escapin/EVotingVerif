@@ -109,6 +109,7 @@ public final class Setup
 
     /*@ requires \invariant_for(this);
       @ requires \invariant_for(server);
+      @ requires \disjoint(SMT.rep, \singleton(Environment.counter));
       @ requires Setup.correctResult != null && Setup.correctResult.length == server.numberOfCandidates;
       @ requires (\forall int k; 0 <= k && k < server.numberOfVoters; \invariant_for(voters[k]));
       @ requires (\forall int k; 0 <= k && k < server.numberOfVoters; !voters[k].voted);
@@ -141,6 +142,7 @@ public final class Setup
           @ maintaining SMT.messages == (\seq_def int k; 0; voter; \old(voters[k].choice));
           @ maintaining SMT.receiver_ids == (\seq_def int k; 0; voter; \old(Params.SERVER_ID));
           @ maintaining SMT.sender_ids == (\seq_def int k; 0; voter; \old(voters[k].sender.id));
+          @ maintaining \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: maybe not needed (only in constructor)
           @ maintaining \new_elems_fresh(SMT.rep);
           @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(
           @                             \infinite_union(int k; (0 <= k && k < server.numberOfVoters)?\singleton(voters[k].voted):\empty), 

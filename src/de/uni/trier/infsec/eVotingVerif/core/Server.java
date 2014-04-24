@@ -24,6 +24,7 @@ public final class Server {
 	  @ invariant 0 <= numberOfCandidates;
 	  @ invariant receiver.server == this;
 	  @ invariant \invariant_for(receiver);
+	  @ accessible \inv: this.*, ballotCast[*], votesForCandidates[*], receiver.*;
 	  @*/
 
 	/*@ requires 0 <= numberOfVoters;
@@ -57,6 +58,27 @@ public final class Server {
 	/**
 	 * Collect one ballot (read from a secure channel)
 	 */
+    /*@ requires \invariant_for(this);
+      @ requires SMT.messages.length == SMT.receiver_ids.length;
+      @ requires SMT.messages.length == SMT.sender_ids.length;
+      @ ensures (\exists int i; 0 <= i && i < SMT.messages.length;
+      @     \old(ballotCast[(int)SMT.sender_ids[i]])?
+      @     ( votesForCandidates[(byte)SMT.messages[i]] == \old(votesForCandidates[(byte)SMT.messages[i]])+1
+      @     && (\forall int j; 0 <= j && j < numberOfCandidates; j != (byte)SMT.messages[i] ==>
+      @             votesForCandidates[j] == \old(votesForCandidates[j]))
+      @     && ballotCast[(int)SMT.sender_ids[i]]
+      @     && (\forall int j; 0 <= j && j < numberOfVoters; j != (int)SMT.sender_ids[i] ==>
+      @         ballotCast[j] == \old(ballotCast[j]))
+      @     ): ((\forall int j; 0 <= j && j < numberOfCandidates;
+      @             votesForCandidates[j] == \old(votesForCandidates[j]))
+      @         && (\forall int j; 0 <= j && j < numberOfVoters;
+      @                 ballotCast[j] == \old(ballotCast[j])))
+      @   );
+      @ ensures \invariant_for(this);
+      @ diverges true;
+      @ assignable votesForCandidates[*], ballotCast[*], Environment.counter;
+      @ helper
+      @*/
 	public void onCollectBallot() throws SMTError {
 		AuthenticatedMessage authMsg = receiver.getMessage(Params.LISTEN_PORT_SERVER_SMT);
 		if (authMsg != null)
@@ -74,11 +96,23 @@ public final class Server {
 	  @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; i != authMsg.message[0] ==>
 	  @		   votesForCandidates[i] == \old(votesForCandidates[i]));
 	  @ ensures ballotCast[authMsg.sender_id];
-	  @ ensures (\forall int j; 0 <= j && j < numberOfCandidates; j != authMsg.sender_id ==>
+	  @ ensures (\forall int j; 0 <= j && j < numberOfVoters; j != authMsg.sender_id ==>
 	  @        ballotCast[j] == \old(ballotCast[j]));
 	  @ ensures \invariant_for(this);
       @ diverges true;
 	  @ assignable votesForCandidates[*], ballotCast[*];
+	  @ also
+	  @ normal_behavior
+	  @ requires \invariant_for(this);
+      @ requires 0 <= authMsg.sender_id && authMsg.sender_id < numberOfVoters;
+      @ requires ballotCast[authMsg.sender_id];
+      @ requires \invariant_for(authMsg);
+      @ requires authMsg.message != null;
+      @ requires authMsg.message.length == 1;
+      @ requires 0 <= authMsg.message[0] && authMsg.message[0] < numberOfCandidates;
+      @ ensures \invariant_for(this);
+      @ diverges true;
+      @ assignable \strictly_nothing;
       @*/
 	private /*@ helper @*/ void onCollectBallot(AuthenticatedMessage authMsg) {
 		if (authMsg == null) return;
