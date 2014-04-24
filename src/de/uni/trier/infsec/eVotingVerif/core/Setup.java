@@ -41,7 +41,9 @@ public final class Setup
 		voters = new Voter[numberOfVoters];
 		for( int i=0; i<numberOfVoters; ++i ) {
 			Sender sender = SMT.registerSender(i); // sender with identifier i
-			byte choice = secret ? choices0[i] : choices1[i];
+			byte choice0 = choices0[i];
+			byte choice1 = choices1[i];
+			byte choice = secret ? choice0 : choice1;
 			voters[i] = new Voter(choice, sender);
 		}
 
