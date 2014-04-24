@@ -89,8 +89,8 @@ public final class Setup
                     AMTError,
                     de.uni.trier.infsec.functionalities.amt.RegistrationError,
                     ConnectionError {
+        de.uni.trier.infsec.functionalities.amt.Sender serverSender = AMT.registerSender(Params.SERVER_ID);
         Receiver serverReceiver = SMT.registerReceiver(Params.SERVER_ID);
-		de.uni.trier.infsec.functionalities.amt.Sender serverSender = AMT.registerSender(Params.SERVER_ID);
 		return new Server(numberOfVoters, numberOfCandidates, serverReceiver, serverSender);
     }
 
