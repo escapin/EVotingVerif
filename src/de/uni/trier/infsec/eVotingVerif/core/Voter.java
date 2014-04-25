@@ -17,7 +17,8 @@ public final class Voter {
 	  @ ensures this.choice == choice;
 	  @ ensures this.sender == sender;
 	  @ ensures !voted;
-	  @ pure
+	  @ ensures \invariant_for(this);
+	  @ pure helper
 	  @*/
 	public Voter(byte choice, Sender sender) throws SMTError, RegistrationError, ConnectionError  {
 		this.choice = choice;
