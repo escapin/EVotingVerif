@@ -56,12 +56,29 @@ public final class Setup
 	}
 
     /*@ requires numberOfVoters >= 0;
+      @ requires numberOfCandidates >= 0;
       @ requires choices0.length == numberOfVoters && choices1.length == numberOfVoters;
-      @ requires (\forall int k; 0 <= k && k < choices0.length; 0 <= choices0[k] && choices0[k] < numberOfCanidates); 
-      @ requires (\forall int k; 0 <= k && k < choices1.length; 0 <= choices1[k] && choices1[k] < numberOfCanidates); 
+      @ requires (\forall int k; 0 <= k && k < choices0.length; 0 <= choices0[k] && choices0[k] < numberOfCandidates); 
+      @ requires (\forall int k; 0 <= k && k < choices1.length; 0 <= choices1[k] && choices1[k] < numberOfCandidates);
+      @ requires SMT.receiver_ids.length == SMT.sender_ids.length;
+      @ requires SMT.receiver_ids.length == SMT.messages.length;
+      @ requires SMT.registered_sender_ids == \seq_empty;
+      @ ensures \fresh(voters); 
       @ ensures voters.length == numberOfVoters;
-      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \fresh(voters[j]) && \invariant_for(voters[j]));
-      @ assignable voters;
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \fresh(voters[j]));
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \invariant_for(voters[j]));
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \fresh(voters[j].sender));
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; voters[j].choice == (secret? choices0[j]: choices1[j]));
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; !voters[j].voted);
+      @ ensures \new_elems_fresh(SMT.rep);
+      @ ensures SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
+      @ ensures SMT.registered_sender_ids == (\seq_def int j; 0; numberOfVoters; j);
+      @ ensures SMT.receiver_ids == \old(SMT.receiver_ids);
+      @ ensures SMT.sender_ids == \old(SMT.sender_ids);
+      @ ensures SMT.messages == \old(SMT.messages);
+      @ diverges true;
+      @ assignable \set_union(\singleton(voters), \set_union(SMT.rep, \set_union(\singleton(SMT.registered_sender_ids), \singleton(Environment.counter))));
       @ helper
       @*/
     private void createVoters(int numberOfCandidates, int numberOfVoters, byte[] choices0,
