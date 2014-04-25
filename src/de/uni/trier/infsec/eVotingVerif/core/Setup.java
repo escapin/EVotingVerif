@@ -20,6 +20,7 @@ public final class Setup
 
 	// the correct result
 	static int[] correctResult; // CONSERVATIVE EXTENSION
+	
 
 	private Setup(int numberOfCandidates, int numberOfVoters) throws Throwable {
 		// let the environment determine two vectors of choices
@@ -57,6 +58,8 @@ public final class Setup
 
     /*@ requires numberOfVoters >= 0;
       @ requires numberOfCandidates >= 0;
+      @ requires \disjoint(this.*, SMT.rep);
+      @ requires \disjoint(voters[*], SMT.rep);
       @ requires choices0.length == numberOfVoters && choices1.length == numberOfVoters;
       @ requires (\forall int k; 0 <= k && k < choices0.length; 0 <= choices0[k] && choices0[k] < numberOfCandidates); 
       @ requires (\forall int k; 0 <= k && k < choices1.length; 0 <= choices1[k] && choices1[k] < numberOfCandidates);
@@ -72,6 +75,8 @@ public final class Setup
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; voters[j].choice == (secret? choices0[j]: choices1[j]));
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; !voters[j].voted);
       @ ensures \new_elems_fresh(SMT.rep);
+      @ ensures \disjoint(this.*, SMT.rep);
+      @ ensures \disjoint(voters[*], SMT.rep);
       @ ensures SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
       @ ensures SMT.registered_sender_ids == (\seq_def int j; 0; numberOfVoters; j);
       @ ensures SMT.receiver_ids == \old(SMT.receiver_ids);
@@ -98,6 +103,8 @@ public final class Setup
           @ maintaining (\forall int j; 0 <= j && j < i; voters[j].choice == (secret? choices0[j]: choices1[j]));
           @ maintaining (\forall int j; 0 <= j && j < i; !voters[j].voted);
           @ maintaining \new_elems_fresh(SMT.rep);
+          @ maintaining \disjoint(this.*, SMT.rep);
+          @ maintaining \disjoint(voters[*], SMT.rep);
           @ maintaining SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
           @ maintaining SMT.registered_sender_ids == (\seq_def int j; 0; i; j);
           @ maintaining SMT.receiver_ids == \old(SMT.receiver_ids);
@@ -106,10 +113,44 @@ public final class Setup
           @ assignable \set_union(voters.*, \set_union(SMT.rep, \set_union(\singleton(SMT.registered_sender_ids), \singleton(Environment.counter))));
           @*/
 		for( int i=0; i<numberOfVoters; ++i ) {
-			de.uni.trier.infsec.functionalities.smt.Sender sender = SMT.registerSender(i); // sender with identifier i
-			byte choice = secret ? choices0[i] : choices1[i];
-			voters[i] = new Voter(choice, sender);
+			createVoter(numberOfCandidates, numberOfVoters, choices0, choices1, i);
 		}
+    }
+
+    /*@ requires numberOfVoters >= 0;
+      @ requires numberOfCandidates >= 0;
+      @ requires choices0.length == numberOfVoters && choices1.length == numberOfVoters;
+      @ requires voters.length == numberOfVoters;
+      @ requires (\forall int k; 0 <= k && k < choices0.length; 0 <= choices0[k] && choices0[k] < numberOfCandidates);
+      @ requires (\forall int k; 0 <= k && k < choices1.length; 0 <= choices1[k] && choices1[k] < numberOfCandidates);
+      @ requires SMT.receiver_ids.length == SMT.sender_ids.length;
+      @ requires SMT.receiver_ids.length == SMT.messages.length;
+      @ requires \disjoint(this.*, SMT.rep);
+      @ requires \disjoint(voters[*], SMT.rep);
+      @ ensures \fresh(voters[i]);
+      @ ensures \invariant_for(voters[i]);
+      @ ensures \fresh(voters[i].sender);
+      @ ensures 0 <= voters[i].choice && voters[i].choice < numberOfCandidates;
+      @ ensures voters[i].choice == (secret? choices0[i]: choices1[i]);
+      @ ensures !voters[i].voted;
+      @ ensures \new_elems_fresh(SMT.rep);
+      @ ensures \disjoint(this.*, SMT.rep);
+      @ ensures \disjoint(voters[*], SMT.rep);
+      @ ensures SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
+      @ ensures SMT.registered_sender_ids == \seq_concat(\old(SMT.registered_sender_ids),\seq_singleton(i));
+      @ ensures SMT.receiver_ids == \old(SMT.receiver_ids);
+      @ ensures SMT.sender_ids == \old(SMT.sender_ids);
+      @ ensures SMT.messages == \old(SMT.messages);
+      @ diverges true;
+      @ assignable \set_union(\singleton(voters[i]), \set_union(SMT.rep, \set_union(\singleton(SMT.registered_sender_ids), \singleton(Environment.counter))));
+      @ helper
+      @*/
+    private void createVoter(int numberOfCandidates, int numberOfVoters, byte[] choices0, byte[] choices1, int i)
+                    throws SMTError, RegistrationError,
+                    de.uni.trier.infsec.functionalities.smt.ConnectionError {
+        de.uni.trier.infsec.functionalities.smt.Sender sender = SMT.registerSender(i); // sender with identifier i
+        byte choice = secret ? choices0[i] : choices1[i];
+        voters[i] = new Voter(choice, sender);
     }
 
     /*@ requires 0 <= numberOfVoters;
