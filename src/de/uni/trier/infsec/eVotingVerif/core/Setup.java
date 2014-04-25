@@ -133,7 +133,17 @@ public final class Setup
 		return res;
 	}
 
+	/*@ normal_behavior
+	  @ requires r1.length == r2.length;
+	  @ ensures \result == (\forall int i; 0 <= i && i < r1.length; r1[i] == r2[i]);
+	  @ strictly_pure helper
+	  @*/
 	private static boolean equalResult(int[] r1, int[] r2) {
+	    /*@ maintaining (\forall int i; 0 <= i && i < j; r1[i] == r2[i]);
+	      @ maintaining 0 <= j && j <= r1.length;
+	      @ decreasing r1.length-j;
+	      @ assignable \strictly_nothing;
+	      @*/
 		for (int j= 0; j<r1.length; j++)
 			if (r1[j]!=r2[j]) return false;
 		return true;
