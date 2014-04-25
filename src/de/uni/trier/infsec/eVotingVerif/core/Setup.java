@@ -85,6 +85,26 @@ public final class Setup
                     byte[] choices1) throws SMTError, RegistrationError,
                     de.uni.trier.infsec.functionalities.smt.ConnectionError {
         voters = new Voter[numberOfVoters];
+        /*@ maintaining 0 <= i && i <= numberOfVoters;
+          @ maintaining (\forall int k; 0 <= k && k < choices0.length; 0 <= choices0[k] && choices0[k] < numberOfCandidates);
+          @ maintaining (\forall int k; 0 <= k && k < choices1.length; 0 <= choices1[k] && choices1[k] < numberOfCandidates);
+          @ maintaining SMT.receiver_ids.length == SMT.sender_ids.length;
+          @ maintaining SMT.receiver_ids.length == SMT.messages.length;
+          @ maintaining \fresh(voters);
+          @ maintaining (\forall int j; 0 <= j && j < i; \fresh(voters[j]));
+          @ maintaining (\forall int j; 0 <= j && j < i; \invariant_for(voters[j]));
+          @ maintaining (\forall int j; 0 <= j && j < i; \fresh(voters[j].sender));
+          @ maintaining (\forall int j; 0 <= j && j < i; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
+          @ maintaining (\forall int j; 0 <= j && j < i; voters[j].choice == (secret? choices0[j]: choices1[j]));
+          @ maintaining (\forall int j; 0 <= j && j < i; !voters[j].voted);
+          @ maintaining \new_elems_fresh(SMT.rep);
+          @ maintaining SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
+          @ maintaining SMT.registered_sender_ids == (\seq_def int j; 0; i; j);
+          @ maintaining SMT.receiver_ids == \old(SMT.receiver_ids);
+          @ maintaining SMT.sender_ids == \old(SMT.sender_ids);
+          @ maintaining SMT.messages == \old(SMT.messages);
+          @ assignable \set_union(voters.*, \set_union(SMT.rep, \set_union(\singleton(SMT.registered_sender_ids), \singleton(Environment.counter))));
+          @*/
 		for( int i=0; i<numberOfVoters; ++i ) {
 			de.uni.trier.infsec.functionalities.smt.Sender sender = SMT.registerSender(i); // sender with identifier i
 			byte choice = secret ? choices0[i] : choices1[i];
