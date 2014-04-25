@@ -105,8 +105,29 @@ public final class Setup
         return new BulletinBoard();
     }
 
+    /*@ normal_behavior
+      @ requires numberOfCandidates >= 0;
+      @ requires (\forall int j; 0 <= j && j < choices.length;
+      @                 0 <= choices[j] && choices[j] < numberOfCandidates);
+      @ ensures \result.length == numberOfCandidates;
+      @ ensures (\forall int k; 0 <= k && k < numberOfCandidates;
+      @             \result[k] == (\num_of int j; 0 <= j && j < choices.length; choices[j]==k));
+      @ ensures \fresh(\result);
+      @ pure helper
+      @*/
 	private static int[] computeResult (byte[] choices, int numberOfCandidates) {
 		int[] res = new int[numberOfCandidates];
+		/*@ maintaining 0 <= i && i <= choices.length;
+		  @ maintaining numberOfCandidates >= 0;
+		  @ maintaining (\forall int j; 0 <= j && j < choices.length;
+          @                 0 <= choices[j] && choices[j] < numberOfCandidates);
+          @ maintaining res.length == numberOfCandidates;
+          @ maintaining (\forall int k; 0 <= k && k < numberOfCandidates;
+          @             res[k] == (\num_of int j; 0 <= j && j < i; choices[j]==k));
+          @ maintaining \fresh(res);
+          @ decreasing choices.length - i;
+          @ assignable res[*];
+		  @*/
 		for (int i=0; i<choices.length; i++) 
 			++res[choices[i]];
 		return res;
