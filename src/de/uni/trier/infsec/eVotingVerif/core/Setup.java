@@ -37,7 +37,7 @@ public final class Setup
 
 		// create voters, using the choices from the vectors
 		// according to the secret bit        
-		createVoters(numberOfVoters, choices0, choices1);
+		createVoters(numberOfCandidates, numberOfVoters, choices0, choices1);
 
 		// create the server
 		server = createServer(numberOfCandidates, numberOfVoters);
@@ -55,7 +55,16 @@ public final class Setup
         return choices;
 	}
 
-    private void createVoters(int numberOfVoters, byte[] choices0,
+    /*@ requires numberOfVoters >= 0;
+      @ requires choices0.length == numberOfVoters && choices1.length == numberOfVoters;
+      @ requires (\forall int k; 0 <= k && k < choices0.length; 0 <= choices0[k] && choices0[k] < numberOfCanidates); 
+      @ requires (\forall int k; 0 <= k && k < choices1.length; 0 <= choices1[k] && choices1[k] < numberOfCanidates); 
+      @ ensures voters.length == numberOfVoters;
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \fresh(voters[j]) && \invariant_for(voters[j]));
+      @ assignable voters;
+      @ helper
+      @*/
+    private void createVoters(int numberOfCandidates, int numberOfVoters, byte[] choices0,
                     byte[] choices1) throws SMTError, RegistrationError,
                     de.uni.trier.infsec.functionalities.smt.ConnectionError {
         voters = new Voter[numberOfVoters];
