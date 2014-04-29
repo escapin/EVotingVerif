@@ -124,8 +124,11 @@ public final class Server {
 		ballotCast[voterID] = true; 
 		if( ballot==null || ballot.length!=1 ) return;  // malformed ballot
 		int candidate = ballot[0];
-		if (candidate >= 0 || candidate < numberOfCandidates ) 
-			votesForCandidates[candidate]++;
+		if (candidate >= 0 || candidate < numberOfCandidates ) {
+			try {
+				votesForCandidates[candidate]++;
+			} catch (Exception e) {}
+		}	
 	}
 	
 	/*

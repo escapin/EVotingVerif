@@ -161,7 +161,9 @@ public final class Setup
                     throws SMTError, RegistrationError,
                     de.uni.trier.infsec.functionalities.smt.ConnectionError {
         de.uni.trier.infsec.functionalities.smt.Sender sender = SMT.registerSender(i); // sender with identifier i
-        byte choice = secret ? choices0[i] : choices1[i];
+        byte choice0 = choices0[i];
+        byte choice1 = choices1[i];
+        byte choice = secret ? choice0 : choice1;
         voters[i] = new Voter(choice, sender);
     }
 
