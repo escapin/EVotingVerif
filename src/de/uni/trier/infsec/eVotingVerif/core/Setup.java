@@ -60,6 +60,8 @@ public final class Setup
       @ requires numberOfCandidates >= 0;
       @ requires \disjoint(this.*, SMT.rep);
       @ requires \disjoint(voters[*], SMT.rep);
+      @ requires \disjoint(choices0[*], SMT.rep);
+      @ requires \disjoint(choices1[*], SMT.rep);
       @ requires choices0.length == numberOfVoters && choices1.length == numberOfVoters;
       @ requires (\forall int k; 0 <= k && k < choices0.length; 0 <= choices0[k] && choices0[k] < numberOfCandidates); 
       @ requires (\forall int k; 0 <= k && k < choices1.length; 0 <= choices1[k] && choices1[k] < numberOfCandidates);
@@ -67,6 +69,8 @@ public final class Setup
       @ requires SMT.receiver_ids.length == SMT.messages.length;
       @ requires SMT.registered_sender_ids == \seq_empty;
       @ ensures \fresh(voters); 
+      @ ensures \typeof(voters) == \type(Voter[]);
+      @ ensures \nonnullelements(voters);
       @ ensures voters.length == numberOfVoters;
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \fresh(voters[j]));
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \invariant_for(voters[j]));
@@ -96,6 +100,7 @@ public final class Setup
           @ maintaining SMT.receiver_ids.length == SMT.sender_ids.length;
           @ maintaining SMT.receiver_ids.length == SMT.messages.length;
           @ maintaining \fresh(voters);
+          @ maintaining \typeof(voters) == \type(Voter[]);
           @ maintaining (\forall int j; 0 <= j && j < i; \fresh(voters[j]));
           @ maintaining (\forall int j; 0 <= j && j < i; \invariant_for(voters[j]));
           @ maintaining (\forall int j; 0 <= j && j < i; \fresh(voters[j].sender));
@@ -105,6 +110,8 @@ public final class Setup
           @ maintaining \new_elems_fresh(SMT.rep);
           @ maintaining \disjoint(this.*, SMT.rep);
           @ maintaining \disjoint(voters[*], SMT.rep);
+          @ maintaining \disjoint(choices0[*], SMT.rep);
+          @ maintaining \disjoint(choices1[*], SMT.rep);
           @ maintaining SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
           @ maintaining SMT.registered_sender_ids == (\seq_def int j; 0; i; j);
           @ maintaining SMT.receiver_ids == \old(SMT.receiver_ids);
@@ -117,9 +124,12 @@ public final class Setup
 		}
     }
 
-    /*@ requires numberOfVoters >= 0;
+    /*@ requires 0 <= i && i < numberOfVoters;
+      @ requires numberOfVoters >= 0;
       @ requires numberOfCandidates >= 0;
       @ requires choices0.length == numberOfVoters && choices1.length == numberOfVoters;
+      @ requires voters != null;
+      @ requires \typeof(voters) == \type(Voter[]);
       @ requires voters.length == numberOfVoters;
       @ requires (\forall int k; 0 <= k && k < choices0.length; 0 <= choices0[k] && choices0[k] < numberOfCandidates);
       @ requires (\forall int k; 0 <= k && k < choices1.length; 0 <= choices1[k] && choices1[k] < numberOfCandidates);
@@ -127,6 +137,8 @@ public final class Setup
       @ requires SMT.receiver_ids.length == SMT.messages.length;
       @ requires \disjoint(this.*, SMT.rep);
       @ requires \disjoint(voters[*], SMT.rep);
+      @ requires \disjoint(choices0[*], SMT.rep);
+      @ requires \disjoint(choices1[*], SMT.rep);
       @ ensures \fresh(voters[i]);
       @ ensures \invariant_for(voters[i]);
       @ ensures \fresh(voters[i].sender);
