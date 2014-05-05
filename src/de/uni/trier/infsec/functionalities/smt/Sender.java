@@ -1,14 +1,16 @@
 package de.uni.trier.infsec.functionalities.smt;
 
+import de.uni.trier.infsec.eVotingVerif.core.Setup;
 import de.uni.trier.infsec.environment.*;
 import de.uni.trier.infsec.lib.network.NetworkClient;
 import de.uni.trier.infsec.lib.network.NetworkError;
 import de.uni.trier.infsec.utils.MessageTools;
 
-final public class Sender 
-{
+final public class Sender {
+    
 	/*@ invariant 
 	  @ (\exists int i; 0 <= i && i < SMT.registered_sender_ids.length; (int)SMT.registered_sender_ids[i]==id);
+	  @ invariant 0 <= id && id < Setup.numberOfVoters;
 	  @ invariant 
 	  @ (\forall Sender s; s.id == id; s == this);
 	  @ invariant \disjoint(SMT.rep, \singleton(this.id));
@@ -16,10 +18,9 @@ final public class Sender
 	public final int id;
 
 	/*@ behavior // the following must be true if no exception is thrown
-	  @ requires message == null || message.length > 0;
+	  @ requires message.length == 1;
 	  @ requires SMT.messages.length == SMT.receiver_ids.length;
       @ requires SMT.messages.length == SMT.sender_ids.length;
-	  @ ensures message != null;
 	  @ ensures SMT.messages == \seq_concat(\old(SMT.messages),\seq_singleton(message[0]));
 	  @ ensures SMT.receiver_ids == \seq_concat(\old(SMT.receiver_ids),\seq_singleton(receiver_id));
 	  @ ensures SMT.sender_ids == \seq_concat(\old(SMT.sender_ids),\seq_singleton(id));
@@ -30,7 +31,7 @@ final public class Sender
       @ diverges true;
 	  @ assignable \set_union(SMT.rep, \set_union(\set_union(\set_union(\singleton(SMT.messages), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter))); // what can be changed
 	  @*/
-	public void sendTo(/*@nullable@*/ byte[] message, int receiver_id, /*@ nullable @*/ String server, int port) throws SMTError, RegistrationError, ConnectionError {
+	public void sendTo(byte[] message, int receiver_id, /*@ nullable @*/ String server, int port) throws SMTError, RegistrationError, ConnectionError {
 		if (SMT.registrationInProgress) throw new SMTError();
 
 		// get from the simulator a message to be later sent out

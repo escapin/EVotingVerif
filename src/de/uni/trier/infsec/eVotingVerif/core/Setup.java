@@ -17,6 +17,9 @@ public final class Setup
 
 	// one secret bit
 	private static boolean secret;
+	
+	//@ public static ghost int numberOfVoters;
+	//@ public static ghost int numberOfCandidates;
 
 	// the correct result
 	static int[] correctResult; // CONSERVATIVE EXTENSION
@@ -61,6 +64,8 @@ public final class Setup
       @ requires \disjoint(this.*, SMT.rep);
       @ requires \disjoint(\singleton(secret), SMT.rep);
       @ requires \disjoint(\singleton(correctResult), SMT.rep);
+      @ requires \disjoint(\singleton(numberOfVoters), SMT.rep);
+      @ requires \disjoint(\singleton(numberOfCandidates), SMT.rep);
       @ requires \disjoint(correctResult[*], SMT.rep);
       @ requires \disjoint(voters[*], SMT.rep);
       @ requires \disjoint(choices0[*], SMT.rep);
@@ -85,6 +90,8 @@ public final class Setup
       @ ensures \disjoint(this.*, SMT.rep);
       @ ensures \disjoint(\singleton(secret), SMT.rep);
       @ ensures \disjoint(\singleton(correctResult), SMT.rep);
+      @ ensures \disjoint(\singleton(numberOfVoters), SMT.rep);
+      @ ensures \disjoint(\singleton(numberOfCandidates), SMT.rep);
       @ ensures \disjoint(correctResult[*], SMT.rep);
       @ ensures \disjoint(voters[*], SMT.rep);
       @ ensures SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
@@ -117,6 +124,8 @@ public final class Setup
           @ maintaining \disjoint(this.*, SMT.rep);
           @ maintaining \disjoint(\singleton(secret), SMT.rep);
           @ maintaining \disjoint(\singleton(correctResult), SMT.rep);
+          @ maintaining \disjoint(\singleton(numberOfVoters), SMT.rep);
+          @ maintaining \disjoint(\singleton(numberOfCandidates), SMT.rep);
           @ maintaining \disjoint(correctResult[*], SMT.rep);
           @ maintaining \disjoint(voters[*], SMT.rep);
           @ maintaining \disjoint(choices0[*], SMT.rep);
@@ -129,7 +138,7 @@ public final class Setup
           @ assignable \set_union(voters.*, \set_union(SMT.rep, \set_union(\singleton(SMT.registered_sender_ids), \singleton(Environment.counter))));
           @*/
 		for( int i=0; i<numberOfVoters; ++i ) {
-			createVoter(numberOfCandidates, numberOfVoters, choices0, choices1, i);
+			createVoter(choices0, choices1, i);
 		}
     }
 
@@ -166,7 +175,7 @@ public final class Setup
       @ assignable \set_union(\singleton(voters[i]), \set_union(SMT.rep, \set_union(\singleton(SMT.registered_sender_ids), \singleton(Environment.counter))));
       @ helper
       @*/
-    private void createVoter(int numberOfCandidates, int numberOfVoters, byte[] choices0, byte[] choices1, int i)
+    private void createVoter(byte[] choices0, byte[] choices1, int i)
                     throws SMTError, RegistrationError,
                     de.uni.trier.infsec.functionalities.smt.ConnectionError {
         de.uni.trier.infsec.functionalities.smt.Sender sender = SMT.registerSender(i); // sender with identifier i
@@ -266,6 +275,8 @@ public final class Setup
         int numberOfVoters = Environment.evalUntrustedInput(1, N);
         if (numberOfVoters<=0 || numberOfCandidates<=0)
 			throw new Throwable();	// abort 
+        //@ set Setup.numberOfCandidates = numberOfCandidates;
+        //@ set Setup.numberOfVoters = numberOfVoters;
 		Setup s = new Setup(numberOfCandidates, numberOfVoters);
         s.votingPhase(N);
         s.afterVotingPhase();
