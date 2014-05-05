@@ -74,8 +74,8 @@ public final class Environment {
       @ ensures true;
       @ strictly_pure
       @*/
-    public static boolean evalUntrustedInput(int n, int m) {
+    public static int evalUntrustedInput(int n, int m) {
         // or any other implementation
-        return n % m == 3;
+        return n % m;
     }
 }        

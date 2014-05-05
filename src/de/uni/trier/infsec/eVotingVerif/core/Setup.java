@@ -258,12 +258,12 @@ public final class Setup
 
 
 	public static void main (String[] a) throws Throwable {
-        int numberOfCandidates = Environment.untrustedInput();
-        int numberOfVoters = Environment.untrustedInput();
+        int N = Environment.untrustedInput(); // the environment decides how long the system runs
+        int numberOfCandidates = Environment.evalUntrustedInput(0, N);
+        int numberOfVoters = Environment.evalUntrustedInput(1, N);
         if (numberOfVoters<=0 || numberOfCandidates<=0)
 			throw new Throwable();	// abort 
 		Setup s = new Setup(numberOfCandidates, numberOfVoters);
-        int N = Environment.untrustedInput(); // the environment decides how long the system runs
         s.votingPhase(N);
         s.afterVotingPhase();
 	}
@@ -312,7 +312,7 @@ public final class Setup
           @*/
         for(int i=0; i<N; ++i ) {
             // the choice is already encoded in N
-            if (Environment.evalUntrustedInput(i, N) && voter < voters.length) { // a voter (determined by the adversary) votes
+            if (Environment.evalUntrustedInput(i, N) > 0 && voter < voters.length) { // a voter (determined by the adversary) votes
 				final Voter v = voters[voter++]; // better: v = voters[decision]
 				v.onSendBallot();
             }
