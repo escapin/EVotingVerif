@@ -52,9 +52,9 @@ public final class Setup
 	
 	/*@ requires 0 <= numberOfVoters;
 	  @ requires 0 <= numberOfCandidates;
-	  @ ensures \fresh(choices);
-	  @ ensures choices.length == numberOfVoters;
-	  @ ensures (\forall int j; 0 <= j && j < numberOfVoters; 0 <= choices[j] && choices[j] < numberOfCandidates);
+	  @ ensures \fresh(\result);
+	  @ ensures \result.length == numberOfVoters;
+	  @ ensures (\forall int j; 0 <= j && j < numberOfVoters; 0 <= \result[j] && \result[j] < numberOfCandidates);
 	  @ assignable \singleton(Environment.counter);
 	  @ helper
 	  @*/

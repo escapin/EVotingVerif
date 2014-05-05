@@ -31,6 +31,7 @@ public final class Environment {
     /*@ normal_behavior
       @ ensures 0 <= \result && \result < n;
       @ assignable counter;
+      @ helper
       @*/
     public static int untrustedInput(int n) {
         int a;
