@@ -50,8 +50,22 @@ public final class Setup
 		BB = createBulltetinBoard();
 	}
 	
+	/*@ requires 0 <= numberOfVoters;
+	  @ requires 0 <= numberOfCandidates;
+	  @ ensures \fresh(choices);
+	  @ ensures choices.length == numberOfVoters;
+	  @ ensures (\forall int j; 0 <= j && j < numberOfVoters; 0 <= choices[j] && choices[j] < numberOfCandidates);
+	  @ assignable \singleton(Environment.counter);
+	  @ helper
+	  @*/
 	private byte[] createChoices(int numberOfVoters, int numberOfCandidates) {
 	    final byte[] choices = new byte[numberOfVoters];
+	    /*@ maintaining 0 <= i && i <= numberOfVoters;
+	      @ maintaining \fresh(choices);
+	      @ maintaining (\forall int j; 0 <= j && j < i; 0 <= choices[j] && choices[j] < numberOfCandidates);
+	      @ assignable \set_union(choices[*], \singleton(Environment.counter));
+	      @ decreasing numberOfVoters-i;
+	      @*/
         for (int i=0; i<numberOfVoters; ++i) {
             // Daniel: this cast is really ugly; why not use byte from the beginning?
             choices[i] = (byte)(Environment.untrustedInput(numberOfCandidates));
