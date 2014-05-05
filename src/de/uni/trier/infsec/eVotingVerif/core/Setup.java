@@ -59,7 +59,8 @@ public final class Setup
     /*@ requires numberOfVoters >= 0;
       @ requires numberOfCandidates >= 0;
       @ requires \disjoint(this.*, SMT.rep);
-      @ requires \disjoint(secret, SMT.rep);
+      @ requires \disjoint(\singleton(secret), SMT.rep);
+      @ requires \disjoint(\singleton(correctResult), SMT.rep);
       @ requires \disjoint(correctResult[*], SMT.rep);
       @ requires \disjoint(voters[*], SMT.rep);
       @ requires \disjoint(choices0[*], SMT.rep);
@@ -82,7 +83,8 @@ public final class Setup
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; !voters[j].voted);
       @ ensures \new_elems_fresh(SMT.rep);
       @ ensures \disjoint(this.*, SMT.rep);
-      @ ensures \disjoint(secret, SMT.rep);
+      @ ensures \disjoint(\singleton(secret), SMT.rep);
+      @ ensures \disjoint(\singleton(correctResult), SMT.rep);
       @ ensures \disjoint(correctResult[*], SMT.rep);
       @ ensures \disjoint(voters[*], SMT.rep);
       @ ensures SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
@@ -113,7 +115,8 @@ public final class Setup
           @ maintaining (\forall int j; 0 <= j && j < i; !voters[j].voted);
           @ maintaining \new_elems_fresh(SMT.rep);
           @ maintaining \disjoint(this.*, SMT.rep);
-          @ maintaining \disjoint(secret, SMT.rep);
+          @ maintaining \disjoint(\singleton(secret), SMT.rep);
+          @ maintaining \disjoint(\singleton(correctResult), SMT.rep);
           @ maintaining \disjoint(correctResult[*], SMT.rep);
           @ maintaining \disjoint(voters[*], SMT.rep);
           @ maintaining \disjoint(choices0[*], SMT.rep);
@@ -258,12 +261,12 @@ public final class Setup
 
 
 	public static void main (String[] a) throws Throwable {
-        int numberOfCandidates = Environment.untrustedInput();
-        int numberOfVoters = Environment.untrustedInput();
+        int N = Environment.untrustedInput(); // the environment decides how long the system runs
+        int numberOfCandidates = Environment.evalUntrustedInput(0, N);
+        int numberOfVoters = Environment.evalUntrustedInput(1, N);
         if (numberOfVoters<=0 || numberOfCandidates<=0)
 			throw new Throwable();	// abort 
 		Setup s = new Setup(numberOfCandidates, numberOfVoters);
-        int N = Environment.untrustedInput(); // the environment decides how long the system runs
         s.votingPhase(N);
         s.afterVotingPhase();
 	}
@@ -312,7 +315,7 @@ public final class Setup
           @*/
         for(int i=0; i<N; ++i ) {
             // the choice is already encoded in N
-            if (Environment.evalUntrustedInput(N) && voter < voters.length) { // a voter (determined by the adversary) votes
+            if (Environment.evalUntrustedInput(i, N) > 0 && voter < voters.length) { // a voter (determined by the adversary) votes
 				final Voter v = voters[voter++]; // better: v = voters[decision]
 				v.onSendBallot();
             }
