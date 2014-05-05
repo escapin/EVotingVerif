@@ -59,6 +59,8 @@ public final class Setup
     /*@ requires numberOfVoters >= 0;
       @ requires numberOfCandidates >= 0;
       @ requires \disjoint(this.*, SMT.rep);
+      @ requires \disjoint(secret, SMT.rep);
+      @ requires \disjoint(correctResult[*], SMT.rep);
       @ requires \disjoint(voters[*], SMT.rep);
       @ requires \disjoint(choices0[*], SMT.rep);
       @ requires \disjoint(choices1[*], SMT.rep);
@@ -80,6 +82,8 @@ public final class Setup
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; !voters[j].voted);
       @ ensures \new_elems_fresh(SMT.rep);
       @ ensures \disjoint(this.*, SMT.rep);
+      @ ensures \disjoint(secret, SMT.rep);
+      @ ensures \disjoint(correctResult[*], SMT.rep);
       @ ensures \disjoint(voters[*], SMT.rep);
       @ ensures SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
       @ ensures SMT.registered_sender_ids == (\seq_def int j; 0; numberOfVoters; j);
@@ -109,6 +113,8 @@ public final class Setup
           @ maintaining (\forall int j; 0 <= j && j < i; !voters[j].voted);
           @ maintaining \new_elems_fresh(SMT.rep);
           @ maintaining \disjoint(this.*, SMT.rep);
+          @ maintaining \disjoint(secret, SMT.rep);
+          @ maintaining \disjoint(correctResult[*], SMT.rep);
           @ maintaining \disjoint(voters[*], SMT.rep);
           @ maintaining \disjoint(choices0[*], SMT.rep);
           @ maintaining \disjoint(choices1[*], SMT.rep);
