@@ -312,7 +312,7 @@ public final class Setup
           @*/
         for(int i=0; i<N; ++i ) {
             // the choice is already encoded in N
-            if (Environment.evalUntrustedInput(N) && voter < voters.length) { // a voter (determined by the adversary) votes
+            if (Environment.evalUntrustedInput(i, N) && voter < voters.length) { // a voter (determined by the adversary) votes
 				final Voter v = voters[voter++]; // better: v = voters[decision]
 				v.onSendBallot();
             }
