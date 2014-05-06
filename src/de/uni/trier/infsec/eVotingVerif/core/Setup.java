@@ -41,7 +41,7 @@ public final class Setup
 
 		// create voters, using the choices from the vectors
 		// according to the secret bit        
-		createVoters(numberOfCandidates, numberOfVoters, choices0, choices1);
+		createVoters(numberOfVoters, choices0, choices1);
 
 		// create the server
 		server = createServer(numberOfCandidates, numberOfVoters);
@@ -90,6 +90,7 @@ public final class Setup
       @ requires SMT.receiver_ids.length == SMT.sender_ids.length;
       @ requires SMT.receiver_ids.length == SMT.messages.length;
       @ requires SMT.registered_sender_ids == \seq_empty;
+      @ requires numberOfVoters == Setup.numberOfVoters;
       @ ensures \fresh(voters); 
       @ ensures \typeof(voters) == \type(Voter[]);
       @ ensures \nonnullelements(voters);
@@ -117,7 +118,7 @@ public final class Setup
       @ assignable \set_union(\singleton(voters), \set_union(SMT.rep, \set_union(\singleton(SMT.registered_sender_ids), \singleton(Environment.counter))));
       @ helper
       @*/
-    private void createVoters(int numberOfCandidates, int numberOfVoters, byte[] choices0,
+    private void createVoters(int numberOfVoters, byte[] choices0,
                     byte[] choices1) throws SMTError, RegistrationError,
                     de.uni.trier.infsec.functionalities.smt.ConnectionError {
         voters = new Voter[numberOfVoters];
