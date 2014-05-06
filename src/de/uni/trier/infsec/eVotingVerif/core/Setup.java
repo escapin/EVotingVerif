@@ -25,6 +25,28 @@ public final class Setup
 	static int[] correctResult; // CONSERVATIVE EXTENSION
 	
 
+    /*@ requires 0 <= numberOfVoters;
+      @ requires 0 <= numberOfCandidates;
+      @ requires SMT.receiver_ids == \seq_empty;
+      @ requires SMT.sender_ids == \seq_empty;
+      @ requires SMT.messages.length == \seq_empty;
+      @ requires \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: make part of invariant
+      @ ensures numberOfVoters == \result.numberOfVoters;
+      @ ensures numberOfCandidates == \result.numberOfCandidates;
+      @ ensures \invariant_for(this);
+      @ ensures \invariant_for(server);
+      @ ensures (\forall int i; 0 <= i && i < numberOfVoters; !server.ballotCast[i]);
+      @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; server.votesForCandidates[i]==0);
+      @ ensures SMT.registered_receiver_ids == \seq_singleton(Params.SERVER_ID);
+      @ ensures SMT.registered_sender_ids == \old(SMT.registered_sender_ids); // TODO
+      @ ensures SMT.receiver_ids == \seq_empty;
+      @ ensures SMT.sender_ids == \seq_empty;
+      @ ensures SMT.messages == \seq_empty;
+      @ ensures \new_elems_fresh(SMT.rep);
+      @ diverges true;
+      @ assignable \set_union(SMT.rep, \set_union(\singleton(SMT.registered_receiver_ids), \singleton(Environment.counter)));
+      @ helper
+      @*/
 	private Setup(int numberOfCandidates, int numberOfVoters) throws Throwable {
 		// let the environment determine two vectors of choices
 		byte[] choices0 = createChoices(numberOfVoters, numberOfCandidates);
