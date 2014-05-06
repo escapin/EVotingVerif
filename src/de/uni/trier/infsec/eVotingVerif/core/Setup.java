@@ -76,10 +76,10 @@ public final class Setup
     /*@ requires numberOfVoters >= 0;
       @ requires numberOfCandidates >= 0;
       @ requires \disjoint(this.*, SMT.rep);
-      @ requires \disjoint(\singleton(secret), SMT.rep);
-      @ requires \disjoint(\singleton(correctResult), SMT.rep);
-      @ requires \disjoint(\singleton(numberOfVoters), SMT.rep);
-      @ requires \disjoint(\singleton(numberOfCandidates), SMT.rep);
+      @ requires \disjoint(\singleton(Setup.secret), SMT.rep);
+      @ requires \disjoint(\singleton(Setup.correctResult), SMT.rep);
+      @ requires \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
+      @ requires \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
       @ requires \disjoint(correctResult[*], SMT.rep);
       @ requires \disjoint(voters[*], SMT.rep);
       @ requires \disjoint(choices0[*], SMT.rep);
@@ -103,10 +103,10 @@ public final class Setup
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; !voters[j].voted);
       @ ensures \new_elems_fresh(SMT.rep);
       @ ensures \disjoint(this.*, SMT.rep);
-      @ ensures \disjoint(\singleton(secret), SMT.rep);
-      @ ensures \disjoint(\singleton(correctResult), SMT.rep);
-      @ ensures \disjoint(\singleton(numberOfVoters), SMT.rep);
-      @ ensures \disjoint(\singleton(numberOfCandidates), SMT.rep);
+      @ ensures \disjoint(\singleton(Setup.secret), SMT.rep);
+      @ ensures \disjoint(\singleton(Setup.correctResult), SMT.rep);
+      @ ensures \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
+      @ ensures \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
       @ ensures \disjoint(correctResult[*], SMT.rep);
       @ ensures \disjoint(voters[*], SMT.rep);
       @ ensures SMT.registered_receiver_ids == \old(SMT.registered_receiver_ids);
@@ -137,10 +137,10 @@ public final class Setup
           @ maintaining (\forall int j; 0 <= j && j < i; !voters[j].voted);
           @ maintaining \new_elems_fresh(SMT.rep);
           @ maintaining \disjoint(this.*, SMT.rep);
-          @ maintaining \disjoint(\singleton(secret), SMT.rep);
-          @ maintaining \disjoint(\singleton(correctResult), SMT.rep);
-          @ maintaining \disjoint(\singleton(numberOfVoters), SMT.rep);
-          @ maintaining \disjoint(\singleton(numberOfCandidates), SMT.rep);
+          @ maintaining \disjoint(\singleton(Setup.secret), SMT.rep);
+          @ maintaining \disjoint(\singleton(Setup.correctResult), SMT.rep);
+          @ maintaining \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
+          @ maintaining \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
           @ maintaining \disjoint(correctResult[*], SMT.rep);
           @ maintaining \disjoint(voters[*], SMT.rep);
           @ maintaining \disjoint(choices0[*], SMT.rep);
@@ -150,6 +150,7 @@ public final class Setup
           @ maintaining SMT.receiver_ids == \old(SMT.receiver_ids);
           @ maintaining SMT.sender_ids == \old(SMT.sender_ids);
           @ maintaining SMT.messages == \old(SMT.messages);
+          @ maintaining numberOfVoters == Setup.numberOfVoters;
           @ assignable \set_union(voters.*, \set_union(SMT.rep, \set_union(\singleton(SMT.registered_sender_ids), \singleton(Environment.counter))));
           @*/
 		for( int i=0; i<numberOfVoters; ++i ) {
