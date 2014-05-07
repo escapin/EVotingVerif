@@ -29,7 +29,7 @@ public final class Setup
       @ requires 0 <= numberOfCandidates;
       @ requires SMT.receiver_ids == \seq_empty;
       @ requires SMT.sender_ids == \seq_empty;
-      @ requires SMT.messages.length == \seq_empty;
+      @ requires SMT.messages == \seq_empty;
       @ requires \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: make part of invariant
       @ ensures numberOfVoters == server.numberOfVoters;
       @ ensures numberOfCandidates == server.numberOfCandidates;
@@ -46,7 +46,7 @@ public final class Setup
       @ ensures \new_elems_fresh(SMT.rep);
       @ ensures \fresh(correctResult) && correctResult.length == numberOfCandidates;
       @ ensures (\forall int k; 0 <= k && k < numberOfCandidates; correctResult[k] == (\num_of int j; 0 <= j && j < numberOfVoters; voters[j].choice==k));
-      @ ensures BulletinBoard != null; 
+      @ ensures BB != null; 
       @ ensures \fresh(voters); 
       @ ensures \typeof(voters) == \type(Voter[]);
       @ ensures \nonnullelements(voters);
