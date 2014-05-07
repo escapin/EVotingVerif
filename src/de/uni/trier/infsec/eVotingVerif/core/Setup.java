@@ -31,20 +31,42 @@ public final class Setup
       @ requires SMT.sender_ids == \seq_empty;
       @ requires SMT.messages.length == \seq_empty;
       @ requires \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: make part of invariant
-      @ ensures numberOfVoters == \result.numberOfVoters;
-      @ ensures numberOfCandidates == \result.numberOfCandidates;
+      @ ensures numberOfVoters == server.numberOfVoters;
+      @ ensures numberOfCandidates == server.numberOfCandidates;
       @ ensures \invariant_for(this);
-      @ ensures \invariant_for(server);
+      @ ensures \fresh(server) && \invariant_for(server);
       @ ensures (\forall int i; 0 <= i && i < numberOfVoters; !server.ballotCast[i]);
       @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; server.votesForCandidates[i]==0);
       @ ensures SMT.registered_receiver_ids == \seq_singleton(Params.SERVER_ID);
-      @ ensures SMT.registered_sender_ids == \old(SMT.registered_sender_ids); // TODO
       @ ensures SMT.receiver_ids == \seq_empty;
       @ ensures SMT.sender_ids == \seq_empty;
       @ ensures SMT.messages == \seq_empty;
+      @ ensures \disjoint(SMT.rep, this.*);
+      @ ensures \disjoint(SMT.rep, \singleton(Environment.counter));
       @ ensures \new_elems_fresh(SMT.rep);
+      @ ensures \fresh(correctResult) && correctResult.length == numberOfCandidates;
+      @ ensures (\forall int k; 0 <= k && k < numberOfCandidates; correctResult[k] == (\num_of int j; 0 <= j && j < numberOfVoters; voters[j].choice==k));
+      @ ensures BulletinBoard != null; 
+      @ ensures \fresh(voters); 
+      @ ensures \typeof(voters) == \type(Voter[]);
+      @ ensures \nonnullelements(voters);
+      @ ensures voters.length == numberOfVoters;
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \fresh(voters[j]));
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \invariant_for(voters[j]));
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \fresh(voters[j].sender));
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
+      @ ensures (\forall int j; 0 <= j && j < numberOfVoters; !voters[j].voted);
+      @ ensures \disjoint(\singleton(Setup.secret), SMT.rep);
+      @ ensures \disjoint(\singleton(Setup.correctResult), SMT.rep);
+      @ ensures \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
+      @ ensures \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
+      @ ensures \disjoint(correctResult[*], SMT.rep);
+      @ ensures \disjoint(voters[*], SMT.rep);
+      @ ensures SMT.registered_sender_ids == (\seq_def int j; 0; numberOfVoters; j);
       @ diverges true;
-      @ assignable \set_union(SMT.rep, \set_union(\singleton(SMT.registered_receiver_ids), \singleton(Environment.counter)));
+      @ assignable \set_union(\set_union(SMT.rep, \set_union(\singleton(SMT.registered_receiver_ids), \singleton(Environment.counter))),
+      @             \set_union(\singleton(voters)),\singleton(SMT.registered_sender_ids));
+      @ signals_only Throwable; // necessary because of bug #1275
       @ helper
       @*/
 	private Setup(int numberOfCandidates, int numberOfVoters) throws Throwable {
@@ -304,6 +326,21 @@ public final class Setup
 		for (int j= 0; j<r1.length; j++)
 			if (r1[j]!=r2[j]) return false;
 		return true;
+	}
+	
+	/*@ normal_behavior
+	  @ requires c1.length == c2.length;
+	  @ requires numberOfCandidates >= 0;
+      @ requires (\forall int j; 0 <= j && j < c1.length;
+      @                 0 <= c1[j] && c1[j] < numberOfCandidates);
+      @ requires (\forall int j; 0 <= j && j < c2.length;
+      @                 0 <= c2[j] && c2[j] < numberOfCandidates);
+      @ ensures \result == (\forall int k; 0 <= k && k < numberOfCandidates;
+      @                     (\num_of int j; 0 <= j && j < c1.length; c1[j]==k) == (\num_of int j; 0 <= j && j < c2.length; c2[j]==k));
+	  @ pure helper
+	  @*/
+	private static boolean equalResult(byte[] c1, byte[] c2, int numberOfCandidates) {
+	    return equalResult(computeResult(c1, numberOfCandidates),computeResult(c2,numberOfCandidates));
 	}
 
 
