@@ -27,6 +27,7 @@ public final class Setup
 
     /*@ requires 0 <= numberOfVoters;
       @ requires 0 <= numberOfCandidates;
+      @ requires numberOfVoters == Setup.numberOfVoters && numberOfCandidates == Setup.numberOfCandidates;
       @ requires SMT.receiver_ids == \seq_empty;
       @ requires SMT.sender_ids == \seq_empty;
       @ requires SMT.messages == \seq_empty;
