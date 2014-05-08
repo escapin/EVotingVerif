@@ -31,6 +31,8 @@ public final class Setup
       @ requires SMT.receiver_ids == \seq_empty;
       @ requires SMT.sender_ids == \seq_empty;
       @ requires SMT.messages == \seq_empty;
+      @ requires SMT.registered_receiver_ids == \seq_empty;
+      @ requires SMT.registered_sender_ids == \seq_empty;
       @ requires \disjoint(SMT.rep, this.*);
       @ requires \disjoint(\singleton(Setup.secret), SMT.rep);
       @ requires \disjoint(\singleton(Setup.correctResult), SMT.rep);
@@ -45,6 +47,7 @@ public final class Setup
       @ ensures (\forall int i; 0 <= i && i < numberOfVoters; !server.ballotCast[i]);
       @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; server.votesForCandidates[i]==0);
       @ ensures SMT.registered_receiver_ids == \seq_singleton(Params.SERVER_ID);
+      @ ensures SMT.registered_sender_ids == (\seq_def int j; 0; numberOfVoters; j);
       @ ensures SMT.receiver_ids == \seq_empty;
       @ ensures SMT.sender_ids == \seq_empty;
       @ ensures SMT.messages == \seq_empty;
@@ -68,7 +71,6 @@ public final class Setup
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \fresh(voters[j].sender));
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; !voters[j].voted);
-      @ ensures SMT.registered_sender_ids == (\seq_def int j; 0; numberOfVoters; j);
       @ ensures Setup.secret == \old(Setup.secret);
       @ diverges true;
       @ assignable \set_union(\singleton(Setup.correctResult),\set_union(\set_union(SMT.rep, \set_union(\singleton(SMT.registered_receiver_ids), \singleton(Environment.counter))),
