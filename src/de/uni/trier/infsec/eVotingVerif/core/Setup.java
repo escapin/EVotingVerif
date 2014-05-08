@@ -65,8 +65,8 @@ public final class Setup
       @ ensures \disjoint(voters[*], SMT.rep);
       @ ensures SMT.registered_sender_ids == (\seq_def int j; 0; numberOfVoters; j);
       @ diverges true;
-      @ assignable \set_union(\set_union(SMT.rep, \set_union(\singleton(SMT.registered_receiver_ids), \singleton(Environment.counter))),
-      @             \set_union(\singleton(voters)),\singleton(SMT.registered_sender_ids));
+      @ assignable \set_union(\singleton(Setup.correctResult),\set_union(\set_union(SMT.rep, \set_union(\singleton(SMT.registered_receiver_ids), \singleton(Environment.counter))),
+      @             \set_union(this.*,\singleton(SMT.registered_sender_ids))));
       @ signals_only Throwable; // necessary because of bug #1275
       @ helper
       @*/
