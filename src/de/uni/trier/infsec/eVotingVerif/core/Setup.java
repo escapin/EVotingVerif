@@ -31,6 +31,12 @@ public final class Setup
       @ requires SMT.receiver_ids == \seq_empty;
       @ requires SMT.sender_ids == \seq_empty;
       @ requires SMT.messages == \seq_empty;
+      @ requires \disjoint(SMT.rep, this.*);
+      @ requires \disjoint(\singleton(Setup.secret), SMT.rep);
+      @ requires \disjoint(\singleton(Setup.correctResult), SMT.rep);
+      @ requires \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
+      @ requires \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
+      @ requires voters == null && server == null && correctResult == null;
       @ requires \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: make part of invariant
       @ ensures numberOfVoters == server.numberOfVoters;
       @ ensures numberOfCandidates == server.numberOfCandidates;
@@ -44,10 +50,15 @@ public final class Setup
       @ ensures SMT.messages == \seq_empty;
       @ ensures \disjoint(SMT.rep, this.*);
       @ ensures \disjoint(SMT.rep, \singleton(Environment.counter));
+      @ ensures \disjoint(\singleton(Setup.secret), SMT.rep);
+      @ ensures \disjoint(\singleton(Setup.correctResult), SMT.rep);
+      @ ensures \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
+      @ ensures \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
+      @ ensures \disjoint(correctResult[*], SMT.rep);
+      @ ensures \disjoint(voters[*], SMT.rep);
       @ ensures \new_elems_fresh(SMT.rep);
       @ ensures \fresh(correctResult) && correctResult.length == numberOfCandidates;
       @ ensures (\forall int k; 0 <= k && k < numberOfCandidates; correctResult[k] == (\num_of int j; 0 <= j && j < numberOfVoters; voters[j].choice==k));
-      @ ensures BB != null; 
       @ ensures \fresh(voters); 
       @ ensures \typeof(voters) == \type(Voter[]);
       @ ensures \nonnullelements(voters);
@@ -57,13 +68,8 @@ public final class Setup
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; \fresh(voters[j].sender));
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
       @ ensures (\forall int j; 0 <= j && j < numberOfVoters; !voters[j].voted);
-      @ ensures \disjoint(\singleton(Setup.secret), SMT.rep);
-      @ ensures \disjoint(\singleton(Setup.correctResult), SMT.rep);
-      @ ensures \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
-      @ ensures \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
-      @ ensures \disjoint(correctResult[*], SMT.rep);
-      @ ensures \disjoint(voters[*], SMT.rep);
       @ ensures SMT.registered_sender_ids == (\seq_def int j; 0; numberOfVoters; j);
+      @ ensures Setup.secret == \old(Setup.secret);
       @ diverges true;
       @ assignable \set_union(\singleton(Setup.correctResult),\set_union(\set_union(SMT.rep, \set_union(\singleton(SMT.registered_receiver_ids), \singleton(Environment.counter))),
       @             \set_union(this.*,\singleton(SMT.registered_sender_ids))));
