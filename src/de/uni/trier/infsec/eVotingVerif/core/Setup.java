@@ -43,7 +43,7 @@ public final class Setup
       @ ensures numberOfVoters == server.numberOfVoters;
       @ ensures numberOfCandidates == server.numberOfCandidates;
       @ ensures \invariant_for(this);
-      @ ensures \fresh(server) && \invariant_for(server);
+      @ ensures \invariant_for(server);
       @ ensures (\forall int i; 0 <= i && i < numberOfVoters; !server.ballotCast[i]);
       @ ensures (\forall int i; 0 <= i && i < numberOfCandidates; server.votesForCandidates[i]==0);
       @ ensures SMT.registered_receiver_ids == \seq_singleton(Params.SERVER_ID);
