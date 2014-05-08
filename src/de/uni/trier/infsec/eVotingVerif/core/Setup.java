@@ -279,7 +279,7 @@ public final class Setup
     }
 
     /*@ ensures true;
-      @ pure
+      @ pure helper
       @*/
     private BulletinBoard createBulltetinBoard() throws ConnectionError {
         return new BulletinBoard();
