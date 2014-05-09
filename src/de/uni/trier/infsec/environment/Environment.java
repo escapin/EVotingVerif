@@ -9,6 +9,7 @@ public final class Environment {
     /*@ normal_behavior
       @ ensures true;
       @ assignable counter;
+      @ helper
       @*/
     public static int untrustedInput() {
         if (counter >= input.length)
@@ -73,7 +74,7 @@ public final class Environment {
 
     /*@ public normal_behavior
       @ ensures true;
-      @ strictly_pure
+      @ strictly_pure helper
       @*/
     public static int evalUntrustedInput(int n, int m) {
         // or any other implementation

@@ -353,21 +353,17 @@ public final class Setup
 	}
 
 
-    /*@ requires 0 <= numberOfVoters;
-      @ requires 0 <= numberOfCandidates;
-      @ requires numberOfVoters == Setup.numberOfVoters && numberOfCandidates == Setup.numberOfCandidates;
-      @ requires SMT.receiver_ids == \seq_empty;
+    /*@ requires SMT.receiver_ids == \seq_empty;
       @ requires SMT.sender_ids == \seq_empty;
       @ requires SMT.messages == \seq_empty;
       @ requires SMT.registered_receiver_ids == \seq_empty;
       @ requires SMT.registered_sender_ids == \seq_empty;
-      @ requires \disjoint(SMT.rep, this.*);
       @ requires \disjoint(\singleton(Setup.secret), SMT.rep);
       @ requires \disjoint(\singleton(Setup.correctResult), SMT.rep);
       @ requires \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
       @ requires \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
-      @ requires voters == null && server == null && correctResult == null;
-      @ requires \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: make part of invariant
+      @ requires \disjoint(SMT.rep, \singleton(Environment.counter));
+      @ diverges true;
       @ helper
       @*/
 	public static void main (/*@ nullable @*/String[] a) throws Throwable {
@@ -439,6 +435,7 @@ public final class Setup
     }
 
 	//@ ensures true;
+	//@ helper
     public void afterVotingPhase() throws Throwable {
         while( Environment.untrustedInput() != 0 ) {
 			int decision = Environment.untrustedInput();
