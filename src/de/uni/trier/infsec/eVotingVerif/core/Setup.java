@@ -381,16 +381,34 @@ public final class Setup
 
     /*@ requires \invariant_for(this);
       @ requires \invariant_for(server);
-      @ requires \disjoint(SMT.rep, \singleton(Environment.counter));
-      @ requires Setup.correctResult != null && Setup.correctResult.length == server.numberOfCandidates;
-      @ requires (\forall int k; 0 <= k && k < server.numberOfVoters; \invariant_for(voters[k]));
-      @ requires (\forall int k; 0 <= k && k < server.numberOfVoters; !voters[k].voted);
-      @ requires (\forall int j; 0 <= j && j < server.numberOfCandidates; 0 == server.votesForCandidates[j]);
-      @ requires (\forall int j; 0 <= j && j < server.numberOfCandidates;
-      @            (\num_of int k; 0 <= k && k < server.numberOfVoters; voters[k].choice==j) == correctResult[j]);
+      @ requires Setup.correctResult != null && Setup.correctResult.length == numberOfCandidates;
+      @ requires (\forall int k; 0 <= k && k < numberOfVoters; \invariant_for(voters[k]));
+      @ requires (\forall int k; 0 <= k && k < numberOfVoters; !voters[k].voted);
+      @ requires (\forall int j; 0 <= j && j < numberOfCandidates;
+      @            (\num_of int k; 0 <= k && k < numberOfVoters; voters[k].choice==j) == correctResult[j]);
       @ requires SMT.messages == \seq_empty;
       @ requires SMT.receiver_ids == \seq_empty;
       @ requires SMT.sender_ids == \seq_empty;
+      //TODO from here on
+      @ requires numberOfVoters == server.numberOfVoters;
+      @ requires numberOfCandidates == server.numberOfCandidates;
+      @ requires (\forall int i; 0 <= i && i < numberOfVoters; !server.ballotCast[i]);
+      @ requires (\forall int i; 0 <= i && i < numberOfCandidates; server.votesForCandidates[i]==0);
+      @ requires SMT.registered_receiver_ids == \seq_singleton(Params.SERVER_ID);
+      @ requires SMT.registered_sender_ids == (\seq_def int j; 0; numberOfVoters; j);
+      @ requires \disjoint(SMT.rep, this.*);
+      @ requires \disjoint(SMT.rep, \singleton(Environment.counter));
+      @ requires \disjoint(\singleton(Setup.secret), SMT.rep);
+      @ requires \disjoint(\singleton(Setup.correctResult), SMT.rep);
+      @ requires \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
+      @ requires \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
+      @ requires \disjoint(correctResult[*], SMT.rep);
+      @ requires \disjoint(voters[*], SMT.rep);
+      @ requires correctResult.length == numberOfCandidates;
+      @ requires \typeof(voters) == \type(Voter[]);
+      @ requires \nonnullelements(voters);
+      @ requires voters.length == numberOfVoters;
+      @ requires (\forall int j; 0 <= j && j < numberOfVoters; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
       @ diverges true;
       // not complete yet, so far only derived from onPostResult contract
       @*/
