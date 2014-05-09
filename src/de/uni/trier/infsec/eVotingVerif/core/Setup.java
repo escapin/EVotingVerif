@@ -372,8 +372,8 @@ public final class Setup
       @*/
 	public static void main (/*@ nullable @*/String[] a) throws Throwable {
         int N = Environment.untrustedInput(); // the environment decides how long the system runs
-        int numberOfCandidates = Environment.evalUntrustedInputNN(0, N);
-        int numberOfVoters = Environment.evalUntrustedInputNN(1, N);
+        int numberOfCandidates = Environment.evalUntrustedInput(0, N);
+        int numberOfVoters = Environment.evalUntrustedInput(1, N);
         if (numberOfVoters<=0 || numberOfCandidates<=0)
 			throw new Throwable();	// abort 
         //@ set Setup.numberOfCandidates = numberOfCandidates;

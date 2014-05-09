@@ -79,16 +79,4 @@ public final class Environment {
         // or any other implementation
         return n % m;
     }
-
-    /*@ public normal_behavior
-      @ ensures \result >= 0;
-      @ strictly_pure
-      @*/
-    public static int evalUntrustedInputNN(int n, int m) {
-        int res;
-        do {
-            res = evalUntrustedInput(n,m);
-        } while (res < 0);
-        return res;
-    }
 }        
