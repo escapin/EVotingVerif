@@ -409,11 +409,14 @@ public final class Setup
       @ requires \nonnullelements(voters);
       @ requires voters.length == numberOfVoters;
       @ requires (\forall int j; 0 <= j && j < numberOfVoters; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
+      @
+      @ // we need some postcondition just to ensure that the contract is not trivially true
+      @ ensures numberOfVoters == \old(numberOfVoters);
       @ diverges true;
-      // not complete yet, so far only derived from onPostResult contract
       @*/
 	public /*@ helper @*/ void votingPhase(int N) throws Throwable {
 	    int voter = 0;
+	    
         /*@ maintaining 0 <= voter && voter <= voters.length;
           @ maintaining \invariant_for(this);
           @ maintaining \invariant_for(server);
