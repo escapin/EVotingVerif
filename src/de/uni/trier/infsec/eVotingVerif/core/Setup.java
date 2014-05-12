@@ -421,16 +421,16 @@ public final class Setup
           @ maintaining 0 <= i && i <= N;
           @ maintaining \invariant_for(this);
           @ maintaining \invariant_for(server);
-          @ maintaining Setup.correctResult != null && Setup.correctResult.length == server.numberOfCandidates;
-          @ maintaining server.numberOfCandidates == \old(server.numberOfCandidates);
-          @ maintaining server.numberOfVoters == \old(server.numberOfVoters);
-          @ maintaining (\forall int k; 0 <= k && k < \old(server.numberOfVoters); \invariant_for(voters[k]) && voters[k].choice == \old(voters[k].choice));
+          @ maintaining Setup.correctResult != null && Setup.correctResult.length == numberOfCandidates;
+          @ maintaining numberOfCandidates == \old(numberOfCandidates);
+          @ maintaining numberOfVoters == \old(numberOfVoters);
+          @ maintaining (\forall int k; 0 <= k && k < \old(numberOfVoters); \invariant_for(voters[k]) && voters[k].choice == \old(voters[k].choice));
           @ maintaining (\forall int k; 0 <= k && k < voter; voters[k].voted);
           @ maintaining (\forall int k; voter <= k && k < \old(server.numberOfVoters); !voters[k].voted);
-          @ maintaining (\forall int j; 0 <= j && j < \old(server.numberOfCandidates);
-          @                 (\num_of int k; 0 <= k && k < voter; \old(voters[k].choice)==j) == server.votesForCandidates[j]);
-          @ maintaining (\forall int j; 0 <= j && j < \old(server.numberOfCandidates);
-          @                 (\num_of int k; 0 <= k && k < \old(server.numberOfVoters); \old(voters[k].choice)==j) == correctResult[j]);     
+          @ maintaining (\forall int j; 0 <= j && j < \old(numberOfCandidates);
+          @                 (\num_of int k; 0 <= k && k < \old(numberOfVoters); \old(voters[k].choice)==j) == correctResult[j]);
+          @ maintaining (\forall int j; 0 <= j && j < \old(numberOfCandidates);
+          @                 (\num_of int k; 0 <= k && k < \old(numberOfVoters); \old(voters[k].choice)==j && server.ballotCast[k]) == server.votesForCandidates[j]);          
           @ maintaining SMT.messages.length == SMT.receiver_ids.length;
           @ maintaining SMT.messages.length == SMT.sender_ids.length;
           @ maintaining SMT.messages == (\seq_def int k; 0; voter; \old(voters[k].choice));
@@ -450,14 +450,14 @@ public final class Setup
           @ maintaining \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
           @ maintaining \disjoint(correctResult[*], SMT.rep);
           @ maintaining \disjoint(voters[*], SMT.rep);
-          @ maintaining correctResult.length == numberOfCandidates;
           @ maintaining \typeof(voters) == \type(Voter[]);
           @ maintaining \nonnullelements(voters);
           @ maintaining voters.length == numberOfVoters;
           @ maintaining (\forall int j; 0 <= j && j < numberOfVoters; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
-          @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(
+          @ maintaining (\forall int j; 0 <= j && j < numberOfVoters; server.ballotCast[j] ==> voters[j].voted);
+          @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(server.votesForCandidates[*], \set_union(server.ballotCast[*], \set_union(
           @                             \infinite_union(int k; (0 <= k && k < server.numberOfVoters)?\singleton(voters[k].voted):\empty), 
-          @                             SMT.rep), \singleton(SMT.messages)), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter));
+          @                             SMT.rep), \singleton(SMT.messages)), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter))));
           @*/
         for(int i=0; i<N; ++i ) {
             // the choice is already encoded in N
