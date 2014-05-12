@@ -33,13 +33,13 @@ public final class Setup
       @ requires SMT.messages == \seq_empty;
       @ requires SMT.registered_receiver_ids == \seq_empty;
       @ requires SMT.registered_sender_ids == \seq_empty;
-      @ requires \disjoint(SMT.rep, this.*);
       @ requires \disjoint(\singleton(Setup.secret), SMT.rep);
       @ requires \disjoint(\singleton(Setup.correctResult), SMT.rep);
       @ requires \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
       @ requires \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
       @ requires voters == null && server == null && correctResult == null;
       @ requires \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: make part of invariant
+      @ ensures \fresh(this);
       @ ensures numberOfVoters == server.numberOfVoters;
       @ ensures numberOfCandidates == server.numberOfCandidates;
       @ ensures \invariant_for(this);
@@ -134,7 +134,8 @@ public final class Setup
       @ requires \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
       @ requires \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
       @ requires \disjoint(correctResult[*], SMT.rep);
-      @ requires \disjoint(voters[*], SMT.rep);
+      @ requires correctResult != null;
+      @ requires voters == null;
       @ requires \disjoint(choices0[*], SMT.rep);
       @ requires \disjoint(choices1[*], SMT.rep);
       @ requires choices0.length == numberOfVoters && choices1.length == numberOfVoters;
@@ -425,7 +426,7 @@ public final class Setup
           @ maintaining server.numberOfVoters == \old(server.numberOfVoters);
           @ maintaining (\forall int k; 0 <= k && k < \old(server.numberOfVoters); \invariant_for(voters[k]) && voters[k].choice == \old(voters[k].choice));
           @ maintaining (\forall int k; 0 <= k && k < voter; voters[k].voted);
-          @ maintaining (\forall int k; i <= k && k < \old(server.numberOfVoters); !voters[k].voted);
+          @ maintaining (\forall int k; voter <= k && k < \old(server.numberOfVoters); !voters[k].voted);
           @ maintaining (\forall int j; 0 <= j && j < \old(server.numberOfCandidates);
           @                 (\num_of int k; 0 <= k && k < voter; \old(voters[k].choice)==j) == server.votesForCandidates[j]);
           @ maintaining (\forall int j; 0 <= j && j < \old(server.numberOfCandidates);
