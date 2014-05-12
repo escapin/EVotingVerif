@@ -389,7 +389,6 @@ public final class Setup
       @ requires SMT.messages == \seq_empty;
       @ requires SMT.receiver_ids == \seq_empty;
       @ requires SMT.sender_ids == \seq_empty;
-      //TODO from here on
       @ requires numberOfVoters == server.numberOfVoters;
       @ requires numberOfCandidates == server.numberOfCandidates;
       @ requires (\forall int i; 0 <= i && i < numberOfVoters; !server.ballotCast[i]);
@@ -418,6 +417,7 @@ public final class Setup
 	    int voter = 0;
 	    
         /*@ maintaining 0 <= voter && voter <= voters.length;
+          @ maintaining 0 <= i && i <= N;
           @ maintaining \invariant_for(this);
           @ maintaining \invariant_for(server);
           @ maintaining Setup.correctResult != null && Setup.correctResult.length == server.numberOfCandidates;
@@ -437,10 +437,26 @@ public final class Setup
           @ maintaining SMT.sender_ids == (\seq_def int k; 0; voter; \old(voters[k].sender.id));
           @ maintaining \disjoint(SMT.rep, \singleton(Environment.counter)); // TODO: maybe not needed (only in constructor)
           @ maintaining \new_elems_fresh(SMT.rep);
+          @ maintaining numberOfVoters == server.numberOfVoters;
+          @ maintaining numberOfCandidates == server.numberOfCandidates;
+          @ maintaining SMT.registered_receiver_ids == \seq_singleton(Params.SERVER_ID);
+          @ maintaining SMT.registered_sender_ids == (\seq_def int j; 0; numberOfVoters; j);
+          @ maintaining \disjoint(SMT.rep, this.*);
+          @ maintaining \disjoint(SMT.rep, \singleton(Environment.counter));
+          @ maintaining \disjoint(\singleton(Setup.secret), SMT.rep);
+          @ maintaining \disjoint(\singleton(Setup.correctResult), SMT.rep);
+          @ maintaining \disjoint(\singleton(Setup.numberOfVoters), SMT.rep);
+          @ maintaining \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
+          @ maintaining \disjoint(correctResult[*], SMT.rep);
+          @ maintaining \disjoint(voters[*], SMT.rep);
+          @ maintaining correctResult.length == numberOfCandidates;
+          @ maintaining \typeof(voters) == \type(Voter[]);
+          @ maintaining \nonnullelements(voters);
+          @ maintaining voters.length == numberOfVoters;
+          @ maintaining (\forall int j; 0 <= j && j < numberOfVoters; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
           @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(
           @                             \infinite_union(int k; (0 <= k && k < server.numberOfVoters)?\singleton(voters[k].voted):\empty), 
           @                             SMT.rep), \singleton(SMT.messages)), \singleton(SMT.receiver_ids)), \singleton(SMT.sender_ids)), \singleton(Environment.counter));
-          // not complete yet, so far only derived from onPostResult contract
           @*/
         for(int i=0; i<N; ++i ) {
             // the choice is already encoded in N
