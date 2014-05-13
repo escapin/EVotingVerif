@@ -381,7 +381,10 @@ public final class Setup
 	}
 
     /*@ requires \invariant_for(this);
-      @ requires \invariant_for(server);
+      @ requires \typeof(voters) == \type(Voter[]);
+      @ requires \nonnullelements(voters);
+      @ requires voters.length == numberOfVoters;
+      @ requires server != null && \invariant_for(server);
       @ requires Setup.correctResult != null && Setup.correctResult.length == numberOfCandidates;
       @ requires (\forall int k; 0 <= k && k < numberOfVoters; \invariant_for(voters[k]));
       @ requires (\forall int k; 0 <= k && k < numberOfVoters; !voters[k].voted);
@@ -404,10 +407,6 @@ public final class Setup
       @ requires \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
       @ requires \disjoint(correctResult[*], SMT.rep);
       @ requires \disjoint(voters[*], SMT.rep);
-      @ requires correctResult.length == numberOfCandidates;
-      @ requires \typeof(voters) == \type(Voter[]);
-      @ requires \nonnullelements(voters);
-      @ requires voters.length == numberOfVoters;
       @ requires (\forall int j; 0 <= j && j < numberOfVoters; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
       @
       @ // we need some postcondition just to ensure that the contract is not trivially true
@@ -420,7 +419,10 @@ public final class Setup
         /*@ maintaining 0 <= voter && voter <= voters.length;
           @ maintaining 0 <= i && i <= N;
           @ maintaining \invariant_for(this);
-          @ maintaining \invariant_for(server);
+          @ maintaining \typeof(voters) == \type(Voter[]);
+          @ maintaining \nonnullelements(voters);
+          @ maintaining voters.length == numberOfVoters;
+          @ maintaining server != null && \invariant_for(server);
           @ maintaining Setup.correctResult != null && Setup.correctResult.length == numberOfCandidates;
           @ maintaining numberOfCandidates == \old(numberOfCandidates);
           @ maintaining numberOfVoters == \old(numberOfVoters);
@@ -450,9 +452,6 @@ public final class Setup
           @ maintaining \disjoint(\singleton(Setup.numberOfCandidates), SMT.rep);
           @ maintaining \disjoint(correctResult[*], SMT.rep);
           @ maintaining \disjoint(voters[*], SMT.rep);
-          @ maintaining \typeof(voters) == \type(Voter[]);
-          @ maintaining \nonnullelements(voters);
-          @ maintaining voters.length == numberOfVoters;
           @ maintaining (\forall int j; 0 <= j && j < numberOfVoters; 0 <= voters[j].choice && voters[j].choice < numberOfCandidates);
           @ maintaining (\forall int j; 0 <= j && j < numberOfVoters; server.ballotCast[j] ==> voters[j].voted);
           @ assignable \set_union(\set_union(\set_union(\set_union(\set_union(server.votesForCandidates[*], \set_union(server.ballotCast[*], \set_union(
