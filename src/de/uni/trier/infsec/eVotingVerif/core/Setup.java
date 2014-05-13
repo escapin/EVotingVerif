@@ -417,7 +417,8 @@ public final class Setup
 	    int voter = 0;
 	    
         /*@ maintaining 0 <= voter && voter <= voters.length;
-          @ maintaining 0 <= i && i <= N;
+          @ maintaining 0 <= i;
+          @ maintaining N < 0 || i <= N;
           @ maintaining \invariant_for(this);
           @ maintaining \typeof(voters) == \type(Voter[]);
           @ maintaining \nonnullelements(voters);
